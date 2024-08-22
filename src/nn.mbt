@@ -25,13 +25,24 @@ pub struct Linear {
   bias : Array[Value]
 }
 
+let random_state : @random.RandomState = @random.init_state(seed=42)
+
 pub fn Linear::new(in_features : Int, out_features : Int) -> Linear {
   Linear::{
     weights: Array::makei(
       out_features,
-      fn { _ => Array::makei(in_features, fn { _ => Value::var(0.0) }) },
+      fn {
+        _ =>
+          Array::makei(
+            in_features,
+            fn { _ => Value::var(@random.gen_double(random_state)) },
+          )
+      },
     ),
-    bias: Array::makei(out_features, fn { _ => Value::var(0.0) }),
+    bias: Array::makei(
+      out_features,
+      fn { _ => Value::var(@random.gen_double(random_state)) },
+    ),
   }
 }
 
