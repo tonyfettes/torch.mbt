@@ -28,6 +28,10 @@ pub fn Tensor::output(self : Tensor, logger : Logger) -> Unit {
   Show::output(self.0, logger)
 }
 
+pub fn Tensor::to_string(self : Tensor) -> String {
+  Show::to_string(self.0)
+}
+
 pub fn Tensor::length(self : Tensor) -> Int {
   self.0.length()
 }
@@ -37,7 +41,7 @@ pub fn Tensor::sample(self : Tensor) -> Int {
   for value in self.0 {
     sum = sum + value.value
   }
-  let mut choice = @random.gen_double(random_state) / 2.0 * sum
+  let mut choice = @random.gen_double(random_state) / 2.0
   for index, value in self.0 {
     choice = choice - value.value
     if choice <= 0.0 {
