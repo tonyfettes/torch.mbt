@@ -71,21 +71,49 @@ pub fn Softmax::new() -> Softmax {
 }
 
 pub fn Softmax::forward(_self : Softmax, input : Array[Value]) -> Array[Value] {
+  let input_exp = input.map(fn { value => value.exp() })
   let mut sum = Value::val(0.0)
-  for value in input {
-    sum = sum + value.exp()
+  for value in input_exp {
+    sum = sum + value
   }
-  input.map(fn { value => value / sum })
+  input_exp.map(fn { value => value / sum })
 }
 
-test "" {
-  let layers = Sequential::new([
-    Linear::new(2, 3),
-    ReLU::new(),
-    Linear::new(3, 2),
-    Softmax::new(),
-  ])
+test "Softmax" {
+  let input = [Value::val(1.0), Value::val(2.0), Value::val(3.0)]
+  let softmax = Softmax::new()
+  let output = softmax.forward(input)
+  inspect!(
+    output,
+    content="[0.09003057317038046, 0.24472847105479767, 0.6652409557748219]",
+  )
+}
+
+test "Linear" {
+  let linear = Linear::new(2, 2)
+  linear.weights[0][0] = Value::var(1.0)
+  linear.weights[0][1] = Value::var(2.0)
+  linear.weights[1][0] = Value::var(3.0)
+  linear.weights[1][1] = Value::var(4.0)
+  linear.bias[0] = Value::var(5.0)
+  linear.bias[1] = Value::var(6.0)
+  let layers = Sequential::new([linear, Softmax::new()])
   let input = [Value::val(1.0), Value::val(2.0)]
   let output = layers.forward(input)
-  inspect!(output, content="[0.0, 0.0]")
+  inspect!(output, content="[9.110511944006454e-4, 0.9990889488055994]")
+  let target = [Value::val(1.0), Value::val(0.0)]
+  let mut loss = Value::val(0.0)
+  for i = 0; i < output.length(); i = i + 1 {
+    loss = loss + (output[i] - target[i]) * (output[i] - target[i])
+  }
+  inspect!(loss, content="1.9963574552509553")
+  loss.backward(loss.value)
+  inspect!(linear.weights[0][0], content="1.0072618853731874")
+  inspect!(linear.weights[0][1], content="2.014523770746375")
+  inspect!(linear.weights[1][0], content="2.9927381146268264")
+  inspect!(linear.weights[1][1], content="3.985476229253654")
+  inspect!(linear.bias[0], content="5.007261885373187")
+  inspect!(linear.bias[1], content="5.992738114626827")
+  let output = layers.forward(input)
+  inspect!(output, content="[9.939220331856465e-4, 0.9990060779668143]")
 }

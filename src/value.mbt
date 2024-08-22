@@ -72,6 +72,10 @@ pub fn Value::op_add(self : Value, other : Value) -> Value {
   Value::{ value: self.value + other.value, graph: Graph::Add(self, other) }
 }
 
+pub fn Value::op_sub(self : Value, other : Value) -> Value {
+  Value::{ value: self.value - other.value, graph: Graph::Add(self, -other) }
+}
+
 pub fn Value::op_mul(self : Value, other : Value) -> Value {
   Value::{ value: self.value * other.value, graph: Graph::Mul(self, other) }
 }
