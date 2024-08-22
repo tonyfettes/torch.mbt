@@ -101,19 +101,19 @@ test "Linear" {
   let input = [Value::val(1.0), Value::val(2.0)]
   let output = layers.forward(input)
   inspect!(output, content="[9.110511944006454e-4, 0.9990889488055994]")
-  let target = [Value::val(1.0), Value::val(0.0)]
+  let target = [Value::val(0.9), Value::val(0.1)]
   let mut loss = Value::val(0.0)
   for i = 0; i < output.length(); i = i + 1 {
-    loss = loss + (output[i] - target[i]) * (output[i] - target[i])
+    loss = loss + (output[i].log() - target[i].log()) * (output[i].log() - target[i].log())
   }
-  inspect!(loss, content="1.9963574552509553")
-  loss.backward(loss.value)
-  inspect!(linear.weights[0][0], content="1.0072618853731874")
-  inspect!(linear.weights[0][1], content="2.014523770746375")
-  inspect!(linear.weights[1][0], content="2.9927381146268264")
-  inspect!(linear.weights[1][1], content="3.985476229253654")
-  inspect!(linear.bias[0], content="5.007261885373187")
-  inspect!(linear.bias[1], content="5.992738114626827")
+  inspect!(loss, content="52.84632439813396")
+  loss.backward(loss.value * 0.001)
+  inspect!(linear.weights[0][0], content="1.3643103694563203")
+  inspect!(linear.weights[0][1], content="2.7286207389126407")
+  inspect!(linear.weights[1][0], content="2.635689630543608")
+  inspect!(linear.weights[1][1], content="3.271379261087216")
+  inspect!(linear.bias[0], content="5.3643103694563194")
+  inspect!(linear.bias[1], content="5.6356896305436095")
   let output = layers.forward(input)
-  inspect!(output, content="[9.939220331856465e-4, 0.9990060779668143]")
+  inspect!(output, content="[0.06734067442631975, 0.9326593255736804]")
 }

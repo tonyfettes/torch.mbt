@@ -58,7 +58,8 @@ pub fn Value::backward(self : Value, value : Double) -> Unit {
       self.value -= value
     }
     Log(a) => {
-      a.backward(value / self.value)
+      let a_value = a.value
+      a.backward(value / a_value)
       self.value -= value
     }
   }
@@ -142,5 +143,5 @@ test "Value::backward - log" {
   let log = v1.log()
   inspect!(log, content="1.6094379124341003")
   log.backward(1.0)
-  inspect!(v1, content="4.378665065440388")
+  inspect!(v1, content="4.8")
 }
