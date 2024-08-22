@@ -59,7 +59,7 @@ pub fn Linear::forward(self : Linear, input : Array[Value]) -> Array[Value] {
 
 pub struct ReLU {}
 
-pub fn reLU(input : Value) -> Value {
+fn reLU(input : Value) -> Value {
   if input.value > 0.0 {
     input
   } else {
@@ -73,6 +73,26 @@ pub fn ReLU::new() -> ReLU {
 
 pub fn ReLU::forward(_self : ReLU, input : Array[Value]) -> Array[Value] {
   input.map(reLU)
+}
+
+pub struct ReLU6 {}
+
+fn reLU6(input : Value) -> Value {
+  if input.value > 6.0 {
+    Value::val(6.0)
+  } else if input.value > 0.0 {
+    input
+  } else {
+    Value::val(0.0)
+  }
+}
+
+pub fn ReLU6::new() -> ReLU6 {
+  ReLU6::{  }
+}
+
+pub fn ReLU6::forward(_self : ReLU6, input : Array[Value]) -> Array[Value] {
+  input.map(reLU6)
 }
 
 pub struct Softmax {}
