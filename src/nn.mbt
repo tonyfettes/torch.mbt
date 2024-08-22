@@ -1,5 +1,5 @@
 pub trait Module {
-  forward(Self, Array[Value]) -> Array[Value]
+  forward(Self, Tensor) -> Tensor
 }
 
 pub struct Sequential {
@@ -12,8 +12,8 @@ pub fn Sequential::new(modules : Array[Module]) -> Sequential {
 
 pub fn Sequential::forward(
   self : Sequential,
-  input : Array[Value]
-) -> Array[Value] {
+  input : Tensor
+) -> Tensor {
   loop input, self.modules[:] {
     input, [module, .. as modules] => continue module.forward(input), modules
     input, [] => input
@@ -21,8 +21,8 @@ pub fn Sequential::forward(
 }
 
 pub struct Linear {
-  weights : Array[Array[Value]]
-  bias : Array[Value]
+  weights : Array[Tensor]
+  bias : Tensor
 }
 
 let random_state : @random.RandomState = @random.init_state(seed=42)
@@ -46,7 +46,7 @@ pub fn Linear::new(in_features : Int, out_features : Int) -> Linear {
   }
 }
 
-pub fn Linear::forward(self : Linear, input : Array[Value]) -> Array[Value] {
+pub fn Linear::forward(self : Linear, input : Tensor) -> Tensor {
   let output = []
   for row = 0; row < self.weights.length(); row = row + 1 {
     output.push(self.bias[row])
@@ -71,7 +71,7 @@ pub fn ReLU::new() -> ReLU {
   ReLU::{  }
 }
 
-pub fn ReLU::forward(_self : ReLU, input : Array[Value]) -> Array[Value] {
+pub fn ReLU::forward(_self : ReLU, input : Tensor) -> Tensor {
   input.map(reLU)
 }
 
@@ -91,7 +91,7 @@ pub fn ReLU6::new() -> ReLU6 {
   ReLU6::{  }
 }
 
-pub fn ReLU6::forward(_self : ReLU6, input : Array[Value]) -> Array[Value] {
+pub fn ReLU6::forward(_self : ReLU6, input : Tensor) -> Tensor {
   input.map(reLU6)
 }
 
@@ -101,7 +101,7 @@ pub fn Softmax::new() -> Softmax {
   Softmax::{  }
 }
 
-pub fn Softmax::forward(_self : Softmax, input : Array[Value]) -> Array[Value] {
+pub fn Softmax::forward(_self : Softmax, input : Tensor) -> Tensor {
   let input_exp = input.map(fn { value => value.exp() })
   let mut sum = Value::val(0.0)
   for value in input_exp {
@@ -155,14 +155,14 @@ test "Linear with ReLU" {
   )
   let input = [Value::val(1.0), Value::val(2.0)]
   let output = layers.forward(input)
-  inspect!(output, content="[0.18351865829887268, 0.8164813417011274]")
+  inspect!(output, content="[0.35707856359873796, 0.642921436401262]")
   let target = [Value::val(1.0), Value::val(0.0)]
   let mut loss = Value::val(0.0)
   for i = 0; i < output.length(); i = i + 1 {
     loss = loss - target[i] * output[i].log()
   }
-  inspect!(loss, content="1.695438936553735")
+  inspect!(loss, content="1.0297994553105834")
   loss.backward(loss.value * 0.01)
   let output = layers.forward(input)
-  inspect!(output, content="[0.36050005361950455, 0.6394999463804955]")
+  inspect!(output, content="[0.45122364611092397, 0.5487763538890761]")
 }
