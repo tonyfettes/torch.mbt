@@ -77,3 +77,15 @@ pub fn Softmax::forward(_self : Softmax, input : Array[Value]) -> Array[Value] {
   }
   input.map(fn { value => value / sum })
 }
+
+test "" {
+  let layers = Sequential::new([
+    Linear::new(2, 3),
+    ReLU::new(),
+    Linear::new(3, 2),
+    Softmax::new(),
+  ])
+  let input = [Value::val(1.0), Value::val(2.0)]
+  let output = layers.forward(input)
+  inspect!(output, content="[0.0, 0.0]")
+}
