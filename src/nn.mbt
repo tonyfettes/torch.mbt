@@ -128,3 +128,21 @@ test "Linear" {
   let output = layers.forward(input)
   inspect!(output, content="[0.002106421695576897, 0.9978935783044232]")
 }
+
+test "Linear with ReLU" {
+  let layers = Sequential::new(
+    [Linear::new(2, 2), ReLU::new(), Linear::new(2, 2), Softmax::new()],
+  )
+  let input = [Value::val(1.0), Value::val(2.0)]
+  let output = layers.forward(input)
+  inspect!(output, content="[0.18351865829887268, 0.8164813417011274]")
+  let target = [Value::val(1.0), Value::val(0.0)]
+  let mut loss = Value::val(0.0)
+  for i = 0; i < output.length(); i = i + 1 {
+    loss = loss - target[i] * output[i].log()
+  }
+  inspect!(loss, content="1.695438936553735")
+  loss.backward(loss.value * 0.01)
+  let output = layers.forward(input)
+  inspect!(output, content="[0.36050005361950455, 0.6394999463804955]")
+}
