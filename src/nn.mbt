@@ -239,7 +239,7 @@ test "Softmax" {
   )
 }
 
-test "MPL" {
+test "MLP" {
   let layers = Sequential::new(
     [
       Linear::new(4, 8),
@@ -259,19 +259,19 @@ test "MPL" {
   let output = layers.forward(input)
   inspect!(
     output,
-    content="[0.21844074732179938, 0.27159413445234065, 0.20761717471753757, 0.30234794350832245]",
+    content="[0.25, 0.25, 0.25, 0.25]",
   )
   let target = Tensor::val([1.0, 0.0, 0.0, 0.0])
   let mut loss = Value::val(0.0)
   for i = 0; i < output.length(); i = i + 1 {
     loss = loss - target[i] * output[i].log()
   }
-  inspect!(loss, content="1.5212404805275148")
+  inspect!(loss, content="1.3862943611198906")
   loss.backward(loss.value * 0.01)
   let output = layers.forward(input)
   inspect!(
     output,
-    content="[0.2282016727797092, 0.2675131713615413, 0.20749331300398954, 0.29679184285475996]",
+    content="[0.2526082998334277, 0.24913056672219078, 0.24913056672219078, 0.24913056672219078]",
   )
 }
 
