@@ -41,12 +41,28 @@ pub fn Tensor::sample(self : Tensor) -> Int {
   for value in self.0 {
     sum = sum + value.value
   }
-  let mut choice = @random.gen_double(random_state) / 2.0
+  let mut choice = @random.double(random_state)
   for index, value in self.0 {
     choice = choice - value.value
     if choice <= 0.0 {
       return index
     }
   }
-  @random.gen_int(random_state) / self.0.length()
+  @random.int(random_state, limit=self.0.length())
+}
+
+pub fn Tensor::op_add(self : Tensor, other : Tensor) -> Tensor {
+  let output = []
+  for i = 0; i < self.length(); i = i + 1 {
+    output.push(self[i] + other[i])
+  }
+  output
+}
+
+pub fn Tensor::op_sub(self : Tensor, other : Tensor) -> Tensor {
+  let output = []
+  for i = 0; i < self.length(); i = i + 1 {
+    output.push(self[i] - other[i])
+  }
+  output
 }
