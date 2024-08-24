@@ -35,8 +35,6 @@ pub struct Linear {
   bias : Tensor
 }
 
-let random_state : @random.Rand = @random.new()
-
 pub fn Linear::new(in_features : Int, out_features : Int) -> Linear {
   Linear::{
     weights: Array::makei(
@@ -45,13 +43,13 @@ pub fn Linear::new(in_features : Int, out_features : Int) -> Linear {
         _ =>
           Array::makei(
             in_features,
-            fn { _ => Value::var(@random.double(random_state) - 0.5) },
+            fn { _ => Value::var(0.0) },
           )
       },
     ),
     bias: Array::makei(
       out_features,
-      fn { _ => Value::var(@random.double(random_state) - 0.5) },
+      fn { _ => Value::var(0.0) },
     ),
   }
 }

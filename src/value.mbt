@@ -205,8 +205,7 @@ fn Value::propagate(self : Value, value : Double) -> Unit {
 fn Value::check(self : Value) -> Unit {
   if self.ref != 0 {
     let debug = self.to_debug()
-    println("ref != 0 found: \{debug}")
-    panic()
+    abort("ref != 0 found: \{debug}")
   }
   match self.graph {
     Val => ()
