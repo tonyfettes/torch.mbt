@@ -10,7 +10,7 @@ pub fn Sequential::new(modules : Array[Module]) -> Sequential {
   Sequential::{ modules, }
 }
 
-pub fn forward(self : Sequential, input : Tensor) -> Tensor {
+pub fn Sequential::forward(self : Sequential, input : Tensor) -> Tensor {
   loop input, self.modules[:] {
     input, [module, .. as modules] => continue module.forward(input), modules
     input, [] => input
@@ -31,35 +31,60 @@ pub fn Sequential::to_string(self : Sequential) -> String {
 }
 
 pub struct Linear {
-  weights : Array[Tensor]
+  weight : Array[Tensor]
   bias : Tensor
 }
 
-pub fn Linear::new(in_features : Int, out_features : Int) -> Linear {
+pub fn Linear::of(weight : Array[Tensor], bias : Tensor) -> Linear {
+  Linear::{ weight, bias }
+}
+
+pub fn Linear::new(
+  in_features : Int,
+  out_features : Int,
+  ~weight_distribution? : Continuous,
+  ~bias_distribution? : Continuous
+) -> Linear {
+  let weight_distribution = match weight_distribution {
+    None => {
+      let in_features = in_features.to_double()
+      let in_features_sqrt = in_features.sqrt()
+      let in_features_sqrt_inv = 1.0 / in_features_sqrt
+      Uniform::new(-in_features_sqrt_inv, in_features_sqrt_inv) as Continuous
+    }
+    Some(distrib) => distrib
+  }
+  let bias_distribution = match bias_distribution {
+    None => {
+      let bound = 1.0 / in_features.to_double().sqrt()
+      Uniform::new(-bound, bound) as Continuous
+    }
+    Some(distrib) => distrib
+  }
   Linear::{
-    weights: Array::makei(
+    weight: Array::makei(
       out_features,
       fn {
         _ =>
           Array::makei(
             in_features,
-            fn { _ => Value::var(0.0) },
+            fn { _ => Value::var(weight_distribution.sample()) },
           )
       },
     ),
     bias: Array::makei(
       out_features,
-      fn { _ => Value::var(0.0) },
+      fn { _ => Value::var(bias_distribution.sample()) },
     ),
   }
 }
 
 pub fn Linear::forward(self : Linear, input : Tensor) -> Tensor {
   let output = []
-  for row = 0; row < self.weights.length(); row = row + 1 {
+  for row = 0; row < self.weight.length(); row = row + 1 {
     let products = []
-    for column = 0; column < self.weights[row].length(); column = column + 1 {
-      products.push(self.weights[row][column] * input[column])
+    for column = 0; column < self.weight[row].length(); column = column + 1 {
+      products.push(self.weight[row][column] * input[column])
     }
     output.push(self.bias[row] + Value::sum(products))
   }
@@ -68,9 +93,9 @@ pub fn Linear::forward(self : Linear, input : Tensor) -> Tensor {
 
 pub fn Linear::output(self : Linear, logger : Logger) -> Unit {
   logger.write_string("Linear(\n")
-  for row = 0; row < self.weights.length(); row = row + 1 {
+  for row = 0; row < self.weight.length(); row = row + 1 {
     logger.write_string("  ")
-    Show::output(self.weights[row], logger)
+    Show::output(self.weight[row], logger)
     logger.write_string("\t| ")
     Show::output(self.bias[row], logger)
     logger.write_char('\n')
@@ -80,10 +105,10 @@ pub fn Linear::output(self : Linear, logger : Logger) -> Unit {
 
 test "Linear" {
   let linear = Linear::new(2, 2)
-  linear.weights[0][0] = Value::var(1.0)
-  linear.weights[0][1] = Value::var(2.0)
-  linear.weights[1][0] = Value::var(3.0)
-  linear.weights[1][1] = Value::var(4.0)
+  linear.weight[0][0] = Value::var(1.0)
+  linear.weight[0][1] = Value::var(2.0)
+  linear.weight[1][0] = Value::var(3.0)
+  linear.weight[1][1] = Value::var(4.0)
   linear.bias[0] = Value::var(5.0)
   linear.bias[1] = Value::var(6.0)
   let layers = Sequential::new([linear])
@@ -96,10 +121,10 @@ test "Linear" {
     let loss = diff
     loss.backward(0.1 * loss.value)
   }
-  inspect!(linear.weights[0][0], content="1.6")
-  inspect!(linear.weights[0][1], content="3.2")
-  inspect!(linear.weights[1][0], content="2.9")
-  inspect!(linear.weights[1][1], content="3.8")
+  inspect!(linear.weight[0][0], content="1.6")
+  inspect!(linear.weight[0][1], content="3.2")
+  inspect!(linear.weight[1][0], content="2.9")
+  inspect!(linear.weight[1][1], content="3.8")
   inspect!(linear.bias[0], content="5.6")
   inspect!(linear.bias[1], content="5.9")
   let output = layers.forward(input)
@@ -108,10 +133,10 @@ test "Linear" {
 
 test "Linear with ReLU" {
   let linear = Linear::new(2, 2)
-  linear.weights[0][0] = Value::var(1.0)
-  linear.weights[0][1] = Value::var(2.0)
-  linear.weights[1][0] = Value::var(3.0)
-  linear.weights[1][1] = Value::var(4.0)
+  linear.weight[0][0] = Value::var(1.0)
+  linear.weight[0][1] = Value::var(2.0)
+  linear.weight[1][0] = Value::var(3.0)
+  linear.weight[1][1] = Value::var(4.0)
   linear.bias[0] = Value::var(5.0)
   linear.bias[1] = Value::var(6.0)
   let layers = Sequential::new([linear, ReLU::new()])
@@ -131,10 +156,10 @@ test "Linear with ReLU" {
 
 test "Linear with Softmax" {
   let linear = Linear::new(2, 2)
-  linear.weights[0][0] = Value::var(2.0)
-  linear.weights[0][1] = Value::var(2.0)
-  linear.weights[1][0] = Value::var(2.0)
-  linear.weights[1][1] = Value::var(2.0)
+  linear.weight[0][0] = Value::var(2.0)
+  linear.weight[0][1] = Value::var(2.0)
+  linear.weight[1][0] = Value::var(2.0)
+  linear.weight[1][1] = Value::var(2.0)
   linear.bias[0] = Value::var(1.0)
   linear.bias[1] = Value::var(2.0)
   let layers = Sequential::new([linear, Softmax::new()])
@@ -259,19 +284,19 @@ test "MLP" {
   let output = layers.forward(input)
   inspect!(
     output,
-    content="[0.25, 0.25, 0.25, 0.25]",
+    content="[0.24558311289222415, 0.2506838678253575, 0.2372466556748227, 0.2664863636075957]",
   )
   let target = Tensor::val([1.0, 0.0, 0.0, 0.0])
   let mut loss = Value::val(0.0)
   for i = 0; i < output.length(); i = i + 1 {
     loss = loss - target[i] * output[i].log()
   }
-  inspect!(loss, content="1.3862943611198906")
+  inspect!(loss, content="1.4041198436552786")
   loss.backward(loss.value * 0.01)
   let output = layers.forward(input)
   inspect!(
     output,
-    content="[0.2526082998334277, 0.24913056672219078, 0.24913056672219078, 0.24913056672219078]",
+    content="[0.25086904059258935, 0.24878557719302433, 0.23622838040740074, 0.2641170018069856]",
   )
 }
 
@@ -304,7 +329,7 @@ pub fn MSELoss::forward(
 
 test "Linear Regression" {
   let model = Linear::new(1, 1)
-  model.weights[0][0] = Value::var(0.0)
+  model.weight[0][0] = Value::var(0.0)
   model.bias[0] = Value::var(0.0)
   let target = fn(x : Array[Double]) { [2.0 * x[0] + 3] }
   let inputs = [
@@ -331,6 +356,6 @@ test "Linear Regression" {
     let loss = mse.forward(model_output, Tensor::val(target_output))
     loss.backward(0.1)
   }
-  inspect!(model.weights[0][0], content="1.981059015531822")
+  inspect!(model.weight[0][0], content="1.981059015531822")
   inspect!(model.bias[0], content="3.01049253711016")
 }

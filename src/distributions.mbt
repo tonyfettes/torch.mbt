@@ -1,3 +1,15 @@
+pub trait Continuous {
+  sample(Self) -> Double
+}
+
+pub trait Discrete {
+  sample(Self) -> Int
+}
+
+impl Continuous for Double with sample(self : Double) -> Double {
+  self
+}
+
 pub struct Uniform {
   lower : Double
   upper : Double
@@ -45,7 +57,7 @@ pub fn Normal::sample(self : Normal) -> Double {
 pub struct Categorical {
   logits : Tensor
   probs : Tensor
-}
+} derive(Show)
 
 pub fn Categorical::new(probs : Tensor) -> Categorical {
   let logits = probs.map(fn(p) { p.log() })
