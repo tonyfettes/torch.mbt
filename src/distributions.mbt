@@ -20,7 +20,7 @@ pub fn Uniform::new(lower : Double, upper : Double) -> Uniform {
 }
 
 pub fn Uniform::sample(self : Uniform) -> Double {
-  rand.double() * (self.upper - self.lower) + self.lower
+  rand.val.double() * (self.upper - self.lower) + self.lower
 }
 
 let normal_buffer : Array[Double] = []
@@ -30,8 +30,8 @@ pub fn normal(~mean : Double = 0.0, ~std : Double = 1.0) -> Double {
     None => ()
     Some(z1) => return z1
   }
-  let u1 = rand.double()
-  let u2 = rand.double()
+  let u1 = rand.val.double()
+  let u2 = rand.val.double()
   let r = (-2.0 * u1.ln()).sqrt()
   let z0 = r * @math.cos(2.0 * pi * u2)
   let z1 = r * @math.sin(2.0 * pi * u2)
@@ -65,14 +65,14 @@ pub fn Categorical::new(probs : Tensor) -> Categorical {
 }
 
 pub fn Categorical::sample(self : Categorical) -> Int {
-  let mut choice = rand.double()
+  let mut choice = rand.val.double()
   for index, value in self.probs.0 {
     choice = choice - value.value
     if choice <= 0.0 {
       return index
     }
   }
-  rand.int(limit=self.probs.length())
+  rand.val.int(limit=self.probs.length())
 }
 
 pub fn Categorical::log_prob(self : Categorical, sample : Int) -> Value {

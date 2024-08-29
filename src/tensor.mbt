@@ -41,14 +41,14 @@ pub fn Tensor::sample(self : Tensor) -> Int {
   for value in self.0 {
     sum = sum + value.value
   }
-  let mut choice = rand.double()
+  let mut choice = rand.val.double()
   for index, value in self.0 {
     choice = choice - value.value
     if choice <= 0.0 {
       return index
     }
   }
-  rand.int(limit=self.0.length())
+  rand.val.int(limit=self.0.length())
 }
 
 pub fn Tensor::op_add(self : Tensor, other : Tensor) -> Tensor {
