@@ -66,3 +66,11 @@ pub fn Tensor::op_sub(self : Tensor, other : Tensor) -> Tensor {
   }
   output
 }
+
+pub fn Tensor::dot(self : Tensor, other : Tensor) -> Value {
+  let output = []
+  for i = 0; i < self.length(); i = i + 1 {
+    output.push(self[i] * other[i])
+  }
+  Value::sum(output)
+}

@@ -328,6 +328,28 @@ pub fn MSELoss::forward(
   loss / Value::val(diff.length().to_double())
 }
 
+pub struct CrossEntropyLoss {}
+
+pub fn CrossEntropyLoss::new() -> CrossEntropyLoss {
+  CrossEntropyLoss::{  }
+}
+
+pub fn CrossEntropyLoss::output(_self : CrossEntropyLoss, logger : Logger) -> Unit {
+  logger.write_string("CrossEntropyLoss()")
+}
+
+pub fn CrossEntropyLoss::forward(
+  _self : CrossEntropyLoss,
+  input : Tensor,
+  target : Tensor
+) -> Value {
+  let diff = []
+  for i = 0; i < input.length(); i = i + 1 {
+    diff.push(- target[i] * input[i].log())
+  }
+  Value::sum(diff)
+}
+
 test "Linear Regression" {
   let model = Linear::new(1, 1)
   model.weight[0][0] = Value::var(0.0)
