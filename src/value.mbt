@@ -151,13 +151,13 @@ fn power(base : Double, exponent : Int) -> Double {
 }
 
 test "power" {
-  inspect!(power(2.0, 0), content="1.0")
-  inspect!(power(2.0, 1), content="2.0")
-  inspect!(power(2.0, 2), content="4.0")
-  inspect!(power(2.0, 3), content="8.0")
-  inspect!(power(2.0, 4), content="16.0")
-  inspect!(power(2.0, 5), content="32.0")
-  inspect!(power(3.0, 6), content="729.0")
+  inspect!(power(2.0, 0), content="1")
+  inspect!(power(2.0, 1), content="2")
+  inspect!(power(2.0, 2), content="4")
+  inspect!(power(2.0, 3), content="8")
+  inspect!(power(2.0, 4), content="16")
+  inspect!(power(2.0, 5), content="32")
+  inspect!(power(3.0, 6), content="729")
 }
 
 fn Value::propagate(self : Value, value : Double) -> Unit {
@@ -294,42 +294,42 @@ pub fn Value::pow(self : Value, exponent : Int) -> Value {
 test "Value::backward - op_neg" {
   let v1 = Value::var(5.0)
   let neg = -v1
-  inspect!(neg, content="-5.0")
+  inspect!(neg, content="-5")
   neg.ref()
   inspect!(v1.ref, content="1")
   neg.propagate(1.0)
   inspect!(v1.ref, content="0")
-  inspect!(v1, content="6.0")
+  inspect!(v1, content="6")
 }
 
 test "Value::backward - op_add" {
   let v1 = Value::var(5.0)
   let v2 = Value::var(4.0)
   let sum = v1 + v2
-  inspect!(sum, content="9.0")
+  inspect!(sum, content="9")
   sum.ref()
   inspect!(v1.ref, content="1")
   inspect!(v2.ref, content="1")
   sum.propagate(1.0)
   inspect!(v1.ref, content="0")
   inspect!(v2.ref, content="0")
-  inspect!(v1, content="4.0")
-  inspect!(v2, content="3.0")
+  inspect!(v1, content="4")
+  inspect!(v2, content="3")
 }
 
 test "Value::backward - op_mul" {
   let v1 = Value::var(5.0)
   let v2 = Value::var(4.0)
   let product = v1 * v2
-  inspect!(product, content="20.0")
+  inspect!(product, content="20")
   product.ref()
   inspect!(v1.ref, content="1")
   inspect!(v2.ref, content="1")
   product.propagate(1.0)
   inspect!(v1.ref, content="0")
   inspect!(v2.ref, content="0")
-  inspect!(v1, content="1.0")
-  inspect!(v2, content="-1.0")
+  inspect!(v1, content="1")
+  inspect!(v2, content="-1")
 }
 
 test "Value::backward - op_div" {
@@ -372,7 +372,7 @@ test "Value::backward - log" {
 test "Value::backward - sum" {
   let v = [Value::var(1.0), Value::var(2.0), Value::var(3.0)]
   let sum = Value::sum(v)
-  inspect!(sum, content="6.0")
+  inspect!(sum, content="6")
   sum.ref()
   inspect!(v[0].ref, content="1")
   inspect!(v[1].ref, content="1")
@@ -381,7 +381,7 @@ test "Value::backward - sum" {
   inspect!(v[0].ref, content="0")
   inspect!(v[1].ref, content="0")
   inspect!(v[2].ref, content="0")
-  inspect!(v[0], content="0.0")
-  inspect!(v[1], content="1.0")
-  inspect!(v[2], content="2.0")
+  inspect!(v[0], content="0")
+  inspect!(v[1], content="1")
+  inspect!(v[2], content="2")
 }

@@ -114,7 +114,7 @@ test "Linear" {
   let layers = Sequential::new([linear])
   let input = [Value::val(1.0), Value::val(2.0)]
   let output = layers.forward(input)
-  inspect!(output, content="[10.0, 17.0]")
+  inspect!(output, content="[10, 17]")
   let target = [Value::val(16.0), Value::val(16.0)]
   for i = 0; i < output.length(); i = i + 1 {
     let diff = output[i] - target[i]
@@ -142,7 +142,7 @@ test "Linear with ReLU" {
   let layers = Sequential::new([linear, ReLU::new()])
   let input = [Value::val(2.0), Value::val(2.0)]
   let output = layers.forward(input)
-  inspect!(output, content="[11.0, 20.0]")
+  inspect!(output, content="[11, 20]")
   let target = [Value::val(1.0), Value::val(0.0)]
   let mut loss = Value::val(0.0)
   for i = 0; i < output.length(); i = i + 1 {
@@ -151,7 +151,7 @@ test "Linear with ReLU" {
   inspect!(loss, content="-2.3978952727983707")
   loss.backward(1.0)
   let output = layers.forward(input)
-  inspect!(output, content="[11.818181818181817, 20.0]")
+  inspect!(output, content="[11.818181818181817, 20]")
 }
 
 test "Linear with Softmax" {
@@ -173,7 +173,7 @@ test "Linear with Softmax" {
   inspect!(loss, content="1.3132616875182228")
   loss.backward(1.0)
   let output = layers.forward(input)
-  inspect!(output, content="[0.9999947593218812, 5.24067811873532e-6]")
+  inspect!(output, content="[0.9999947593218812, 0.00000524067811873532]")
 }
 
 pub struct ReLU {}

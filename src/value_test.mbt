@@ -1,29 +1,29 @@
 test "Value::backward - op_neg" {
   let v1 = @torch.Value::var(5.0)
   let neg = -v1
-  inspect!(neg, content="-5.0")
+  inspect!(neg, content="-5")
   neg.backward(1.0)
-  inspect!(v1, content="6.0")
+  inspect!(v1, content="6")
 }
 
 test "Value::backward - op_add" {
   let v1 = @torch.Value::var(5.0)
   let v2 = @torch.Value::var(4.0)
   let sum = v1 + v2
-  inspect!(sum, content="9.0")
+  inspect!(sum, content="9")
   sum.backward(1.0)
-  inspect!(v1, content="4.0")
-  inspect!(v2, content="3.0")
+  inspect!(v1, content="4")
+  inspect!(v2, content="3")
 }
 
 test "Value::backward - op_mul" {
   let v1 = @torch.Value::var(5.0)
   let v2 = @torch.Value::var(4.0)
   let product = v1 * v2
-  inspect!(product, content="20.0")
+  inspect!(product, content="20")
   product.backward(1.0)
-  inspect!(v1, content="1.0")
-  inspect!(v2, content="-1.0")
+  inspect!(v1, content="1")
+  inspect!(v2, content="-1")
 }
 
 test "Value::backward - op_div" {
@@ -61,19 +61,19 @@ test "Value::backward - sum" {
     @torch.Value::var(3.0),
   ]
   let sum = @torch.Value::sum(v)
-  inspect!(sum, content="6.0")
+  inspect!(sum, content="6")
   sum.backward(1.0)
-  inspect!(v[0], content="0.0")
-  inspect!(v[1], content="1.0")
-  inspect!(v[2], content="2.0")
+  inspect!(v[0], content="0")
+  inspect!(v[1], content="1")
+  inspect!(v[2], content="2")
 }
 
 test "Value::backward - pow" {
   let v1 = @torch.Value::var(5.0)
   let square = v1.pow(2)
-  inspect!(square, content="25.0")
+  inspect!(square, content="25")
   square.backward(0.1)
-  inspect!(v1, content="4.0")
+  inspect!(v1, content="4")
 }
 
 test "Linear Regression" {
