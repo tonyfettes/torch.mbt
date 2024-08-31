@@ -93,137 +93,81 @@ pub fn Tensor::to_string(self : Tensor) -> String {
   Show::to_string(self.value)
 }
 
-pub trait Value: Show + Default {
-  tensor(Self) -> Tensor
-}
+// pub fn Tensor::new[X : Value](
+//   value : X,
+//   ~requires_grad : Bool = false
+// ) -> Tensor {
+//   let tensor = value.tensor()
+//   if requires_grad {
+//     tensor.graph = Graph::Var
+//   }
+//   tensor
+// }
 
-trait Default {
-  default() -> Self
-}
+// test "Tensor::new - Scalar" {
+//   let value = 1.0
+//   let tensor = Tensor::new(value)
+//   inspect!(tensor.value, content="[1]")
+//   inspect!(tensor.shape, content="[]")
+//   inspect!(tensor.size, content="[]")
+//   inspect!(tensor.graph, content="Val")
+//   inspect!(tensor.ref, content="0")
+//   inspect!(tensor.grad, content="[0]")
+//   inspect!(tensor, content="1")
+// }
 
-impl Value for Double with tensor(self : Double) -> Tensor {
-  Tensor::{
-    value: [self],
-    shape: [],
-    size: [],
-    graph: Graph::Val,
-    ref: 0,
-    grad: [0.0],
-  }
-}
+// test "Tensor::new - Vector" {
+//   let value = [0.0, 1.0, 2.0, 3.0]
+//   let tensor = Tensor::new(value)
+//   inspect!(tensor.value, content="[0, 1, 2, 3]")
+//   inspect!(tensor.shape, content="[4]")
+//   inspect!(tensor.size, content="[1]")
+//   inspect!(tensor.graph, content="Val")
+//   inspect!(tensor.ref, content="0")
+//   inspect!(tensor.grad, content="[0, 0, 0, 0]")
+//   inspect!(tensor, content="[0, 1, 2, 3]")
+// }
 
-impl Default for Double with default() -> Double { 0.0 }
+// test "Tensor::new - Matrix" {
+//   let value = [[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]]
+//   let tensor = Tensor::new(value)
+//   inspect!(tensor.value, content="[0, 1, 2, 3, 4, 5]")
+//   inspect!(tensor.shape, content="[2, 3]")
+//   inspect!(tensor.size, content="[3, 1]")
+//   inspect!(tensor.graph, content="Val")
+//   inspect!(tensor.ref, content="0")
+//   inspect!(tensor.grad, content="[0, 0, 0, 0, 0, 0]")
+//   inspect!(tensor, content="[[0, 1, 2], [3, 4, 5]]")
+// }
 
-impl[X : Value + Default] Value for Array[X] with tensor(self : Array[X]) -> Tensor {
-  let tensors = self.map(fn { x => x.tensor() })
-  let shape = [self.length()]
-  if self.length() == 0 {
-    for s in X::default().tensor().shape {
-      shape.push(s)
-    }
-  } else {
-    for i = 0; i < tensors[0].shape.length(); i = i + 1 {
-      shape.push(tensors[0].shape[i])
-    }
-  }
-  let size = [1]
-  for i = shape.length() - 1; i > 0; i = i - 1 {
-    size.push(shape[i] * size[size.length() - 1])
-  }
-  size.rev_inplace()
-  let value = []
-  for i = 0; i < tensors.length(); i = i + 1 {
-    for j = 0; j < tensors[i].value.length(); j = j + 1 {
-      value.push(tensors[i].value[j])
-    }
-  }
-  Tensor::{
-    value: FixedArray::from_array(value),
-    shape: FixedArray::from_array(shape),
-    size: FixedArray::from_array(size),
-    graph: Graph::Val,
-    ref: 0,
-    grad: FixedArray::make(value.length(), 0.0),
-  }
-}
-
-impl[X] Default for Array[X] with default() -> Array[X] { [] }
-
-pub fn Tensor::new[X : Value](
-  value : X,
-  ~requires_grad : Bool = false
-) -> Tensor {
-  let tensor = value.tensor()
-  if requires_grad {
-    tensor.graph = Graph::Var
-  }
-  tensor
-}
-
-test "Tensor::new - Scalar" {
-  let value = 1.0
-  let tensor = Tensor::new(value)
-  inspect!(tensor.value, content="[1]")
-  inspect!(tensor.shape, content="[]")
-  inspect!(tensor.size, content="[]")
-  inspect!(tensor.graph, content="Val")
-  inspect!(tensor.ref, content="0")
-  inspect!(tensor.grad, content="[0]")
-  inspect!(tensor, content="1")
-}
-
-test "Tensor::new - Vector" {
-  let value = [0.0, 1.0, 2.0, 3.0]
-  let tensor = Tensor::new(value)
-  inspect!(tensor.value, content="[0, 1, 2, 3]")
-  inspect!(tensor.shape, content="[4]")
-  inspect!(tensor.size, content="[1]")
-  inspect!(tensor.graph, content="Val")
-  inspect!(tensor.ref, content="0")
-  inspect!(tensor.grad, content="[0, 0, 0, 0]")
-  inspect!(tensor, content="[0, 1, 2, 3]")
-}
-
-test "Tensor::new - Matrix" {
-  let value = [[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]]
-  let tensor = Tensor::new(value)
-  inspect!(tensor.value, content="[0, 1, 2, 3, 4, 5]")
-  inspect!(tensor.shape, content="[2, 3]")
-  inspect!(tensor.size, content="[3, 1]")
-  inspect!(tensor.graph, content="Val")
-  inspect!(tensor.ref, content="0")
-  inspect!(tensor.grad, content="[0, 0, 0, 0, 0, 0]")
-  inspect!(tensor, content="[[0, 1, 2], [3, 4, 5]]")
-}
-
-test "Tensor::new - Tensor" {
-  let tensor = Tensor::new(
-    [
-      [[0.0, 1.0, 2.0, 3.0], [4.0, 5.0, 6.0, 7.0], [8.0, 9.0, 10.0, 11.0]],
-      [
-        [12.0, 13.0, 14.0, 15.0],
-        [16.0, 17.0, 18.0, 19.0],
-        [20.0, 21.0, 22.0, 23.0],
-      ],
-    ],
-  )
-  inspect!(
-    tensor.value,
-    content="[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]",
-  )
-  inspect!(tensor.shape, content="[2, 3, 4]")
-  inspect!(tensor.size, content="[12, 4, 1]")
-  inspect!(tensor.graph, content="Val")
-  inspect!(tensor.ref, content="0")
-  inspect!(
-    tensor.grad,
-    content="[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]",
-  )
-  inspect!(
-    tensor,
-    content="[[[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11]], [[12, 13, 14, 15], [16, 17, 18, 19], [20, 21, 22, 23]]]",
-  )
-}
+// test "Tensor::new - Tensor" {
+//   let tensor = Tensor::new(
+//     [
+//       [[0.0, 1.0, 2.0, 3.0], [4.0, 5.0, 6.0, 7.0], [8.0, 9.0, 10.0, 11.0]],
+//       [
+//         [12.0, 13.0, 14.0, 15.0],
+//         [16.0, 17.0, 18.0, 19.0],
+//         [20.0, 21.0, 22.0, 23.0],
+//       ],
+//     ],
+//   )
+//   inspect!(
+//     tensor.value,
+//     content="[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]",
+//   )
+//   inspect!(tensor.shape, content="[2, 3, 4]")
+//   inspect!(tensor.size, content="[12, 4, 1]")
+//   inspect!(tensor.graph, content="Val")
+//   inspect!(tensor.ref, content="0")
+//   inspect!(
+//     tensor.grad,
+//     content="[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]",
+//   )
+//   inspect!(
+//     tensor,
+//     content="[[[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11]], [[12, 13, 14, 15], [16, 17, 18, 19], [20, 21, 22, 23]]]",
+//   )
+// }
 
 pub struct Slice {
   tensor : Tensor
@@ -237,22 +181,22 @@ pub fn Tensor::op_get(self : Tensor, index : Int) -> Slice {
   Slice::{ tensor: self, path: [Index(index)] }
 }
 
-test "panic Tensor::op_get - Scalar" {
-  let tensor = Tensor::new(1.0)
-  tensor[0] |> ignore
-}
+// test "panic Tensor::op_get - Scalar" {
+//   let tensor = Tensor::new(1.0)
+//   tensor[0] |> ignore
+// }
 
-test "Tensor::op_get - Vector" {
-  let tensor = Tensor::new([0.0, 1.0, 2.0, 3.0])
-  let slice = tensor[1]
-  inspect!(slice, content="1")
-}
+// test "Tensor::op_get - Vector" {
+//   let tensor = Tensor::new([0.0, 1.0, 2.0, 3.0])
+//   let slice = tensor[1]
+//   inspect!(slice, content="1")
+// }
 
-test "Tensor::op_get - Matrix" {
-  let tensor = Tensor::new([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]])
-  let view = tensor[1]
-  inspect!(view, content="[3, 4, 5]")
-}
+// test "Tensor::op_get - Matrix" {
+//   let tensor = Tensor::new([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]])
+//   let view = tensor[1]
+//   inspect!(view, content="[3, 4, 5]")
+// }
 
 pub fn Tensor::length(self : Tensor) -> Int {
   self.shape[0]
@@ -342,28 +286,28 @@ pub fn Slice::tensor(self : Slice) -> Tensor {
   }
 }
 
-test "panic Tensor::op_as_view - Scalar" {
-  let tensor = Tensor::new(1.0)
-  tensor[0:1] |> ignore
-}
+// test "panic Tensor::op_as_view - Scalar" {
+//   let tensor = Tensor::new(1.0)
+//   tensor[0:1] |> ignore
+// }
 
-test "Tensor::op_as_view - Vector" {
-  let tensor = Tensor::new([0.0, 1.0, 2.0, 3.0])
-  inspect!(tensor[1:3], content="[1, 2]")
-  inspect!(tensor[1:], content="[1, 2, 3]")
-  inspect!(tensor[:3], content="[0, 1, 2]")
-}
+// test "Tensor::op_as_view - Vector" {
+//   let tensor = Tensor::new([0.0, 1.0, 2.0, 3.0])
+//   inspect!(tensor[1:3], content="[1, 2]")
+//   inspect!(tensor[1:], content="[1, 2, 3]")
+//   inspect!(tensor[:3], content="[0, 1, 2]")
+// }
 
-test "Tensor::op_as_view - Matrix" {
-  let tensor = Tensor::new([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]])
-  inspect!(tensor[1:2], content="[[3, 4, 5]]")
-  inspect!(tensor[1:], content="[[3, 4, 5]]")
-  inspect!(tensor[:2], content="[[0, 1, 2], [3, 4, 5]]")
-  inspect!(tensor[:], content="[[0, 1, 2], [3, 4, 5]]")
-  inspect!(tensor[:][1], content="[1, 4]")
-  inspect!(tensor[:][1:], content="[[1, 2], [4, 5]]")
-  inspect!(tensor[:][:], content="[[0, 1, 2], [3, 4, 5]]")
-}
+// test "Tensor::op_as_view - Matrix" {
+//   let tensor = Tensor::new([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]])
+//   inspect!(tensor[1:2], content="[[3, 4, 5]]")
+//   inspect!(tensor[1:], content="[[3, 4, 5]]")
+//   inspect!(tensor[:2], content="[[0, 1, 2], [3, 4, 5]]")
+//   inspect!(tensor[:], content="[[0, 1, 2], [3, 4, 5]]")
+//   inspect!(tensor[:][1], content="[1, 4]")
+//   inspect!(tensor[:][1:], content="[[1, 2], [4, 5]]")
+//   inspect!(tensor[:][:], content="[[0, 1, 2], [3, 4, 5]]")
+// }
 
 pub fn Tensor::op_add(self : Tensor, other : Tensor) -> Tensor {
   let length = self.value.length()
