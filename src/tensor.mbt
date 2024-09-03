@@ -21,8 +21,7 @@ pub enum Graph {
   Pow(Tensor, Int)
   MatMul(Tensor, Tensor)
   Get(Tensor, FixedArray[Int])
-  Con(Array[Tensor])
-  Cat(Array[Tensor])
+  Cat(Array[Tensor], Int)
 } derive(Show)
 
 pub fn Tensor::get(self : Tensor, index : Array[Int]) -> Double {
@@ -607,6 +606,117 @@ fn Tensor::ref(self : Tensor) -> Unit {
     MatMul(a, b) => {
       a.ref()
       b.ref()
+    }
+    Cat(xs, _) =>
+      for x in xs {
+        x.ref()
+      }
+    Get(x, _) => {
+      x.ref()
+    }
+  }
+}
+
+fn power(base : Double, exponent : Int) -> Double {
+  if exponent == 0 {
+    return 1.0
+  }
+  if exponent == 1 {
+    return base
+  }
+  let mut result = 1.0
+  let mut base = base
+  let mut exponent = exponent
+  while exponent > 0 {
+    if exponent % 2 == 1 {
+      result = result * base
+    }
+    base = base * base
+    exponent = exponent / 2
+  }
+  result
+}
+
+fn Tensor::propagate(self : Tensor) -> Unit {
+  self.ref -= 1
+  if self.ref != 0 {
+    return
+  }
+  match self.graph {
+    Val => return
+    Var => return
+    Add(a, b) => {
+      for i = 0; i < self.grad.length(); i = i + 1 {
+        a.grad[i] += self.grad[i]
+        b.grad[i] += self.grad[i]
+      }
+    }
+    Sub(a, b) => {
+      for i = 0; i < self.grad.length(); i = i + 1 {
+        a.grad[i] -= self.grad[i]
+        b.grad[i] -= self.grad[i]
+      }
+    }
+    Mul(a, b) => {
+      for i = 0; i < self.grad.length(); i = i + 1 {
+        a.grad[i] += self.grad[i] * b.value[i]
+        b.grad[i] += self.grad[i] * a.value[i]
+      }
+    }
+    Div(a, b) => {
+      for i = 0; i < self.grad.length(); i = i + 1 {
+        a.grad[i] += self.grad[i] / b.value[i]
+        b.grad[i] += -self.grad[i] * a.value[i] / b.value[i] / b.value[i]
+      }
+    }
+    Neg(a) => {
+      for i = 0; i < self.grad.length(); i = i + 1 {
+        a.grad[i] -= self.grad[i]
+      }
+    }
+    Exp(a) => {
+      for i = 0; i < self.grad.length(); i = i + 1 {
+        a.grad[i] += self.grad[i] * self.value[i]
+      }
+    }
+    Log(a) => {
+      for i = 0; i < self.grad.length(); i = i + 1 {
+        a.grad[i] += self.grad[i] / a.value[i]
+      }
+    }
+    Sum(x) => {
+      for i = 0; i < x.shape[0]; i = i + 1 {
+        for j = 0; j < x.size[0]; j = j + 1 {
+          x.grad[i * x.size[0] + j] += self.grad[j]
+        }
+      }
+    }
+    Pow(a, b) => {
+      for i = 0; i < self.grad.length(); i = i + 1 {
+        a.grad[i] = self.grad[i] * b.to_double() * power(a.value[i], b - 1)
+      }
+    }
+    MatMul(a, b) => {
+      for i = 0; i < a.shape[0]; i = i + 1 {
+        for j = 0; j < b.shape[1]; j = j + 1 {
+          for k = 0; k < a.shape[1]; k = k + 1 {
+            a.grad[i * a.size[0] + k] += self.grad[i * a.shape[0] + j] * b.value[k * b.size[0] + j]
+          }
+        }
+      }
+    }
+    Get(x, m) => {
+      for i = 0; i < m.length(); i = i + 1 {
+        x.grad[m[i]] += self.grad[i]
+      }
+    }
+    Cat(xs, d) => {
+      let mut n = 0
+      for x in xs {
+        for i = 0; i < x.length(); i = i + 1 {
+          x.grad[i] 
+        }
+      }
     }
   }
 }
