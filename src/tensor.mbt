@@ -720,3 +720,26 @@ fn Tensor::propagate(self : Tensor) -> Unit {
     }
   }
 }
+
+fn Value::check(self : Value) -> Unit {
+  if self.ref != 0 {
+    abort("ref != 0")
+  }
+  match self.graph {
+    Val => ()
+    Var => ()
+    Add(a, b) => {
+      a.check()
+      b.check()
+    }
+    Mul(a, b) => {
+      a.check()
+      b.check()
+    }
+  }
+}
+
+pub fn Value::backward(self : Value, value : Double) -> Unit {
+  self.ref()
+  self.propagate()
+}
