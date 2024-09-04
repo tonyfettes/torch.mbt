@@ -21,7 +21,7 @@ pub enum Graph {
   Pow(Tensor, Int)
   MatMul(Tensor, Tensor)
   Get(Tensor, FixedArray[Int])
-  Cat(Array[Tensor], Int)
+  Cat(Array[Tensor], FixedArray[(Int, Int)])
 } derive(Show)
 
 pub fn Tensor::get(self : Tensor, index : Array[Int]) -> Double {
@@ -59,7 +59,7 @@ fn Tensor::_output(
         logger.write_string(", ")
       }
     }
-    index.pop_exn() |> ignore
+    index.unsafe_pop() |> ignore
     logger.write_string("]")
   }
 
@@ -70,7 +70,7 @@ fn Tensor::_output(
       Index(range_index) => {
         index.push(range_index)
         self._output(logger, range, index)
-        index.pop_exn() |> ignore
+        index.unsafe_pop() |> ignore
       }
       Slice(start, end) => output_range(start, end)
     }
@@ -578,7 +578,6 @@ fn Tensor::ref(self : Tensor) -> Unit {
   if self.ref > 1 {
     return
   }
-  self.grad.fill(0.0)
   match self.graph {
     Val => ()
     Var => ()
@@ -611,9 +610,7 @@ fn Tensor::ref(self : Tensor) -> Unit {
       for x in xs {
         x.ref()
       }
-    Get(x, _) => {
-      x.ref()
-    }
+    Get(x, _) => x.ref()
   }
 }
 
@@ -637,6 +634,20 @@ fn power(base : Double, exponent : Int) -> Double {
   result
 }
 
+test "power" {
+  inspect!(power(2.0, 0), content="1")
+  inspect!(power(2.0, 1), content="2")
+  inspect!(power(0.0, 5), content="0")
+  inspect!(power(1.0, 10), content="1")
+  inspect!(power(3.0, 3), content="27")
+  inspect!(power(4.0, 2), content="16")
+  inspect!(power(5.0, 3), content="125")
+  inspect!(power(2.0, 10), content="1024")
+  inspect!(power(1.5, 3), content="3.375")
+  inspect!(power(2.5, 2), content="6.25")
+  inspect!(power(2.0, 100), content="1.2676506002282294e+30")
+}
+
 fn Tensor::propagate(self : Tensor) -> Unit {
   self.ref -= 1
   if self.ref != 0 {
@@ -650,39 +661,50 @@ fn Tensor::propagate(self : Tensor) -> Unit {
         a.grad[i] += self.grad[i]
         b.grad[i] += self.grad[i]
       }
+      a.propagate()
+      b.propagate()
     }
     Sub(a, b) => {
       for i = 0; i < self.grad.length(); i = i + 1 {
         a.grad[i] -= self.grad[i]
         b.grad[i] -= self.grad[i]
       }
+      a.propagate()
+      b.propagate()
     }
     Mul(a, b) => {
       for i = 0; i < self.grad.length(); i = i + 1 {
         a.grad[i] += self.grad[i] * b.value[i]
         b.grad[i] += self.grad[i] * a.value[i]
       }
+      a.propagate()
+      b.propagate()
     }
     Div(a, b) => {
       for i = 0; i < self.grad.length(); i = i + 1 {
         a.grad[i] += self.grad[i] / b.value[i]
         b.grad[i] += -self.grad[i] * a.value[i] / b.value[i] / b.value[i]
       }
+      a.propagate()
+      b.propagate()
     }
     Neg(a) => {
       for i = 0; i < self.grad.length(); i = i + 1 {
         a.grad[i] -= self.grad[i]
       }
+      a.propagate()
     }
     Exp(a) => {
       for i = 0; i < self.grad.length(); i = i + 1 {
         a.grad[i] += self.grad[i] * self.value[i]
       }
+      a.propagate()
     }
     Log(a) => {
       for i = 0; i < self.grad.length(); i = i + 1 {
         a.grad[i] += self.grad[i] / a.value[i]
       }
+      a.propagate()
     }
     Sum(x) => {
       for i = 0; i < x.shape[0]; i = i + 1 {
@@ -690,56 +712,155 @@ fn Tensor::propagate(self : Tensor) -> Unit {
           x.grad[i * x.size[0] + j] += self.grad[j]
         }
       }
+      x.propagate()
     }
     Pow(a, b) => {
       for i = 0; i < self.grad.length(); i = i + 1 {
         a.grad[i] = self.grad[i] * b.to_double() * power(a.value[i], b - 1)
       }
+      a.propagate()
     }
     MatMul(a, b) => {
       for i = 0; i < a.shape[0]; i = i + 1 {
         for j = 0; j < b.shape[1]; j = j + 1 {
           for k = 0; k < a.shape[1]; k = k + 1 {
-            a.grad[i * a.size[0] + k] += self.grad[i * a.shape[0] + j] * b.value[k * b.size[0] + j]
+            a.grad[i * a.size[0] + k] += self.grad[i * a.shape[0] + j] *
+              b.value[k * b.size[0] + j]
+            b.grad[k * b.size[0] + j] += self.grad[i * a.shape[0] + j] *
+              a.value[i * a.size[0] + k]
           }
         }
       }
+      a.propagate()
+      b.propagate()
     }
     Get(x, m) => {
       for i = 0; i < m.length(); i = i + 1 {
         x.grad[m[i]] += self.grad[i]
       }
+      x.propagate()
     }
-    Cat(xs, d) => {
-      let mut n = 0
-      for x in xs {
-        for i = 0; i < x.length(); i = i + 1 {
-          x.grad[i] 
-        }
+    Cat(xs, m) =>
+      for i = 0; i < self.grad.length(); i = i + 1 {
+        let (x, m) = m[i]
+        xs[x].grad[m] += self.grad[i]
+        xs[x].propagate()
       }
-    }
   }
 }
 
-fn Value::check(self : Value) -> Unit {
+fn Tensor::check(self : Tensor) -> Unit {
   if self.ref != 0 {
     abort("ref != 0")
   }
   match self.graph {
     Val => ()
     Var => ()
-    Add(a, b) => {
-      a.check()
-      b.check()
+    Add(x, y) => {
+      x.check()
+      y.check()
     }
-    Mul(a, b) => {
-      a.check()
-      b.check()
+    Sub(x, y) => {
+      x.check()
+      y.check()
     }
+    Mul(x, y) => {
+      x.check()
+      y.check()
+    }
+    Div(x, y) => {
+      x.check()
+      y.check()
+    }
+    Neg(x) => x.check()
+    Exp(x) => x.check()
+    Log(x) => x.check()
+    Sum(x) => x.check()
+    Pow(x, _) => x.check()
+    MatMul(x, y) => {
+      x.check()
+      y.check()
+    }
+    Get(a, _) => a.check()
+    Cat(xs, _) =>
+      for x in xs {
+        x.check()
+      }
   }
 }
 
-pub fn Value::backward(self : Value, value : Double) -> Unit {
+pub fn Tensor::backward(self : Tensor) -> Unit {
   self.ref()
+  for i = 0; i < self.grad.length(); i = i + 1 {
+    self.grad[i] += 1.0
+  }
   self.propagate()
+  self.check()
+}
+
+test "Tensor::backward - Add" {
+  let a = Tensor::new(1.0)
+  let b = Tensor::new(2.0)
+  let c = a + b
+  c.backward()
+  inspect!(a.grad, content="[1]")
+  inspect!(b.grad, content="[1]")
+}
+
+test "Tensor::backward - Mul" {
+  let a = Tensor::new(3.0)
+  let b = Tensor::new(4.0)
+  let c = a * b
+  c.backward()
+  inspect!(a.grad, content="[4]")
+  inspect!(b.grad, content="[3]")
+}
+
+test "Tensor::bacward - MatMul" {
+  let a = [
+    [Tensor::new(1.0), Tensor::new(2.0), Tensor::new(3.0)],
+    [Tensor::new(4.0), Tensor::new(5.0), Tensor::new(6.0)],
+  ]
+  let b = [
+    [Tensor::new(7.0), Tensor::new(8.0)],
+    [Tensor::new(9.0), Tensor::new(10.0)],
+    [Tensor::new(11.0), Tensor::new(12.0)],
+  ]
+  let c = []
+  for i = 0; i < a.length(); i = i + 1 {
+    let row = []
+    for j = 0; j < b[0].length(); j = j + 1 {
+      let mut sum = Tensor::new(0.0)
+      for k = 0; k < a[0].length(); k = k + 1 {
+        sum = sum + a[i][k] * b[k][j]
+      }
+      row.push(sum)
+    }
+    c.push(row)
+  }
+  inspect!(c, content="[[58, 64], [139, 154]]")
+  for row in c {
+    for col in row {
+      col.backward()
+    }
+  }
+  inspect!(a[0][0].grad, content="[15]")
+  inspect!(a[0][1].grad, content="[19]")
+  inspect!(a[0][2].grad, content="[23]")
+  inspect!(a[1][0].grad, content="[15]")
+  inspect!(a[1][1].grad, content="[19]")
+  inspect!(a[1][2].grad, content="[23]")
+  inspect!(b[0][0].grad, content="[5]")
+  inspect!(b[0][1].grad, content="[5]")
+  inspect!(b[1][0].grad, content="[7]")
+  inspect!(b[1][1].grad, content="[7]")
+  inspect!(b[2][0].grad, content="[9]")
+  inspect!(b[2][1].grad, content="[9]")
+  let x = Tensor::new([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+  let y = Tensor::new([[7.0, 8.0], [9.0, 10.0], [11.0, 12.0]])
+  let z = x.matmul(y)
+  inspect!(z, content="[[58, 64], [139, 154]]")
+  z.backward()
+  inspect!(x.grad, content="[15, 19, 23, 15, 19, 23]")
+  inspect!(y.grad, content="[5, 5, 7, 7, 9, 9]")
 }
