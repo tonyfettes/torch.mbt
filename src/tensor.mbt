@@ -22,7 +22,7 @@ pub enum Graph {
   MatMul(Tensor, Tensor)
   Get(Tensor, FixedArray[Int])
   Cat(Array[Tensor], FixedArray[(Int, Int)])
-  Any(~ref : () -> Unit, ~propagate : () -> Unit)
+  Any(~ref : () -> Unit, ~propagate : () -> Unit, ~check : () -> Unit)
 } derive(Show)
 
 pub fn Tensor::get(self : Tensor, index : Array[Int]) -> Double {
@@ -108,12 +108,9 @@ pub fn Tensor::op_get(self : Tensor, index : Int) -> TensorView {
 }
 
 pub fn Tensor::op_set[X : Value](self : Tensor, index : Int, other : X) -> Unit {
-  println("Tensor::op_set: \{self} \{index} \{other}")
-  println("Tensor::op_set: self.size = \{self.size}")
   let other = other.to_tensor()
   let offset = index * self.size[0]
   for i = 0; i < self.size[0]; i = i + 1 {
-    println("self.value[\{offset + i}] = other.value[\{i}]")
     self.value[offset + i] = other.value[i]
   }
 }
@@ -238,15 +235,15 @@ pub fn Tensor::op_mul(self : Tensor, other : Tensor) -> Tensor {
 }
 
 pub fn Tensor::op_div(self : Tensor, other : Tensor) -> Tensor {
-  let other = if other.shape.length() == 0 {
-    Tensor::new(Array::make(self.value.length(), other.value[0]))
+  let other_value = if other.shape.length() == 0 {
+    FixedArray::make(self.value.length(), other.value[0])
   } else {
-    other
+    other.value
   }
   let length = self.value.length()
   let output : FixedArray[Double] = FixedArray::make(length, 0.0)
   for i = 0; i < self.value.length(); i = i + 1 {
-    output[i] = self.value[i] / other.value[i]
+    output[i] = self.value[i] / other_value[i]
   }
   Tensor::{
     value: output,
@@ -350,7 +347,6 @@ pub fn Tensor::dot(self : Tensor, other : Tensor) -> Tensor {
 }
 
 pub fn Tensor::matmul(self : Tensor, other : Tensor) -> Tensor {
-  println("Tensor::matmul: \{self.shape} \{other.shape}")
   if self.shape.length() != 2 || other.shape.length() != 2 {
     abort("Cannot matrix multiply non-matrices")
   }
@@ -376,7 +372,7 @@ pub fn Tensor::matmul(self : Tensor, other : Tensor) -> Tensor {
   }
 }
 
-test "Tensor::matmul" {
+test "Tensor::matmul - 2x3 * 3x2" {
   let a = Tensor::new([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
   let b = Tensor::new([[7.0, 8.0], [9.0, 10.0], [11.0, 12.0]])
   let c = a.matmul(b)
@@ -390,6 +386,18 @@ test "Tensor::matmul" {
   inspect!(c.ref, content="0")
   inspect!(c.grad, content="[0, 0, 0, 0]")
   inspect!(c, content="[[58, 64], [139, 154]]")
+}
+
+test "Tensor::matmul - 1x2 * 2x2" {
+  let x = Tensor::new([1.0, 2.0])
+  let w = Tensor::new([[1.0, 2.0], [3.0, 4.0]])
+  inspect!(x.reshape([1, ..x.shape]).matmul(w), content="[[7, 10]]")
+}
+
+test "Tensor::matmul - 1x2 * 2x2" {
+  let x = Tensor::new([2.0, 2.0])
+  let w = Tensor::new([[2.0, 2.0], [2.0, 2.0]])
+  inspect!(x.reshape([1, ..x.shape]).matmul(w), content="[[8, 8]]")
 }
 
 pub trait Value: Show {
@@ -789,7 +797,7 @@ fn Tensor::propagate(self : Tensor) -> Unit {
     }
     Sub(a, b) => {
       for i = 0; i < self.grad.length(); i = i + 1 {
-        a.grad[i] -= self.grad[i]
+        a.grad[i] = self.grad[i]
         b.grad[i] -= self.grad[i]
       }
       a.propagate()
@@ -804,9 +812,16 @@ fn Tensor::propagate(self : Tensor) -> Unit {
       b.propagate()
     }
     Div(a, b) => {
-      for i = 0; i < self.grad.length(); i = i + 1 {
-        a.grad[i] += self.grad[i] / b.value[i]
-        b.grad[i] += -self.grad[i] * a.value[i] / b.value[i] / b.value[i]
+      if b.shape.length() == 0 {
+        for i = 0; i < self.grad.length(); i = i + 1 {
+          a.grad[i] += self.grad[i] / b.value[0]
+          b.grad[0] += -self.grad[i] * a.value[i] / b.value[0] / b.value[0]
+        }
+      } else {
+        for i = 0; i < self.grad.length(); i = i + 1 {
+          a.grad[i] += self.grad[i] / b.value[i]
+          b.grad[i] += -self.grad[i] * a.value[i] / b.value[i] / b.value[i]
+        }
       }
       a.propagate()
       b.propagate()
@@ -910,7 +925,7 @@ fn Tensor::check(self : Tensor) -> Unit {
       for x in xs {
         x.check()
       }
-    Any(..) => ()
+    Any(~check, ..) => check()
   }
 }
 
@@ -995,6 +1010,7 @@ pub fn Tensor::reshape(self : Tensor, shape : Array[Int]) -> Tensor {
   for i = shape.length() - 1; i > 0; i = i - 1 {
     size.push(shape[i] * size[size.length() - 1])
   }
+  size.rev_inplace()
   Tensor::{
     value: self.value.copy(),
     shape: FixedArray::from_array(shape),
@@ -1005,29 +1021,37 @@ pub fn Tensor::reshape(self : Tensor, shape : Array[Int]) -> Tensor {
   }
 }
 
+test "Tensor::reshape" {
+  let tensor = Tensor::new([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]])
+  let reshaped = tensor.reshape([3, 2])
+  inspect!(reshaped, content="[[0, 1], [2, 3], [4, 5]]")
+  inspect!(
+    reshaped.graph,
+    content="Get([[0, 1, 2], [3, 4, 5]], [0, 1, 2, 3, 4, 5])",
+  )
+  reshaped.ref()
+  inspect!(tensor.ref, content="1")
+}
+
 pub fn Tensor::reLU(self : Tensor) -> Tensor {
   let x = self
   let self = Tensor::{
     value: self.value.map(fn { x => if x > 0.0 { x } else { 0.0 } }),
     shape: self.shape,
     size: self.size,
-    graph: Graph::Any(
-      ref=fn() {
-        self.ref += 1
-        if self.ref > 1 {
-          return
-        }
-        self.ref()
-      },
-      propagate=fn() {
-        for i = 0; i < self.grad.length(); i = i + 1 {
-          x.grad[i] += self.grad[i] * if self.value[i] > 0.0 { 1.0 } else { 0.0 }
-        }
-        x.propagate()
-      },
-    ),
+    graph: Graph::Val,
     ref: 0,
     grad: FixedArray::make(self.value.length(), 0.0),
   }
+  self.graph = Any(
+    ref=fn() { x.ref() },
+    propagate=fn() {
+      for i = 0; i < self.grad.length(); i = i + 1 {
+        x.grad[i] += self.grad[i] * if self.value[i] > 0.0 { 1.0 } else { 0.0 }
+      }
+      x.propagate()
+    },
+    check=fn() { x.check() },
+  )
   self
 }
