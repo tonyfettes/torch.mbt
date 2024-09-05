@@ -1,7 +1,22 @@
-pub trait Continuous {
-  sample(Self, ~shape: Array[Int]) -> Tensor
+trait IContinuous {
+  _sample(Self) -> Double
 }
 
+pub trait Continuous: IContinuous {
+  sample(Self, ~shape : Array[Int]) -> Tensor
+}
+
+impl Continuous with sample(self : Self, ~shape : Array[Int]) -> Tensor {
+  let mut size = 1
+  for s in shape {
+    size *= s
+  }
+  let sample = []
+  for i = 0; i < size; i = i + 1 {
+    sample.push(IContinuous::_sample(self))
+  }
+  Tensor::new(sample).reshape(shape)
+}
 pub trait Discrete {
   sample(Self) -> Int
 }
@@ -31,18 +46,6 @@ fn Uniform::_sample(self : Uniform) -> Double {
   rand.val.double() * (self.upper - self.lower) + self.lower
 }
 
-pub fn Uniform::sample(self : Uniform, ~shape : Array[Int]) -> Tensor {
-  let mut size = 1
-  for s in shape {
-    size *= s
-  }
-  let sample = []
-  for i = 0; i < size; i = i + 1 {
-    sample.push(self._sample())
-  }
-  Tensor::new(sample).reshape(shape)
-}
-
 let normal_buffer : Array[Double] = []
 
 pub fn normal(~mean : Double = 0.0, ~std : Double = 1.0) -> Double {
@@ -70,20 +73,8 @@ pub fn Normal::new(~mean : Double = 0.0, ~std : Double = 1.0) -> Normal {
   Normal::{ mean, std }
 }
 
-pub fn Normal::_sample(self : Normal) -> Double {
+fn Normal::_sample(self : Normal) -> Double {
   normal(mean=self.mean, std=self.std)
-}
-
-pub fn Normal::sample(self : Uniform, ~shape : Array[Int]) -> Tensor {
-  let mut size = 1
-  for s in shape {
-    size *= s
-  }
-  let sample = []
-  for i = 0; i < size; i = i + 1 {
-    sample.push(self._sample())
-  }
-  Tensor::new(sample).reshape(shape)
 }
 
 pub struct Categorical {

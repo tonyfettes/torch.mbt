@@ -42,7 +42,6 @@ pub fn Linear::of(weight : Tensor, bias : Tensor) -> Linear {
 pub fn Linear::new(
   in_features : Int,
   out_features : Int,
-  ~bias : Bool = true,
   ~weight_distribution? : Continuous,
   ~bias_distribution? : Continuous
 ) -> Linear {
@@ -62,13 +61,13 @@ pub fn Linear::new(
     Some(distrib) => distrib
   }
   Linear::{
-    weight: weight_distribution.sample(~shape=[in_features, out_features]),
-    bias: bias_distribution.sample(~shape=[out_features]),
+    weight: weight_distribution.sample(shape=[in_features, out_features]),
+    bias: bias_distribution.sample(shape=[out_features]),
   }
 }
 
 pub fn Linear::forward(self : Linear, input : Tensor) -> Tensor {
-  input.matmul(self.weight) + self.bias
+  (input.reshape([1, ..input.shape]).matmul(self.weight) + self.bias)[0].to_tensor()
 }
 
 pub fn Linear::output(self : Linear, logger : Logger) -> Unit {
@@ -85,21 +84,21 @@ pub fn Linear::output(self : Linear, logger : Logger) -> Unit {
 
 test "Linear" {
   let linear = Linear::new(2, 2)
-  linear.weight[0][0] = Value::var(1.0)
-  linear.weight[0][1] = Value::var(2.0)
-  linear.weight[1][0] = Value::var(3.0)
-  linear.weight[1][1] = Value::var(4.0)
-  linear.bias[0] = Value::var(5.0)
-  linear.bias[1] = Value::var(6.0)
+  linear.weight[0][0] = 1.0
+  linear.weight[0][1] = 2.0
+  linear.weight[1][0] = 3.0
+  linear.weight[1][1] = 4.0
+  linear.bias[0] = 5.0
+  linear.bias[1] = 6.0
   let layers = Sequential::new([linear])
-  let input = [Value::val(1.0), Value::val(2.0)]
+  let input = tensor([1.0, 2.0])
   let output = layers.forward(input)
   inspect!(output, content="[10, 17]")
-  let target = [Value::val(16.0), Value::val(16.0)]
+  let target = tensor([16.0, 16.0])
   for i = 0; i < output.length(); i = i + 1 {
     let diff = output[i] - target[i]
     let loss = diff
-    loss.backward(0.1 * loss.value)
+    loss.backward()
   }
   inspect!(linear.weight[0][0], content="1.6")
   inspect!(linear.weight[0][1], content="3.2")
@@ -113,58 +112,50 @@ test "Linear" {
 
 test "Linear with ReLU" {
   let linear = Linear::new(2, 2)
-  linear.weight[0][0] = Value::var(1.0)
-  linear.weight[0][1] = Value::var(2.0)
-  linear.weight[1][0] = Value::var(3.0)
-  linear.weight[1][1] = Value::var(4.0)
-  linear.bias[0] = Value::var(5.0)
-  linear.bias[1] = Value::var(6.0)
+  linear.weight[0][0] = 1.0
+  linear.weight[0][1] = 2.0
+  linear.weight[1][0] = 3.0
+  linear.weight[1][1] = 4.0
+  linear.bias[0] = 5.0
+  linear.bias[1] = 6.0
   let layers = Sequential::new([linear, ReLU::new()])
-  let input = [Value::val(2.0), Value::val(2.0)]
+  let input = tensor([2.0, 2.0])
   let output = layers.forward(input)
   inspect!(output, content="[11, 20]")
-  let target = [Value::val(1.0), Value::val(0.0)]
-  let mut loss = Value::val(0.0)
+  let target = tensor([1.0, 0.0])
+  let mut loss = tensor(0.0)
   for i = 0; i < output.length(); i = i + 1 {
-    loss = loss - target[i] * output[i].log()
+    loss = loss - target[i].to_tensor() * output[i].log()
   }
   inspect!(loss, content="-2.3978952727983707")
-  loss.backward(1.0)
+  loss.backward()
   let output = layers.forward(input)
   inspect!(output, content="[11.818181818181817, 20]")
 }
 
 test "Linear with Softmax" {
   let linear = Linear::new(2, 2)
-  linear.weight[0][0] = Value::var(2.0)
-  linear.weight[0][1] = Value::var(2.0)
-  linear.weight[1][0] = Value::var(2.0)
-  linear.weight[1][1] = Value::var(2.0)
-  linear.bias[0] = Value::var(1.0)
-  linear.bias[1] = Value::var(2.0)
+  linear.weight[0][0] = 2.0
+  linear.weight[0][1] = 2.0
+  linear.weight[1][0] = 2.0
+  linear.weight[1][1] = 2.0
+  linear.bias[0] = 1.0
+  linear.bias[1] = 2.0
   let layers = Sequential::new([linear, Softmax::new()])
-  let input = [Value::val(2.0), Value::val(2.0)]
+  let input = tensor([2.0, 2.0])
   let output = layers.forward(input)
-  let target = Tensor::val([1.0, 0.0])
-  let mut loss = Value::val(0.0)
+  let target = tensor([1.0, 0.0])
+  let mut loss = tensor(0.0)
   for i = 0; i < output.length(); i = i + 1 {
-    loss = loss - target[i] * output[i].log()
+    loss = loss - target[i].to_tensor() * output[i].log()
   }
   inspect!(loss, content="1.3132616875182228")
-  loss.backward(1.0)
+  loss.backward()
   let output = layers.forward(input)
   inspect!(output, content="[0.9999947593218812, 0.00000524067811873532]")
 }
 
 pub struct ReLU {}
-
-fn reLU(input : Value) -> Value {
-  if input.value > 0.0 {
-    input
-  } else {
-    Value::val(0.0)
-  }
-}
 
 pub fn ReLU::new() -> ReLU {
   ReLU::{  }
@@ -175,32 +166,10 @@ pub fn ReLU::output(_self : ReLU, logger : Logger) -> Unit {
 }
 
 pub fn ReLU::forward(_self : ReLU, input : Tensor) -> Tensor {
-  input.map(reLU)
+  input.reLU()
 }
 
 pub struct ReLU6 {}
-
-fn reLU6(input : Value) -> Value {
-  if input.value > 6.0 {
-    Value::val(6.0)
-  } else if input.value > 0.0 {
-    input
-  } else {
-    Value::val(0.0)
-  }
-}
-
-pub fn ReLU6::new() -> ReLU6 {
-  ReLU6::{  }
-}
-
-pub fn ReLU6::output(_self : ReLU6, logger : Logger) -> Unit {
-  logger.write_string("ReLU6()")
-}
-
-pub fn ReLU6::forward(_self : ReLU6, input : Tensor) -> Tensor {
-  input.map(reLU6)
-}
 
 pub struct Softmax {}
 
@@ -213,30 +182,26 @@ pub fn Softmax::output(_self : Softmax, logger : Logger) -> Unit {
 }
 
 pub fn Softmax::forward(_self : Softmax, input : Tensor) -> Tensor {
-  let exp = input.map(fn { value => value.exp() })
-  let sum = Value::sum(exp)
-  let output = []
-  for value in exp {
-    output.push(value / sum)
-  }
-  output
+  let exp = input.exp()
+  let sum = exp.sum()
+  exp / sum
 }
 
 test "Softmax" {
-  let input = [Value::var(1.0), Value::var(2.0), Value::var(3.0)]
+  let input = tensor([1.0, 2.0, 3.0])
   let softmax = Softmax::new()
   let output = softmax.forward(input)
   inspect!(
     output,
     content="[0.09003057317038046, 0.24472847105479767, 0.6652409557748219]",
   )
-  let target = Tensor::val([1.0, 0.0, 0.0])
-  let mut loss = Value::val(0.0)
+  let target = tensor([1.0, 0.0, 0.0])
+  let mut loss = tensor(0.0)
   for i = 0; i < output.length(); i = i + 1 {
     loss = loss + target[i] * output[i]
   }
   inspect!(loss, content="0.09003057317038046")
-  loss.backward(1.0)
+  loss.backward()
   let output = softmax.forward(input)
   inspect!(
     output,
@@ -256,24 +221,19 @@ test "MLP" {
       Softmax::new(),
     ],
   )
-  let input = [
-    Value::val(1.0),
-    Value::val(1.0),
-    Value::val(1.0),
-    Value::val(1.0),
-  ]
+  let input = tensor([1.0, 1.0, 1.0, 1.0])
   let output = layers.forward(input)
   inspect!(
     output,
     content="[0.18384932308483545, 0.27209037641072775, 0.27304055950350237, 0.27101974100093446]",
   )
-  let target = Tensor::val([1.0, 0.0, 0.0, 0.0])
-  let mut loss = Value::val(0.0)
+  let target = tensor([1.0, 0.0, 0.0, 0.0])
+  let mut loss = tensor(0.0)
   for i = 0; i < output.length(); i = i + 1 {
-    loss = loss - target[i] * output[i].log()
+    loss = loss - target[i].to_tensor() * output[i].log()
   }
   inspect!(loss, content="1.6936387531299375")
-  loss.backward(loss.value * 0.01)
+  loss.backward()
   let output = layers.forward(input)
   inspect!(
     output,
@@ -299,13 +259,9 @@ pub fn MSELoss::forward(
   _self : MSELoss,
   input : Tensor,
   target : Tensor
-) -> Value {
-  let diff = []
-  for i = 0; i < input.length(); i = i + 1 {
-    diff.push(input[i] - target[i])
-  }
-  let loss = Value::sum(diff.map(fn { value => value.pow(2) }))
-  loss / Value::val(diff.length().to_double())
+) -> Tensor {
+  let diff = input - target
+  diff.pow(2).sum() / tensor(diff.length().to_double())
 }
 
 pub struct CrossEntropyLoss {}
@@ -314,7 +270,10 @@ pub fn CrossEntropyLoss::new() -> CrossEntropyLoss {
   CrossEntropyLoss::{  }
 }
 
-pub fn CrossEntropyLoss::output(_self : CrossEntropyLoss, logger : Logger) -> Unit {
+pub fn CrossEntropyLoss::output(
+  _self : CrossEntropyLoss,
+  logger : Logger
+) -> Unit {
   logger.write_string("CrossEntropyLoss()")
 }
 
@@ -323,17 +282,14 @@ pub fn CrossEntropyLoss::forward(
   input : Tensor,
   target : Tensor
 ) -> Value {
-  let diff = []
-  for i = 0; i < input.length(); i = i + 1 {
-    diff.push(- target[i] * input[i].log())
-  }
-  Value::sum(diff)
+  let diff = -target * input.log()
+  diff.sum()
 }
 
 test "Linear Regression" {
   let model = Linear::new(1, 1)
-  model.weight[0][0] = Value::var(0.0)
-  model.bias[0] = Value::var(0.0)
+  model.weight[0][0] = 0.0
+  model.bias[0] = 0.0
   let target = fn(x : Array[Double]) { [2.0 * x[0] + 3] }
   let inputs = [
     0.8208251, 0.90000966, 0.28106993, 0.39323831, 0.43506248, 0.4969614, 0.52247973,
@@ -353,11 +309,11 @@ test "Linear Regression" {
     0.98899348, 0.25727347,
   ]
   for input in inputs {
-    let model_output = model.forward(Tensor::val([input]))
+    let model_output = model.forward(tensor([input]))
     let target_output = target([input])
     let mse = MSELoss::new()
-    let loss = mse.forward(model_output, Tensor::val(target_output))
-    loss.backward(0.1)
+    let loss = mse.forward(model_output, tensor(target_output))
+    loss.backward()
   }
   inspect!(model.weight[0][0], content="1.981059015531822")
   inspect!(model.bias[0], content="3.01049253711016")

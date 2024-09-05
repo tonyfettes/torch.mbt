@@ -22,7 +22,7 @@ pub enum Graph {
   MatMul(Tensor, Tensor)
   Get(Tensor, FixedArray[Int])
   Cat(Array[Tensor], FixedArray[(Int, Int)])
-  Reshape(Tensor)
+  Any(~ref : () -> Unit, ~propagate : () -> Unit)
 } derive(Show)
 
 pub fn Tensor::get(self : Tensor, index : Array[Int]) -> Double {
@@ -37,6 +37,20 @@ pub fn Tensor::get(self : Tensor, index : Array[Int]) -> Double {
     offset += index[i] * self.size[i]
   }
   self.value[offset]
+}
+
+pub fn Tensor::set(self : Tensor, index : Array[Int], value : Double) -> Unit {
+  if index.length() != self.shape.length() {
+    abort("Index length does not match tensor shape")
+  }
+  let mut offset = 0
+  for i = 0; i < index.length(); i = i + 1 {
+    if index[i] < 0 || index[i] >= self.shape[i] {
+      abort("Index out of bounds")
+    }
+    offset += index[i] * self.size[i]
+  }
+  self.value[offset] = value
 }
 
 fn Tensor::_output(
@@ -91,6 +105,25 @@ pub fn Tensor::op_get(self : Tensor, index : Int) -> TensorView {
     abort("Tensor is a scalar")
   }
   TensorView::{ tensor: self, path: [Index(index)] }
+}
+
+pub fn Tensor::op_set[X : Value](self : Tensor, index : Int, other : X) -> Unit {
+  println("Tensor::op_set: \{self} \{index} \{other}")
+  println("Tensor::op_set: self.size = \{self.size}")
+  let other = other.to_tensor()
+  let offset = index * self.size[0]
+  for i = 0; i < self.size[0]; i = i + 1 {
+    println("self.value[\{offset + i}] = other.value[\{i}]")
+    self.value[offset + i] = other.value[i]
+  }
+}
+
+test "Tensor::op_set" {
+  let tensor = Tensor::new([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+  tensor[1] = [7.0, 8.0, 9.0]
+  inspect!(tensor, content="[[1, 2, 3], [7, 8, 9]]")
+  tensor[0] = [0.0, 1.0, 2.0]
+  inspect!(tensor, content="[[0, 1, 2], [7, 8, 9]]")
 }
 
 pub fn Tensor::length(self : Tensor) -> Int {
@@ -205,6 +238,11 @@ pub fn Tensor::op_mul(self : Tensor, other : Tensor) -> Tensor {
 }
 
 pub fn Tensor::op_div(self : Tensor, other : Tensor) -> Tensor {
+  let other = if other.shape.length() == 0 {
+    Tensor::new(Array::make(self.value.length(), other.value[0]))
+  } else {
+    other
+  }
   let length = self.value.length()
   let output : FixedArray[Double] = FixedArray::make(length, 0.0)
   for i = 0; i < self.value.length(); i = i + 1 {
@@ -312,6 +350,7 @@ pub fn Tensor::dot(self : Tensor, other : Tensor) -> Tensor {
 }
 
 pub fn Tensor::matmul(self : Tensor, other : Tensor) -> Tensor {
+  println("Tensor::matmul: \{self.shape} \{other.shape}")
   if self.shape.length() != 2 || other.shape.length() != 2 {
     abort("Cannot matrix multiply non-matrices")
   }
@@ -353,7 +392,7 @@ test "Tensor::matmul" {
   inspect!(c, content="[[58, 64], [139, 154]]")
 }
 
-pub trait IntoTensor {
+pub trait Value: Show {
   to_tensor(Self) -> Tensor
 }
 
@@ -361,7 +400,7 @@ pub trait Default {
   default() -> Self
 }
 
-pub impl IntoTensor for Double with to_tensor(self : Double) -> Tensor {
+pub impl Value for Double with to_tensor(self : Double) -> Tensor {
   Tensor::{
     value: [self],
     shape: [],
@@ -374,17 +413,15 @@ pub impl IntoTensor for Double with to_tensor(self : Double) -> Tensor {
 
 pub impl Default for Double with default() -> Double { 0.0 }
 
-pub fn Tensor::new[X : IntoTensor](self : X) -> Tensor {
+pub fn Tensor::new[X : Value](self : X) -> Tensor {
   self.to_tensor()
 }
 
-pub fn tensor[X : IntoTensor](x : X) -> Tensor {
+pub fn tensor[X : Value](x : X) -> Tensor {
   x.to_tensor()
 }
 
-pub impl[X : IntoTensor + Default] IntoTensor for Array[X] with to_tensor(
-  self : Array[X]
-) -> Tensor {
+pub impl[X : Value + Default] Value for Array[X] with to_tensor(self : Array[X]) -> Tensor {
   let tensors = self.map(fn { x => x.to_tensor() })
   let shape = [self.length()]
   if self.length() == 0 {
@@ -502,6 +539,58 @@ pub fn TensorView::op_get(self : TensorView, index : Int) -> TensorView {
   TensorView::{ tensor: self.tensor, path: [..self.path, Index(index)] }
 }
 
+pub fn TensorView::op_set(
+  self : TensorView,
+  index : Int,
+  other : Value
+) -> Unit {
+  let other = other.to_tensor()
+  fn assign(
+    path : ArrayView[TensorIndex],
+    self_indicies : Array[Int],
+    other_indicies : Array[Int]
+  ) -> Unit {
+    if self_indicies.length() == self.tensor.shape.length() {
+      let mut self_offset = 0
+      for i = 0; i < self_indicies.length(); i = i + 1 {
+        self_offset += self_indicies[i] * self.tensor.size[i]
+      }
+      let mut other_offset = 0
+      for i = 0; i < other_indicies.length(); i = i + 1 {
+        other_offset += other_indicies[i] * other.size[i]
+      }
+      self.tensor.value[self_offset] = other.value[other_offset]
+      return
+    }
+    match path {
+      [Index(index), .. as path] =>
+        assign(path, [..self_indicies, index], other_indicies)
+      [Slice(start, end), .. as path] =>
+        for i = start; i < end; i = i + 1 {
+          assign(path, [..self_indicies, i], [..other_indicies, i - start])
+        }
+      [] =>
+        for i = 0; i < self.tensor.shape[self_indicies.length()]; i = i + 1 {
+          assign(path, [..self_indicies, i], [..other_indicies, i])
+        }
+    }
+  }
+
+  assign([..self.path, Index(index)][:], [], [])
+}
+
+test "TensorView::op_set" {
+  let tensor = Tensor::new([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+  tensor[:][1] = [7.0, 8.0]
+  inspect!(tensor, content="[[1, 7, 3], [4, 8, 6]]")
+  tensor[:][0] = [0.0, 1.0]
+  inspect!(tensor, content="[[0, 7, 3], [1, 8, 6]]")
+  tensor[:][2] = [2.0, 3.0]
+  inspect!(tensor, content="[[0, 7, 2], [1, 8, 3]]")
+  tensor[0][0] = 9.0
+  inspect!(tensor, content="[[9, 7, 2], [1, 8, 3]]")
+}
+
 pub fn TensorView::op_as_view(
   self : TensorView,
   ~start : Int,
@@ -512,6 +601,22 @@ pub fn TensorView::op_as_view(
     Some(end) => end
   }
   TensorView::{ tensor: self.tensor, path: [..self.path, Slice(start, end)] }
+}
+
+pub fn TensorView::op_add(self : TensorView, other : TensorView) -> Tensor {
+  self.to_tensor() + other.to_tensor()
+}
+
+pub fn TensorView::op_sub(self : TensorView, other : TensorView) -> Tensor {
+  self.to_tensor() + other.to_tensor()
+}
+
+pub fn TensorView::op_mul(self : TensorView, other : TensorView) -> Tensor {
+  self.to_tensor() * other.to_tensor()
+}
+
+pub fn TensorView::log(self : TensorView) -> Tensor {
+  self.to_tensor().log()
 }
 
 pub fn TensorView::to_tensor(self : TensorView) -> Tensor {
@@ -612,6 +717,7 @@ fn Tensor::ref(self : Tensor) -> Unit {
         x.ref()
       }
     Get(x, _) => x.ref()
+    Any(~ref, ..) => ref()
   }
 }
 
@@ -647,6 +753,22 @@ test "power" {
   inspect!(power(1.5, 3), content="3.375")
   inspect!(power(2.5, 2), content="6.25")
   inspect!(power(2.0, 100), content="1.2676506002282294e+30")
+}
+
+pub fn Tensor::pow(self : Tensor, exponent : Int) -> Tensor {
+  let length = self.value.length()
+  let output : FixedArray[Double] = FixedArray::make(length, 0.0)
+  for i = 0; i < self.value.length(); i = i + 1 {
+    output[i] = power(self.value[i], exponent)
+  }
+  Tensor::{
+    value: output,
+    shape: self.shape,
+    size: self.size,
+    graph: Graph::Pow(self, exponent),
+    ref: 0,
+    grad: FixedArray::make(length, 0.0),
+  }
 }
 
 fn Tensor::propagate(self : Tensor) -> Unit {
@@ -747,6 +869,7 @@ fn Tensor::propagate(self : Tensor) -> Unit {
         xs[x].grad[m] += self.grad[i]
         xs[x].propagate()
       }
+    Any(~propagate, ..) => propagate()
   }
 }
 
@@ -787,6 +910,7 @@ fn Tensor::check(self : Tensor) -> Unit {
       for x in xs {
         x.check()
       }
+    Any(..) => ()
   }
 }
 
@@ -876,7 +1000,34 @@ pub fn Tensor::reshape(self : Tensor, shape : Array[Int]) -> Tensor {
     shape: FixedArray::from_array(shape),
     size: FixedArray::from_array(size),
     ref: 0,
-    graph: Reshape(self),
-    grad: FixedArray::make(self.value.length(), 0.0)
+    graph: Get(self, FixedArray::makei(self.value.length(), fn { i => i })),
+    grad: FixedArray::make(self.value.length(), 0.0),
   }
+}
+
+pub fn Tensor::reLU(self : Tensor) -> Tensor {
+  let x = self
+  let self = Tensor::{
+    value: self.value.map(fn { x => if x > 0.0 { x } else { 0.0 } }),
+    shape: self.shape,
+    size: self.size,
+    graph: Graph::Any(
+      ref=fn() {
+        self.ref += 1
+        if self.ref > 1 {
+          return
+        }
+        self.ref()
+      },
+      propagate=fn() {
+        for i = 0; i < self.grad.length(); i = i + 1 {
+          x.grad[i] += self.grad[i] * if self.value[i] > 0.0 { 1.0 } else { 0.0 }
+        }
+        x.propagate()
+      },
+    ),
+    ref: 0,
+    grad: FixedArray::make(self.value.length(), 0.0),
+  }
+  self
 }
