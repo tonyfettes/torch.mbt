@@ -1,3 +1,6 @@
-target/
-.mooncakes/
-.moonbit-lsp.json
+/target/
+/.mooncakes/
+/.moonbit-lsp.json
+/.venv/
+/.envrc
+/.python-version

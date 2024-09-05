@@ -1086,42 +1086,49 @@ test {
   let mut step = 0
   for epoch = 0; epoch < total_epoch; epoch = epoch + 1 {
     for datum in train {
-      let input = [
-        datum.sepal_length,
-        datum.sepal_width,
-        datum.petal_length,
-        datum.petal_width,
-      ]
+      let input = @torch.tensor(
+        [
+          datum.sepal_length,
+          datum.sepal_width,
+          datum.petal_length,
+          datum.petal_width,
+        ],
+      )
       let target = match datum.species {
-        Setosa => [1.0, 0.0, 0.0]
-        Versicolor => [0.0, 1.0, 0.0]
-        Virginica => [0.0, 0.0, 1.0]
+        Setosa => @torch.tensor([1.0, 0.0, 0.0])
+        Versicolor => @torch.tensor([0.0, 1.0, 0.0])
+        Virginica => @torch.tensor([0.0, 0.0, 1.0])
       }
-      let output = model.forward(@torch.Tensor::val(input))
+      let output = model.forward(input)
       let lr = 0.01 *
         (@math.cos(step.to_double() / total_step.to_double() * @math.pi) + 1.0)
-      loss.forward(output, @torch.Tensor::val(target)).backward(lr)
+      let optimizer = @torch.SGD::new(model.parameters(), learning_rate=lr)
+      optimizer.zero_grad()
+      loss.forward(output, target).backward()
+      optimizer.step()
       step = step + 1
     }
   }
   let mut accuracy = 0.0
   for datum in validate {
-    let input = [
-      datum.sepal_length,
-      datum.sepal_width,
-      datum.petal_length,
-      datum.petal_width,
-    ]
+    let input = @torch.tensor(
+      [
+        datum.sepal_length,
+        datum.sepal_width,
+        datum.petal_length,
+        datum.petal_width,
+      ],
+    )
     let target = match datum.species {
-      Setosa => [1.0, 0.0, 0.0]
-      Versicolor => [0.0, 1.0, 0.0]
-      Virginica => [0.0, 0.0, 1.0]
+      Setosa => @torch.tensor([1.0, 0.0, 0.0])
+      Versicolor => @torch.tensor([0.0, 1.0, 0.0])
+      Virginica => @torch.tensor([0.0, 0.0, 1.0])
     }
-    let output = model.forward(@torch.Tensor::val(input))
-    accuracy += output.dot(@torch.Tensor::val(target)).value
+    let output = model.forward(input)
+    accuracy += (output * target).sum().value[0]
   }
   inspect!(
     accuracy / validate.length().to_double(),
-    content="0.951233288139901",
+    content="0.965300824134553",
   )
 }

@@ -1,13 +1,36 @@
-pub trait Continuous {
-  sample(Self) -> Double
+trait IContinuous {
+  _sample(Self) -> Double
 }
 
+pub trait Continuous: IContinuous {
+  sample(Self, ~shape : Array[Int]) -> Tensor
+}
+
+impl Continuous with sample(self : Self, ~shape : Array[Int]) -> Tensor {
+  let mut size = 1
+  for s in shape {
+    size *= s
+  }
+  let sample = []
+  for i = 0; i < size; i = i + 1 {
+    sample.push(IContinuous::_sample(self))
+  }
+  Tensor::new(sample).reshape(shape)
+}
 pub trait Discrete {
   sample(Self) -> Int
 }
 
-impl Continuous for Double with sample(self : Double) -> Double {
-  self
+impl Continuous for Double with sample(self : Double, ~shape : Array[Int]) -> Tensor {
+  let mut size = 1
+  for s in shape {
+    size *= s
+  }
+  let sample = []
+  for i = 0; i < size; i = i + 1 {
+    sample.push(self)
+  }
+  Tensor::new(sample).reshape(shape)
 }
 
 pub struct Uniform {
@@ -19,7 +42,7 @@ pub fn Uniform::new(lower : Double, upper : Double) -> Uniform {
   Uniform::{ lower, upper }
 }
 
-pub fn Uniform::sample(self : Uniform) -> Double {
+fn Uniform::_sample(self : Uniform) -> Double {
   rand.val.double() * (self.upper - self.lower) + self.lower
 }
 
@@ -50,7 +73,7 @@ pub fn Normal::new(~mean : Double = 0.0, ~std : Double = 1.0) -> Normal {
   Normal::{ mean, std }
 }
 
-pub fn Normal::sample(self : Normal) -> Double {
+fn Normal::_sample(self : Normal) -> Double {
   normal(mean=self.mean, std=self.std)
 }
 
@@ -60,14 +83,17 @@ pub struct Categorical {
 } derive(Show)
 
 pub fn Categorical::new(probs : Tensor) -> Categorical {
-  let logits = probs.map(fn(p) { p.log() })
+  let logits = probs.log()
   Categorical::{ logits, probs }
 }
 
 pub fn Categorical::sample(self : Categorical) -> Int {
+  if self.probs.shape.length() != 1 {
+    abort("Categorical distribution only supports 1D probabilities")
+  }
   let mut choice = rand.val.double()
-  for index, value in self.probs.0 {
-    choice = choice - value.value
+  for index, value in self.probs.value {
+    choice = choice - value
     if choice <= 0.0 {
       return index
     }
@@ -75,6 +101,6 @@ pub fn Categorical::sample(self : Categorical) -> Int {
   rand.val.int(limit=self.probs.length())
 }
 
-pub fn Categorical::log_prob(self : Categorical, sample : Int) -> Value {
-  self.logits[sample]
+pub fn Categorical::log_prob(self : Categorical, sample : Int) -> Tensor {
+  self.logits[sample].to_tensor()
 }
