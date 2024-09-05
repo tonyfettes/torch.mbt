@@ -2,4 +2,4 @@
 
 ## Roadmap
 
-- [ ] Use `Tensor` for everything, remove `Value` type
+- [x] Use `Tensor` for everything, remove `Value` type
