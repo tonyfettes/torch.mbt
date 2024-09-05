@@ -22,6 +22,7 @@ pub enum Graph {
   MatMul(Tensor, Tensor)
   Get(Tensor, FixedArray[Int])
   Cat(Array[Tensor], FixedArray[(Int, Int)])
+  Reshape(Tensor)
 } derive(Show)
 
 pub fn Tensor::get(self : Tensor, index : Array[Int]) -> Double {
@@ -863,4 +864,19 @@ test "Tensor::bacward - MatMul" {
   z.backward()
   inspect!(x.grad, content="[15, 19, 23, 15, 19, 23]")
   inspect!(y.grad, content="[5, 5, 7, 7, 9, 9]")
+}
+
+pub fn Tensor::reshape(self : Tensor, shape : Array[Int]) -> Tensor {
+  let size = [1]
+  for i = shape.length() - 1; i > 0; i = i - 1 {
+    size.push(shape[i] * size[size.length() - 1])
+  }
+  Tensor::{
+    value: self.value.copy(),
+    shape: FixedArray::from_array(shape),
+    size: FixedArray::from_array(size),
+    ref: 0,
+    graph: Reshape(self),
+    grad: FixedArray::make(self.value.length(), 0.0)
+  }
 }
