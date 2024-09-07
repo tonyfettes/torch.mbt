@@ -4,3 +4,4 @@
 /.venv/
 /.envrc
 /.python-version
+/node_modules/
