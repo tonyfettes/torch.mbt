@@ -652,9 +652,7 @@ pub fn TensorView::to_tensor(self : TensorView) -> Tensor {
   for p in self.path {
     match p {
       Index(_) => ()
-      Slice(start, stop) => {
-        shape.push(stop - start)
-      }
+      Slice(start, stop) => shape.push(stop - start)
     }
   }
   for i = self.path.length(); i < self.tensor.shape.length(); i = i + 1 {
@@ -674,16 +672,14 @@ pub fn TensorView::to_tensor(self : TensorView) -> Tensor {
     }
     match path {
       [Index(index), .. as path] => build(path, [..indicies, index])
-      [Slice(start, stop), .. as path] => {
+      [Slice(start, stop), .. as path] =>
         for i = start; i < stop; i = i + 1 {
           build(path, [..indicies, i])
         }
-      }
-      [] => {
+      [] =>
         for i = 0; i < self.tensor.shape[indicies.length()]; i = i + 1 {
           build(path, [..indicies, i])
         }
-      }
     }
   }
 
@@ -1108,8 +1104,8 @@ pub fn cross_correlation(
     let row = []
     for j = 0; j < output_width; j = j + 1 {
       let patch = image[i * stride:i * stride + kernel_height][j * stride:j *
-        stride +
-        kernel_width].to_tensor()
+      stride +
+      kernel_width].to_tensor()
       row.push((patch * kernel).sum().sum())
     }
     output.push(row)
@@ -1127,7 +1123,10 @@ test "Tensor::op_as_view" {
     ],
   )
   inspect!(image[0:3][0:3], content="[[0, 1, 2], [4, 5, 6], [8, 9, 10]]")
-  inspect!(image[0:3][0:3].to_tensor(), content="[[0, 1, 2], [4, 5, 6], [8, 9, 10]]")
+  inspect!(
+    image[0:3][0:3].to_tensor(),
+    content="[[0, 1, 2], [4, 5, 6], [8, 9, 10]]",
+  )
 }
 
 test "cross_correlation" {

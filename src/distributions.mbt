@@ -17,6 +17,7 @@ impl Continuous with sample(self : Self, ~shape : Array[Int]) -> Tensor {
   }
   Tensor::new(sample).reshape(shape)
 }
+
 pub trait Discrete {
   sample(Self) -> Int
 }

@@ -140,7 +140,10 @@ test "Linear with ReLU" {
   optimizer.zero_grad()
   loss.backward()
   optimizer.step()
-  inspect!(linear.weight, content="[[1.1818181818181819, 3], [2.1818181818181817, 4]]")
+  inspect!(
+    linear.weight,
+    content="[[1.1818181818181819, 3], [2.1818181818181817, 4]]",
+  )
   let output = layers.forward(input)
   inspect!(output, content="[11.818181818181817, 20]")
 }
