@@ -1,0 +1,23 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .:
+    devDependencies:
+      '@moonbit/moonbit-lsp':
+        specifier: ^0.1.202409021
+        version: 0.1.202409021
+
+packages:
+
+  '@moonbit/moonbit-lsp@0.1.202409021':
+    resolution: {integrity: sha512-ino6VRmIqqlOyrwub7IV1DYE9c+LURkPV3KHhQd/BEtEoKLEEjfHsx1oMZOFzyYGTIP+dVlIo+0FC/Srj0dK1Q==}
+    hasBin: true
+
+snapshots:
+
+  '@moonbit/moonbit-lsp@0.1.202409021': {}

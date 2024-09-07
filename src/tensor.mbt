@@ -170,6 +170,10 @@ pub fn Tensor::to_tensor(self : Tensor) -> Tensor {
   self
 }
 
+fn Tensor::default() -> Tensor {
+  abort("Unable to construct a tensor with default shape")
+}
+
 pub fn Tensor::op_add(self : Tensor, other : Tensor) -> Tensor {
   let length = self.value.length()
   let output : FixedArray[Double] = FixedArray::make(length, 0.0)
@@ -447,16 +451,28 @@ pub impl[X : Value + Default] Value for Array[X] with to_tensor(self : Array[X])
   }
   size.rev_inplace()
   let value = []
+  let map = []
   for i = 0; i < tensors.length(); i = i + 1 {
     for j = 0; j < tensors[i].value.length(); j = j + 1 {
       value.push(tensors[i].value[j])
+      map.push((i, j))
+    }
+  }
+  let mut graph = Graph::Val
+  for tensor in tensors {
+    match tensor.graph {
+      Val => ()
+      _ => {
+        graph = Graph::Cat(tensors, FixedArray::from_array(map))
+        break
+      }
     }
   }
   Tensor::{
     value: FixedArray::from_array(value),
     shape: FixedArray::from_array(shape),
     size: FixedArray::from_array(size),
-    graph: Graph::Val,
+    graph,
     ref: 0,
     grad: FixedArray::make(value.length(), 0.0),
   }
@@ -532,7 +548,7 @@ test "Tensor::new - Tensor" {
 pub enum TensorIndex {
   Index(Int)
   Slice(Int, Int)
-}
+} derive(Show)
 
 pub struct TensorView {
   tensor : Tensor
@@ -541,6 +557,10 @@ pub struct TensorView {
 
 pub fn TensorView::output(self : TensorView, logger : Logger) -> Unit {
   self.tensor._output(logger, self.path, [])
+}
+
+pub fn TensorView::to_string(self : TensorView) -> String {
+  Show::to_string(self)
 }
 
 pub fn TensorView::op_get(self : TensorView, index : Int) -> TensorView {
@@ -629,6 +649,17 @@ pub fn TensorView::log(self : TensorView) -> Tensor {
 
 pub fn TensorView::to_tensor(self : TensorView) -> Tensor {
   let shape = []
+  for p in self.path {
+    match p {
+      Index(_) => ()
+      Slice(start, stop) => {
+        shape.push(stop - start)
+      }
+    }
+  }
+  for i = self.path.length(); i < self.tensor.shape.length(); i = i + 1 {
+    shape.push(self.tensor.shape[i])
+  }
   let value = []
   let mapping : Array[Int] = []
   fn build(path : ArrayView[TensorIndex], indicies : Array[Int]) -> Unit {
@@ -644,13 +675,11 @@ pub fn TensorView::to_tensor(self : TensorView) -> Tensor {
     match path {
       [Index(index), .. as path] => build(path, [..indicies, index])
       [Slice(start, stop), .. as path] => {
-        shape.push(stop - start)
         for i = start; i < stop; i = i + 1 {
           build(path, [..indicies, i])
         }
       }
       [] => {
-        shape.push(self.tensor.shape[indicies.length()])
         for i = 0; i < self.tensor.shape[indicies.length()]; i = i + 1 {
           build(path, [..indicies, i])
         }
@@ -1054,4 +1083,62 @@ pub fn Tensor::reLU(self : Tensor) -> Tensor {
     check=fn() { x.check() },
   )
   self
+}
+
+pub fn Tensor::to_double(self : Tensor) -> Double {
+  if self.shape.length() != 0 {
+    abort("Tensor is not a scalar")
+  }
+  self.value[0]
+}
+
+pub fn cross_correlation(
+  image : Tensor,
+  kernel : Tensor,
+  ~stride : Int = 1
+) -> Tensor {
+  let image_height = image.shape[0]
+  let image_width = image.shape[1]
+  let kernel_height = kernel.shape[0]
+  let kernel_width = kernel.shape[1]
+  let output_height = (image_height - kernel_height) / stride + 1
+  let output_width = (image_width - kernel_width) / stride + 1
+  let output : Array[Array[Tensor]] = []
+  for i = 0; i < output_height; i = i + 1 {
+    let row = []
+    for j = 0; j < output_width; j = j + 1 {
+      let patch = image[i * stride:i * stride + kernel_height][j * stride:j *
+        stride +
+        kernel_width].to_tensor()
+      row.push((patch * kernel).sum().sum())
+    }
+    output.push(row)
+  }
+  Tensor::new(output)
+}
+
+test "Tensor::op_as_view" {
+  let image = tensor(
+    [
+      [0.0, 1.0, 2.0, 3.0],
+      [4.0, 5.0, 6.0, 7.0],
+      [8.0, 9.0, 10.0, 11.0],
+      [12.0, 13.0, 14.0, 15.0],
+    ],
+  )
+  inspect!(image[0:3][0:3], content="[[0, 1, 2], [4, 5, 6], [8, 9, 10]]")
+  inspect!(image[0:3][0:3].to_tensor(), content="[[0, 1, 2], [4, 5, 6], [8, 9, 10]]")
+}
+
+test "cross_correlation" {
+  let image = tensor(
+    [
+      [0.0, 1.0, 2.0, 3.0],
+      [4.0, 5.0, 6.0, 7.0],
+      [8.0, 9.0, 10.0, 11.0],
+      [12.0, 13.0, 14.0, 15.0],
+    ],
+  )
+  let kernel = tensor([[0.0, 1.0, -1.0], [1.0, -1.0, 0.0], [1.0, 1.0, 0.0]])
+  inspect!(cross_correlation(image, kernel), content="[[15, 17], [23, 25]]")
 }
