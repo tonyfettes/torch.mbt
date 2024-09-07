@@ -22,17 +22,7 @@ pub trait Discrete {
   sample(Self) -> Int
 }
 
-impl Continuous for Double with sample(self : Double, ~shape : Array[Int]) -> Tensor {
-  let mut size = 1
-  for s in shape {
-    size *= s
-  }
-  let sample = []
-  for i = 0; i < size; i = i + 1 {
-    sample.push(self)
-  }
-  Tensor::new(sample).reshape(shape)
-}
+impl IContinuous for Double with _sample(self : Double) -> Double { self }
 
 pub struct Uniform {
   lower : Double

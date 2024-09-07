@@ -1,10 +1,10 @@
 pub struct Tensor {
-  mut value : FixedArray[Double]
-  shape : FixedArray[Int]
-  size : FixedArray[Int]
+  priv mut value : FixedArray[Double]
+  priv shape : FixedArray[Int]
+  priv size : FixedArray[Int]
   priv mut graph : Graph
   priv mut ref : Int
-  mut grad : FixedArray[Double]
+  priv mut grad : FixedArray[Double]
 }
 
 pub enum Graph {

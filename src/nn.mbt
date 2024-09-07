@@ -345,3 +345,48 @@ test "Linear Regression" {
   inspect!(model.weight[0][0], content="1.981059015531822")
   inspect!(model.bias[0], content="3.01049253711016")
 }
+
+pub struct Conv2d {
+  weight : Array[Array[Tensor]]
+}
+
+pub trait Shape {
+  to_array(Self) -> Array[Int]
+}
+
+pub fn Conv2d::new[S : Shape](
+  in_channels : Int,
+  out_channels : Int,
+  kernel_size : S
+) -> Conv2d {
+  let weight_distribution : Continuous = 0.0
+  let weight = Array::makei(
+    in_channels,
+    fn {
+      _ =>
+        Array::makei(
+          out_channels,
+          fn { _ => weight_distribution.sample(shape=kernel_size.to_array()) },
+        )
+    },
+  )
+  Conv2d::{ weight, }
+}
+
+pub fn Conv2d::output(self : Conv2d, logger : Logger) -> Unit {
+  Show::output(self.weight, logger)
+}
+
+pub fn Conv2d::forward(self : Conv2d, input : Tensor) -> Tensor {
+  let output = []
+  for n = 0; n < input.shape[0]; n = n + 1 {
+    let channels = []
+    for c = 0; c < input.shape[1]; c = c + 1 {
+      channels.push(
+        cross_correlation(input[n][c].to_tensor(), self.weight[n][c]),
+      )
+    }
+    output.push(Tensor::new(channels).sum())
+  }
+  Tensor::new(output)
+}
