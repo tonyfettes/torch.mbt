@@ -1,7 +1,7 @@
 pub struct Tensor {
   priv mut value : FixedArray[Double]
   priv shape : FixedArray[Int]
-  priv size : FixedArray[Int]
+  priv block : FixedArray[Int]
   priv mut graph : Graph
   priv mut ref : Int
   priv mut grad : FixedArray[Double]
@@ -34,7 +34,7 @@ pub fn Tensor::get(self : Tensor, index : Array[Int]) -> Double {
     if index[i] < 0 || index[i] >= self.shape[i] {
       abort("Index out of bounds")
     }
-    offset += index[i] * self.size[i]
+    offset += index[i] * self.block[i]
   }
   self.value[offset]
 }
@@ -48,7 +48,7 @@ pub fn Tensor::set(self : Tensor, index : Array[Int], value : Double) -> Unit {
     if index[i] < 0 || index[i] >= self.shape[i] {
       abort("Index out of bounds")
     }
-    offset += index[i] * self.size[i]
+    offset += index[i] * self.block[i]
   }
   self.value[offset] = value
 }
@@ -109,8 +109,8 @@ pub fn Tensor::op_get(self : Tensor, index : Int) -> TensorView {
 
 pub fn Tensor::op_set[X : Value](self : Tensor, index : Int, other : X) -> Unit {
   let other = other.to_tensor()
-  let offset = index * self.size[0]
-  for i = 0; i < self.size[0]; i = i + 1 {
+  let offset = index * self.block[0]
+  for i = 0; i < self.block[0]; i = i + 1 {
     self.value[offset + i] = other.value[i]
   }
 }
@@ -183,7 +183,7 @@ pub fn Tensor::op_add(self : Tensor, other : Tensor) -> Tensor {
   Tensor::{
     value: output,
     shape: self.shape,
-    size: self.size,
+    block: self.block,
     graph: Graph::Add(self, other),
     ref: 0,
     grad: FixedArray::make(length, 0.0),
@@ -199,7 +199,7 @@ pub fn Tensor::op_sub(self : Tensor, other : Tensor) -> Tensor {
   Tensor::{
     value: output,
     shape: self.shape,
-    size: self.size,
+    block: self.block,
     graph: Graph::Sub(self, other),
     ref: 0,
     grad: FixedArray::make(length, 0.0),
@@ -215,7 +215,7 @@ pub fn Tensor::op_neg(self : Tensor) -> Tensor {
   Tensor::{
     value: output,
     shape: self.shape,
-    size: self.size,
+    block: self.block,
     graph: Graph::Neg(self),
     ref: 0,
     grad: FixedArray::make(length, 0.0),
@@ -231,7 +231,7 @@ pub fn Tensor::op_mul(self : Tensor, other : Tensor) -> Tensor {
   Tensor::{
     value: output,
     shape: self.shape,
-    size: self.size,
+    block: self.block,
     graph: Graph::Mul(self, other),
     ref: 0,
     grad: FixedArray::make(length, 0.0),
@@ -252,7 +252,7 @@ pub fn Tensor::op_div(self : Tensor, other : Tensor) -> Tensor {
   Tensor::{
     value: output,
     shape: self.shape,
-    size: self.size,
+    block: self.block,
     graph: Graph::Div(self, other),
     ref: 0,
     grad: FixedArray::make(length, 0.0),
@@ -268,7 +268,7 @@ pub fn Tensor::exp(self : Tensor) -> Tensor {
   Tensor::{
     value: output,
     shape: self.shape,
-    size: self.size,
+    block: self.block,
     graph: Graph::Exp(self),
     ref: 0,
     grad: FixedArray::make(length, 0.0),
@@ -284,7 +284,7 @@ pub fn Tensor::log(self : Tensor) -> Tensor {
   Tensor::{
     value: output,
     shape: self.shape,
-    size: self.size,
+    block: self.block,
     graph: Graph::Log(self),
     ref: 0,
     grad: FixedArray::make(length, 0.0),
@@ -292,13 +292,13 @@ pub fn Tensor::log(self : Tensor) -> Tensor {
 }
 
 pub fn Tensor::sum(self : Tensor) -> Tensor {
-  if self.size.length() == 0 {
+  if self.block.length() == 0 {
     abort("Cannot sum a scalar")
   }
-  let value : FixedArray[Double] = FixedArray::make(self.size[0], 0.0)
+  let value : FixedArray[Double] = FixedArray::make(self.block[0], 0.0)
   for i = 0; i < self.shape[0]; i = i + 1 {
-    for j = 0; j < self.size[0]; j = j + 1 {
-      value[j] = value[j] + self.value[i * self.size[0] + j]
+    for j = 0; j < self.block[0]; j = j + 1 {
+      value[j] = value[j] + self.value[i * self.block[0] + j]
     }
   }
   let shape : FixedArray[Int] = FixedArray::make(self.shape.length() - 1, 0)
@@ -306,16 +306,16 @@ pub fn Tensor::sum(self : Tensor) -> Tensor {
     shape[i - 1] = self.shape[i]
   }
   let size : FixedArray[Int] = FixedArray::make(self.shape.length() - 1, 0)
-  for i = 1; i < self.size.length(); i = i + 1 {
-    size[i - 1] = self.size[i]
+  for i = 1; i < self.block.length(); i = i + 1 {
+    size[i - 1] = self.block[i]
   }
   Tensor::{
     value,
     shape,
-    size,
+    block: size,
     graph: Graph::Sum(self),
     ref: 0,
-    grad: FixedArray::make(self.size[0], 0.0),
+    grad: FixedArray::make(self.block[0], 0.0),
   }
 }
 
@@ -324,7 +324,7 @@ test "Tensor::sum - Vector" {
   let sum = tensor.sum()
   inspect!(sum.value, content="[6]")
   inspect!(sum.shape, content="[]")
-  inspect!(sum.size, content="[]")
+  inspect!(sum.block, content="[]")
   inspect!(sum.graph, content="Sum([0, 1, 2, 3])")
   inspect!(sum.ref, content="0")
   inspect!(sum.grad, content="[0]")
@@ -336,7 +336,7 @@ test "Tensor::sum - Matrix" {
   let sum = tensor.sum()
   inspect!(sum.value, content="[3, 5, 7]")
   inspect!(sum.shape, content="[3]")
-  inspect!(sum.size, content="[1]")
+  inspect!(sum.block, content="[1]")
   inspect!(sum.graph, content="Sum([[0, 1, 2], [3, 4, 5]])")
   inspect!(sum.ref, content="0")
   inspect!(sum.grad, content="[0, 0, 0]")
@@ -369,7 +369,7 @@ pub fn Tensor::matmul(self : Tensor, other : Tensor) -> Tensor {
   Tensor::{
     value: output,
     shape: FixedArray::from_array([self.shape[0], other.shape[1]]),
-    size: FixedArray::from_array([other.shape[1], 1]),
+    block: FixedArray::from_array([other.shape[1], 1]),
     graph: Graph::MatMul(self, other),
     ref: 0,
     grad: FixedArray::make(self.shape[0] * other.shape[1], 0.0),
@@ -382,7 +382,7 @@ test "Tensor::matmul - 2x3 * 3x2" {
   let c = a.matmul(b)
   inspect!(c.value, content="[58, 64, 139, 154]")
   inspect!(c.shape, content="[2, 2]")
-  inspect!(c.size, content="[2, 1]")
+  inspect!(c.block, content="[2, 1]")
   inspect!(
     c.graph,
     content="MatMul([[1, 2, 3], [4, 5, 6]], [[7, 8], [9, 10], [11, 12]])",
@@ -416,7 +416,7 @@ pub impl Value for Double with to_tensor(self : Double) -> Tensor {
   Tensor::{
     value: [self],
     shape: [],
-    size: [],
+    block: [],
     graph: Graph::Val,
     ref: 0,
     grad: [0.0],
@@ -471,7 +471,7 @@ pub impl[X : Value + Default] Value for Array[X] with to_tensor(self : Array[X])
   Tensor::{
     value: FixedArray::from_array(value),
     shape: FixedArray::from_array(shape),
-    size: FixedArray::from_array(size),
+    block: FixedArray::from_array(size),
     graph,
     ref: 0,
     grad: FixedArray::make(value.length(), 0.0),
@@ -485,7 +485,7 @@ test "Tensor::new - Scalar" {
   let tensor = Tensor::new(value)
   inspect!(tensor.value, content="[1]")
   inspect!(tensor.shape, content="[]")
-  inspect!(tensor.size, content="[]")
+  inspect!(tensor.block, content="[]")
   inspect!(tensor.graph, content="Val")
   inspect!(tensor.ref, content="0")
   inspect!(tensor.grad, content="[0]")
@@ -497,7 +497,7 @@ test "Tensor::new - Vector" {
   let tensor = Tensor::new(value)
   inspect!(tensor.value, content="[0, 1, 2, 3]")
   inspect!(tensor.shape, content="[4]")
-  inspect!(tensor.size, content="[1]")
+  inspect!(tensor.block, content="[1]")
   inspect!(tensor.graph, content="Val")
   inspect!(tensor.ref, content="0")
   inspect!(tensor.grad, content="[0, 0, 0, 0]")
@@ -509,7 +509,7 @@ test "Tensor::new - Matrix" {
   let tensor = Tensor::new(value)
   inspect!(tensor.value, content="[0, 1, 2, 3, 4, 5]")
   inspect!(tensor.shape, content="[2, 3]")
-  inspect!(tensor.size, content="[3, 1]")
+  inspect!(tensor.block, content="[3, 1]")
   inspect!(tensor.graph, content="Val")
   inspect!(tensor.ref, content="0")
   inspect!(tensor.grad, content="[0, 0, 0, 0, 0, 0]")
@@ -532,7 +532,7 @@ test "Tensor::new - Tensor" {
     content="[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]",
   )
   inspect!(tensor.shape, content="[2, 3, 4]")
-  inspect!(tensor.size, content="[12, 4, 1]")
+  inspect!(tensor.block, content="[12, 4, 1]")
   inspect!(tensor.graph, content="Val")
   inspect!(tensor.ref, content="0")
   inspect!(
@@ -581,11 +581,11 @@ pub fn TensorView::op_set(
     if self_indicies.length() == self.tensor.shape.length() {
       let mut self_offset = 0
       for i = 0; i < self_indicies.length(); i = i + 1 {
-        self_offset += self_indicies[i] * self.tensor.size[i]
+        self_offset += self_indicies[i] * self.tensor.block[i]
       }
       let mut other_offset = 0
       for i = 0; i < other_indicies.length(); i = i + 1 {
-        other_offset += other_indicies[i] * other.size[i]
+        other_offset += other_indicies[i] * other.block[i]
       }
       self.tensor.value[self_offset] = other.value[other_offset]
       return
@@ -647,10 +647,25 @@ pub fn TensorView::log(self : TensorView) -> Tensor {
   self.to_tensor().log()
 }
 
+fn compute_block_size(shape : FixedArray[Int]) -> FixedArray[Int] {
+  let mut dimension = shape.length()
+  let block = FixedArray::make(dimension, 1)
+  dimension -= 1
+  while dimension > 0 {
+    block[dimension - 1] = block[dimension] * shape[dimension]
+    dimension -= 1
+  }
+  block
+}
+
+test "compute_block_size" {
+  inspect!(compute_block_size([2, 3, 4]), content="[12, 4, 1]")
+}
+
 pub fn TensorView::to_tensor(self : TensorView) -> Tensor {
-  let shape = []
-  for p in self.path {
-    match p {
+  let shape : Array[Int] = []
+  for part in self.path {
+    match part {
       Index(_) => ()
       Slice(start, stop) => shape.push(stop - start)
     }
@@ -658,44 +673,47 @@ pub fn TensorView::to_tensor(self : TensorView) -> Tensor {
   for i = self.path.length(); i < self.tensor.shape.length(); i = i + 1 {
     shape.push(self.tensor.shape[i])
   }
-  let value = []
-  let mapping : Array[Int] = []
-  fn build(path : ArrayView[TensorIndex], indicies : Array[Int]) -> Unit {
-    if indicies.length() == self.tensor.shape.length() {
-      let mut offset = 0
-      for i = 0; i < indicies.length(); i = i + 1 {
-        offset += indicies[i] * self.tensor.size[i]
-      }
-      value.push(self.tensor.value[offset])
-      mapping.push(offset)
+  // We can't avoid this allocation because we don't know the length of the
+  // array.
+  let shape = FixedArray::from_array(shape)
+  let block = compute_block_size(shape)
+  let total = if shape.length() == 0 { 1 } else { shape[0] * block[0] }
+  let value = FixedArray::make(total, 0.0)
+  let mut value_length = 0
+  let index = FixedArray::make(total, 0)
+  let mut index_length = 0
+  fn build(dimension : Int, offset : Int) -> Unit {
+    if dimension >= self.tensor.shape.length() {
+      value[value_length] = self.tensor.value[offset]
+      value_length += 1
+      index[index_length] = offset
+      index_length += 1
       return
     }
-    match path {
-      [Index(index), .. as path] => build(path, [..indicies, index])
-      [Slice(start, stop), .. as path] =>
-        for i = start; i < stop; i = i + 1 {
-          build(path, [..indicies, i])
-        }
-      [] =>
-        for i = 0; i < self.tensor.shape[indicies.length()]; i = i + 1 {
-          build(path, [..indicies, i])
+    if dimension >= self.path.length() {
+      for i in 0..<self.tensor.shape[dimension] {
+        build(dimension + 1, offset + i * self.tensor.block[dimension])
+      }
+      return
+    }
+    match self.path[dimension] {
+      Index(index) =>
+        build(dimension + 1, offset + index * self.tensor.block[dimension])
+      Slice(start, end) =>
+        for i in start..<end {
+          build(dimension + 1, offset + i * self.tensor.block[dimension])
         }
     }
   }
 
-  build(self.path[:], [])
-  let size = [1]
-  for i = shape.length() - 1; i > 0; i = i - 1 {
-    size.push(shape[i] * size[size.length() - 1])
-  }
-  size.rev_inplace()
+  build(0, 0)
   Tensor::{
-    value: FixedArray::from_array(value),
-    shape: FixedArray::from_array(shape),
-    size: FixedArray::from_array(size),
-    graph: Graph::Get(self.tensor, FixedArray::from_array(mapping)),
+    value,
+    shape,
+    block,
+    graph: Graph::Get(self.tensor, index),
     ref: 0,
-    grad: FixedArray::make(value.length(), 0.0),
+    grad: FixedArray::make(total, 0.0),
   }
 }
 
@@ -705,7 +723,7 @@ test "TensorView::to_tensor" {
   let tensor = view.to_tensor()
   inspect!(tensor.value, content="[3, 4, 5]")
   inspect!(tensor.shape, content="[3]")
-  inspect!(tensor.size, content="[1]")
+  inspect!(tensor.block, content="[1]")
   inspect!(tensor.graph, content="Get([[0, 1, 2], [3, 4, 5]], [3, 4, 5])")
   inspect!(tensor.ref, content="0")
   inspect!(tensor.grad, content="[0, 0, 0]")
@@ -797,7 +815,7 @@ pub fn Tensor::pow(self : Tensor, exponent : Int) -> Tensor {
   Tensor::{
     value: output,
     shape: self.shape,
-    size: self.size,
+    block: self.block,
     graph: Graph::Pow(self, exponent),
     ref: 0,
     grad: FixedArray::make(length, 0.0),
@@ -871,8 +889,8 @@ fn Tensor::propagate(self : Tensor) -> Unit {
     }
     Sum(x) => {
       for i = 0; i < x.shape[0]; i = i + 1 {
-        for j = 0; j < x.size[0]; j = j + 1 {
-          x.grad[i * x.size[0] + j] += self.grad[j]
+        for j = 0; j < x.block[0]; j = j + 1 {
+          x.grad[i * x.block[0] + j] += self.grad[j]
         }
       }
       x.propagate()
@@ -887,10 +905,10 @@ fn Tensor::propagate(self : Tensor) -> Unit {
       for i = 0; i < a.shape[0]; i = i + 1 {
         for j = 0; j < b.shape[1]; j = j + 1 {
           for k = 0; k < a.shape[1]; k = k + 1 {
-            a.grad[i * a.size[0] + k] += self.grad[i * a.shape[0] + j] *
-              b.value[k * b.size[0] + j]
-            b.grad[k * b.size[0] + j] += self.grad[i * a.shape[0] + j] *
-              a.value[i * a.size[0] + k]
+            a.grad[i * a.block[0] + k] += self.grad[i * a.shape[0] + j] *
+              b.value[k * b.block[0] + j]
+            b.grad[k * b.block[0] + j] += self.grad[i * a.shape[0] + j] *
+              a.value[i * a.block[0] + k]
           }
         }
       }
@@ -1039,7 +1057,7 @@ pub fn Tensor::reshape(self : Tensor, shape : Array[Int]) -> Tensor {
   Tensor::{
     value: self.value.copy(),
     shape: FixedArray::from_array(shape),
-    size: FixedArray::from_array(size),
+    block: FixedArray::from_array(size),
     ref: 0,
     graph: Get(self, FixedArray::makei(self.value.length(), fn { i => i })),
     grad: FixedArray::make(self.value.length(), 0.0),
@@ -1063,7 +1081,7 @@ pub fn Tensor::reLU(self : Tensor) -> Tensor {
   let self = Tensor::{
     value: self.value.map(fn { x => if x > 0.0 { x } else { 0.0 } }),
     shape: self.shape,
-    size: self.size,
+    block: self.block,
     graph: Graph::Val,
     ref: 0,
     grad: FixedArray::make(self.value.length(), 0.0),
@@ -1072,7 +1090,8 @@ pub fn Tensor::reLU(self : Tensor) -> Tensor {
     ref=fn() { x.ref() },
     propagate=fn() {
       for i = 0; i < self.grad.length(); i = i + 1 {
-        x.grad[i] += self.grad[i] * if self.value[i] > 0.0 { 1.0 } else { 0.0 }
+        x.grad[i] += self.grad[i] *
+          (if self.value[i] > 0.0 { 1.0 } else { 0.0 })
       }
       x.propagate()
     },
@@ -1140,4 +1159,129 @@ test "cross_correlation" {
   )
   let kernel = tensor([[0.0, 1.0, -1.0], [1.0, -1.0, 0.0], [1.0, 1.0, 0.0]])
   inspect!(cross_correlation(image, kernel), content="[[15, 17], [23, 25]]")
+}
+
+pub fn Tensor::permute(self : Tensor, permutation : Array[Int]) -> Tensor {
+  if permutation.length() != self.shape.length() {
+    abort("Permutation length does not match tensor rank")
+  }
+  let shape = FixedArray::makei(
+    self.shape.length(),
+    fn(i) { self.shape[permutation[i]] },
+  )
+  let value = []
+  let index = []
+  fn build(dimension : Int, offset : Int) -> Unit {
+    if dimension == self.shape.length() {
+      value.push(self.value[offset])
+      index.push(offset)
+      return
+    }
+    for i = 0; i < self.shape[permutation[dimension]]; i = i + 1 {
+      build(dimension + 1, offset + i * self.block[permutation[dimension]])
+    }
+  }
+
+  build(0, 0)
+  Tensor::{
+    value: FixedArray::from_array(value),
+    shape,
+    block: compute_block_size(shape),
+    graph: Graph::Val,
+    ref: 0,
+    grad: FixedArray::make(value.length(), 0.0),
+  }
+}
+
+test "Tensor::permute" {
+  let tensor = tensor([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]])
+  inspect!(tensor.shape, content="[2, 3]")
+  inspect!(tensor.value, content="[0, 1, 2, 3, 4, 5]")
+  inspect!(tensor, content="[[0, 1, 2], [3, 4, 5]]")
+  let permuted = tensor.permute([1, 0])
+  inspect!(permuted.shape, content="[3, 2]")
+  inspect!(permuted.value, content="[0, 3, 1, 4, 2, 5]")
+  inspect!(permuted, content="[[0, 3], [1, 4], [2, 5]]")
+}
+
+pub fn Tensor::moveaxis[X : ToIntArray](
+  self : Tensor,
+  source : X,
+  destination : X
+) -> Tensor {
+  let source = source.to_int_array()
+  let destination = destination.to_int_array()
+  if source.length() != destination.length() {
+    abort(
+      "Source axes (\{source}) and destination axes (\{destination}) must have the same length",
+    )
+  }
+  let permutation = Array::make(self.shape.length(), -1)
+  let arranged = Array::make(self.shape.length(), false)
+  for i = 0; i < source.length(); i = i + 1 {
+    let source = if source[i] < 0 {
+      source[i] + self.shape.length()
+    } else {
+      source[i]
+    }
+    let destination = if destination[i] < 0 {
+      destination[i] + self.shape.length()
+    } else {
+      destination[i]
+    }
+    if permutation[destination] != -1 {
+      abort(
+        "Destination axis \{destination} is already assigned to \{permutation[destination]}",
+      )
+    }
+    permutation[destination] = source
+  }
+  let mut dimension = 0
+  for i = 0; i < permutation.length(); i = i + 1 {
+    if permutation[i] != -1 {
+      continue
+    }
+    while arranged[dimension] {
+      dimension += 1
+    }
+    arranged[dimension] = true
+    permutation[i] = dimension
+  }
+  self.permute(permutation)
+}
+
+test "Tensor::moveaxis" {
+  let tensor = tensor(
+    [
+      [[0.0, 1.0, 2.0], [0.0, 1.0, 2.0]],
+      [[0.0, 1.0, 2.0], [0.0, 1.0, 2.0]],
+      [[0.0, 1.0, 2.0], [0.0, 1.0, 2.0]],
+      [[0.0, 1.0, 2.0], [0.0, 1.0, 2.0]],
+    ],
+  )
+  inspect!(tensor.shape, content="[4, 2, 3]")
+  let moved = tensor.moveaxis(-1, 0)
+  inspect!(moved.shape, content="[3, 4, 2]")
+  inspect!(
+    moved,
+    content="[[[0, 0], [0, 0], [0, 0], [0, 0]], [[1, 1], [1, 1], [1, 1], [1, 1]], [[2, 2], [2, 2], [2, 2], [2, 2]]]",
+  )
+}
+
+pub trait ToIntArray {
+  to_int_array(Self) -> Array[Int]
+}
+
+pub trait ToInt {
+  to_int(Self) -> Int
+}
+
+impl ToIntArray for Int with to_int_array(self : Int) -> Array[Int] { [self] }
+
+impl ToInt for Int with to_int(self : Int) -> Int { self }
+
+impl[X : ToInt] ToIntArray for Array[X] with to_int_array(self : Array[X]) -> Array[
+  Int,
+] {
+  self.map(fn { x => x.to_int() })
 }

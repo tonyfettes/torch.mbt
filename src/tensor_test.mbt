@@ -49,3 +49,26 @@ test "Tensor::op_get - Matrix" {
   let view = tensor[1]
   inspect!(view, content="[3, 4, 5]")
 }
+
+test "TensorView::to_tensor" {
+  let tensor = @torch.tensor(
+    [
+      [[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]],
+      [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]],
+      [[2.0, 3.0, 4.0], [5.0, 6.0, 7.0]],
+    ],
+  )
+  inspect!(
+    tensor[:][0].to_tensor(),
+    content="[[0, 1, 2], [1, 2, 3], [2, 3, 4]]",
+  )
+  inspect!(tensor[0][:].to_tensor(), content="[[0, 1, 2], [3, 4, 5]]")
+  inspect!(tensor[0][:][1].to_tensor(), content="[1, 4]")
+  inspect!(tensor[:][1][1].to_tensor(), content="[4, 5, 6]")
+  inspect!(tensor[:1][1][:].to_tensor(), content="[[3, 4, 5]]")
+}
+
+test "Tensor::permute" {
+  let tensor = @torch.tensor([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]])
+  inspect!(tensor.permute([1, 0]), content="[[0, 3], [1, 4], [2, 5]]")
+}
