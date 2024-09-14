@@ -24,7 +24,7 @@ pub fn Sequential::parameters(self : Sequential) -> Iter[Tensor] {
 
 pub fn Sequential::output(self : Sequential, logger : Logger) -> Unit {
   for module in self.modules {
-    module.output(logger)
+    Show::output(module, logger)
     logger.write_string(",\n")
   }
 }
@@ -38,7 +38,7 @@ pub fn Sequential::to_string(self : Sequential) -> String {
 pub struct Linear {
   weight : Tensor
   bias : Tensor
-}
+} derive(ToJson, @json.FromJson)
 
 pub fn Linear::of(weight : Tensor, bias : Tensor) -> Linear {
   Linear::{ weight, bias }
@@ -174,7 +174,7 @@ test "Linear with Softmax" {
   inspect!(output, content="[0.9999947593218812, 0.00000524067811873532]")
 }
 
-pub struct ReLU {}
+pub struct ReLU {} derive(ToJson, @json.FromJson)
 
 pub fn ReLU::new() -> ReLU {
   ReLU::{  }
@@ -194,7 +194,7 @@ pub fn ReLU::parameters(_self : ReLU) -> Iter[Tensor] {
 
 pub struct ReLU6 {}
 
-pub struct Softmax {}
+pub struct Softmax {} derive(ToJson, @json.FromJson)
 
 pub fn Softmax::new() -> Softmax {
   Softmax::{  }

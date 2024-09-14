@@ -1,0 +1,15 @@
+{
+  "is-main": true,
+  "import": [
+    "tonyfettes/torch",
+    "moonbitlang/x/fs"
+  ],
+  "link": {
+    "wasm-gc": {
+      "exports": [
+        "entry"
+      ],
+      "export-memory-name": "memory"
+    }
+  }
+}

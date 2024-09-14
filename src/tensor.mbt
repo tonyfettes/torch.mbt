@@ -7,6 +7,49 @@ pub struct Tensor {
   priv mut grad : FixedArray[Double]
 }
 
+pub fn Tensor::to_json(self : Tensor) -> Json {
+  fn build(dimension : Int, offset : Int) -> Json {
+    if dimension >= self.shape.length() {
+      return Json::Number(self.value[offset])
+    }
+    let elements = []
+    for i = 0; i < self.shape[dimension]; i = i + 1 {
+      elements.push(build(dimension + 1, offset + i * self.block[dimension]))
+    }
+    Json::Array(elements)
+  }
+
+  build(0, 0)
+}
+
+test "Tensor::to_json" {
+  let tensor = tensor([[0.0, 1, 2], [3, 4, 5]])
+  inspect!(tensor, content="[[0, 1, 2], [3, 4, 5]]")
+}
+
+pub fn Tensor::from_json(
+  json : Json,
+  path : @json.JsonPath
+) -> Tensor!@json.JsonDecodeError {
+  match json {
+    Json::Number(x) => Tensor::new(x)
+    Json::Array(xs) => {
+      let value : Array[Tensor] = []
+      for i, x in xs {
+        value.push(Tensor::from_json!(x, @json.add_index(path, i)))
+      }
+      Tensor::new(value)
+    }
+    _ => raise @json.JsonDecodeError((path, "Expected an array"))
+  }
+}
+
+test "Tensor::from_json" {
+  let json : Json = [[0, 1, 2], [3, 4, 5]]
+  let tensor : Tensor = json |> @json.from_json!()
+  inspect!(tensor, content="[[0, 1, 2], [3, 4, 5]]")
+}
+
 pub enum Graph {
   Val
   Var
@@ -21,7 +64,7 @@ pub enum Graph {
   Pow(Tensor, Int)
   MatMul(Tensor, Tensor)
   Get(Tensor, FixedArray[Int])
-  Cat(Array[Tensor], FixedArray[(Int, Int)])
+  Cat(FixedArray[Tensor], FixedArray[(Int, Int)])
   Any(~ref : () -> Unit, ~propagate : () -> Unit, ~check : () -> Unit)
 } derive(Show)
 
@@ -433,7 +476,9 @@ pub fn tensor[X : Value](x : X) -> Tensor {
   x.to_tensor()
 }
 
-pub impl[X : Value + Default] Value for Array[X] with to_tensor(self : Array[X]) -> Tensor {
+pub impl[X : Value + Default] Value for FixedArray[X] with to_tensor(
+  self : FixedArray[X]
+) -> Tensor {
   let tensors = self.map(fn { x => x.to_tensor() })
   let shape = [self.length()]
   if self.length() == 0 {
@@ -464,6 +509,54 @@ pub impl[X : Value + Default] Value for Array[X] with to_tensor(self : Array[X])
       Val => ()
       _ => {
         graph = Graph::Cat(tensors, FixedArray::from_array(map))
+        break
+      }
+    }
+  }
+  Tensor::{
+    value: FixedArray::from_array(value),
+    shape: FixedArray::from_array(shape),
+    block: FixedArray::from_array(size),
+    graph,
+    ref: 0,
+    grad: FixedArray::make(value.length(), 0.0),
+  }
+}
+
+pub impl[X : Value + Default] Value for Array[X] with to_tensor(self : Array[X]) -> Tensor {
+  let tensors = self.map(fn { x => x.to_tensor() })
+  let shape = [self.length()]
+  if self.length() == 0 {
+    for s in X::default().to_tensor().shape {
+      shape.push(s)
+    }
+  } else {
+    for i = 0; i < tensors[0].shape.length(); i = i + 1 {
+      shape.push(tensors[0].shape[i])
+    }
+  }
+  let size = [1]
+  for i = shape.length() - 1; i > 0; i = i - 1 {
+    size.push(shape[i] * size[size.length() - 1])
+  }
+  size.rev_inplace()
+  let value = []
+  let map = []
+  for i = 0; i < tensors.length(); i = i + 1 {
+    for j = 0; j < tensors[i].value.length(); j = j + 1 {
+      value.push(tensors[i].value[j])
+      map.push((i, j))
+    }
+  }
+  let mut graph = Graph::Val
+  for tensor in tensors {
+    match tensor.graph {
+      Val => ()
+      _ => {
+        graph = Graph::Cat(
+          FixedArray::from_array(tensors),
+          FixedArray::from_array(map),
+        )
         break
       }
     }
@@ -1284,4 +1377,8 @@ impl[X : ToInt] ToIntArray for Array[X] with to_int_array(self : Array[X]) -> Ar
   Int,
 ] {
   self.map(fn { x => x.to_int() })
+}
+
+pub fn forward(self : Tensor, module : Module) -> Tensor {
+  module.forward(self)
 }

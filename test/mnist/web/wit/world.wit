@@ -1,0 +1,6 @@
+package tonyfettes:mnist;
+
+world model {
+  export load: func(blob: string);
+  export infer: func(input: list<f64>) -> list<f64>;
+}

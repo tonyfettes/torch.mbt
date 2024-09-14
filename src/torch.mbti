@@ -1,0 +1,221 @@
+package tonyfettes/torch
+
+// Values
+fn normal(~mean : Double = .., ~std : Double = ..) -> Double
+
+fn seed(Bytes) -> Unit
+
+fn tensor[X : Value + Show](X) -> Tensor
+
+// Types and methods
+pub struct Categorical {
+  pub logits : Tensor
+  pub probs : Tensor
+}
+impl Categorical {
+  log_prob(Self, Int) -> Tensor
+  new(Tensor) -> Self
+  sample(Self) -> Int
+  to_string(Self) -> String
+}
+
+pub type CrossEntropyLoss
+impl CrossEntropyLoss {
+  forward(Self, Tensor, Tensor) -> Tensor
+  new() -> Self
+  output(Self, Logger) -> Unit
+}
+
+pub enum Graph {
+  Val
+  Var
+  Add(Tensor, Tensor)
+  Sub(Tensor, Tensor)
+  Mul(Tensor, Tensor)
+  Div(Tensor, Tensor)
+  Neg(Tensor)
+  Exp(Tensor)
+  Log(Tensor)
+  Sum(Tensor)
+  Pow(Tensor, Int)
+  MatMul(Tensor, Tensor)
+  Get(Tensor, FixedArray[Int])
+  Cat(Array[Tensor], FixedArray[Tuple[Int, Int]])
+  Any(() -> Unit, () -> Unit, () -> Unit)
+}
+impl Graph {
+  to_string(Self) -> String
+}
+
+pub struct Linear {
+  pub weight : Tensor
+  pub bias : Tensor
+}
+impl Linear {
+  forward(Self, Tensor) -> Tensor
+  new(Int, Int, ~weight_distribution? : Continuous, ~bias_distribution? : Continuous) -> Self
+  of(Tensor, Tensor) -> Self
+  output(Self, Logger) -> Unit
+  parameters(Self) -> Iter[Tensor]
+}
+
+pub type MSELoss
+impl MSELoss {
+  forward(Self, Tensor, Tensor) -> Tensor
+  new() -> Self
+  output(Self, Logger) -> Unit
+}
+
+pub struct Normal {
+  pub mean : Double
+  pub std : Double
+}
+impl Normal {
+  new(~mean : Double = .., ~std : Double = ..) -> Self
+}
+
+pub type ReLU
+impl ReLU {
+  forward(Self, Tensor) -> Tensor
+  new() -> Self
+  output(Self, Logger) -> Unit
+  parameters(Self) -> Iter[Tensor]
+}
+
+pub type ReLU6
+
+pub struct SGD {
+  pub parameters : Array[Tensor]
+  pub learning_rate : Double
+}
+impl SGD {
+  new(Iter[Tensor], ~learning_rate : Double) -> Self
+  step(Self) -> Unit
+  zero_grad(Self) -> Unit
+}
+
+pub struct Sequential {
+  pub modules : Array[Module]
+}
+impl Sequential {
+  forward(Self, Tensor) -> Tensor
+  new(Array[Module]) -> Self
+  output(Self, Logger) -> Unit
+  parameters(Self) -> Iter[Tensor]
+  to_string(Self) -> String
+}
+
+pub type Softmax
+impl Softmax {
+  forward(Self, Tensor) -> Tensor
+  new() -> Self
+  output(Self, Logger) -> Unit
+  parameters(Self) -> Iter[Tensor]
+}
+
+pub struct Tensor {
+  pub value : FixedArray[Double]
+  pub shape : FixedArray[Int]
+  pub size : FixedArray[Int]
+  pub grad : FixedArray[Double]
+  // private fields
+}
+impl Tensor {
+  backward(Self) -> Unit
+  dot(Self, Self) -> Self
+  exp(Self) -> Self
+  get(Self, Array[Int]) -> Double
+  length(Self) -> Int
+  log(Self) -> Self
+  matmul(Self, Self) -> Self
+  new[X : Value + Show](X) -> Self
+  op_add(Self, Self) -> Self
+  op_as_view(Self, ~start : Int, ~end? : Int) -> TensorView
+  op_div(Self, Self) -> Self
+  op_get(Self, Int) -> TensorView
+  op_mul(Self, Self) -> Self
+  op_neg(Self) -> Self
+  op_set[X : Value + Show](Self, Int, X) -> Unit
+  op_sub(Self, Self) -> Self
+  output(Self, Logger) -> Unit
+  pow(Self, Int) -> Self
+  reLU(Self) -> Self
+  reshape(Self, Array[Int]) -> Self
+  set(Self, Array[Int], Double) -> Unit
+  sum(Self) -> Self
+  to_string(Self) -> String
+  to_tensor(Self) -> Self
+}
+
+pub enum TensorIndex {
+  Index(Int)
+  Slice(Int, Int)
+}
+
+pub struct TensorView {
+  pub tensor : Tensor
+  pub path : Array[TensorIndex]
+}
+impl TensorView {
+  log(Self) -> Tensor
+  op_add(Self, Self) -> Tensor
+  op_as_view(Self, ~start : Int, ~end? : Int) -> Self
+  op_get(Self, Int) -> Self
+  op_mul(Self, Self) -> Tensor
+  op_set(Self, Int, Value) -> Unit
+  op_sub(Self, Self) -> Tensor
+  output(Self, Logger) -> Unit
+  to_tensor(Self) -> Tensor
+}
+
+pub struct Uniform {
+  pub lower : Double
+  pub upper : Double
+}
+impl Uniform {
+  new(Double, Double) -> Self
+}
+
+// Type aliases
+
+// Traits
+pub trait Continuous : IContinuous {
+  sample(Self, ~shape : Array[Int]) -> Tensor
+}
+
+pub trait Default {
+  default() -> Self
+}
+
+pub trait Discrete {
+  sample(Self) -> Int
+}
+
+pub trait Loss {
+  forward(Self, Tensor, Tensor) -> Value
+}
+
+pub trait Module : Show {
+  forward(Self, Tensor) -> Tensor
+  parameters(Self) -> Iter[Tensor]
+}
+
+pub trait Value : Show {
+  to_tensor(Self) -> Tensor
+}
+
+// Extension Methods
+impl Show for Categorical
+
+impl Show for Graph
+
+impl Continuous for Continuous
+
+impl Default for Double
+
+impl Default for Array
+
+impl Value for Double
+
+impl Value for Array
+

@@ -1,5 +1,6 @@
 {
   "import": [
-    "tonyfettes/torch"
+    "tonyfettes/torch",
+    "moonbitlang/x/fs"
   ]
 }
