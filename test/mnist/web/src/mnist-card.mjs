@@ -1,6 +1,5 @@
-import "./mnist-image.mjs";
-
-console.log("HERE");
+// @ts-check
+import MnistImage from "./mnist-image.mjs";
 
 const template = document.createElement("template");
 template.innerHTML = `<div
@@ -30,26 +29,33 @@ labelTemplate.innerHTML = `<style>
 </style>
 <div class="mnist-label"></div>`;
 
-class MnistCard extends HTMLDivElement {
+class MnistCard extends HTMLElement {
   constructor() {
     super();
-    this.classList.add("mnist-card");
   }
   loadImage() {
-    console.log("Loading image");
-    /** @type {HTMLCanvasElement} */
-    const image = document.createElement("canvas", {
-      is: "mnist-image",
-    });
+    const image = document.createElement("mnist-image");
+    if (!(image instanceof MnistImage)) {
+      return;
+    }
     image.setAttribute("src", `/data/${this._split}_${this._id}.json`);
     image.addEventListener("load", () => {
       const template = labelTemplate.content.cloneNode(true);
-      template.querySelector(".mnist-label").innerHTML =
-        image.getAttribute("label");
-      this.shadowRoot.querySelector("#wrapper").appendChild(template);
+      const shadowRoot = this.shadowRoot;
+      if (!shadowRoot) {
+        return;
+      }
+      shadowRoot.querySelector("#wrapper")?.appendChild(template);
+      const label = shadowRoot.querySelector(".mnist-label");
+      if (!label) {
+        return;
+      }
+      label.innerHTML = image.getAttribute("label") ?? "";
+      const context = image.getContext();
+      if (!context) {
+        return;
+      }
       this.addEventListener("mousedown", () => {
-        console.log("Selecting image");
-        const context = image.getContext("2d");
         this.dispatchEvent(
           new CustomEvent("select", {
             detail: context.getImageData(0, 0, 28, 28),
@@ -58,11 +64,11 @@ class MnistCard extends HTMLDivElement {
       });
     });
     if (!this._image) {
-      this.shadowRoot.querySelector("#wrapper").appendChild(image);
+      this.shadowRoot?.querySelector("#wrapper")?.appendChild(image);
     } else {
       this.shadowRoot
-        .querySelector("#wrapper")
-        .replaceChild(image, this._image);
+        ?.querySelector("#wrapper")
+        ?.replaceChild(image, this._image);
     }
     this._image = image;
   }
@@ -82,7 +88,7 @@ class MnistCard extends HTMLDivElement {
   }
   connectedCallback() {
     this.attachShadow({ mode: "open" });
-    this.shadowRoot.appendChild(template.content.cloneNode(true));
+    this.shadowRoot?.appendChild(template.content.cloneNode(true));
 
     this._split = this.getAttribute("data-split");
     this._id = this.getAttribute("data-id");
@@ -93,6 +99,6 @@ class MnistCard extends HTMLDivElement {
   }
 }
 
-customElements.define("mnist-card", MnistCard, { extends: "div" });
+customElements.define("mnist-card", MnistCard);
 
 export default MnistCard;

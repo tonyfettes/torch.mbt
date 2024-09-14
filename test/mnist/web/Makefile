@@ -1,18 +1,20 @@
-DEBUG = target/wasm/debug/build
-RELEASE = target/wasm/release/build
+TARGET = wasm
+DEBUG = target/$(TARGET)/debug/build
+RELEASE = target/$(TARGET)/release/build
 WIT = wit
 WAT = $(DEBUG)/gen/gen.wat
 WASM = $(DEBUG)/gen/gen.wasm
 
-.PHONY: default $(WAT) $(WASM) clean run
+.PHONY: default $(WAT) $(WASM) clean run wat
 
 default: main
 
 $(WASM):
-	moon build --target wasm -g
+	moon build --target $(TARGET) -g
 
+wat: $(WAT)
 $(WAT):
-	moon build --target wasm -g --output-wat
+	moon build --target $(TARGET) -g --output-wat
 
 $(DEBUG)/gen/gen.embedded.wasm: $(WIT) $(WASM)
 	wasm-tools component embed $(WIT) $(WASM) -o $@ --encoding utf16

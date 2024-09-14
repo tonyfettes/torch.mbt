@@ -1,6 +1,8 @@
 {
+  "is-main": true,
   "import": [
     "tonyfettes/torch",
+    "tonyfettes/torch/mnist",
     "moonbitlang/x/fs"
   ]
 }

@@ -1369,11 +1369,11 @@ pub trait ToInt {
   to_int(Self) -> Int
 }
 
-impl ToIntArray for Int with to_int_array(self : Int) -> Array[Int] { [self] }
+pub impl ToIntArray for Int with to_int_array(self : Int) -> Array[Int] { [self] }
 
-impl ToInt for Int with to_int(self : Int) -> Int { self }
+pub impl ToInt for Int with to_int(self : Int) -> Int { self }
 
-impl[X : ToInt] ToIntArray for Array[X] with to_int_array(self : Array[X]) -> Array[
+pub impl[X : ToInt] ToIntArray for Array[X] with to_int_array(self : Array[X]) -> Array[
   Int,
 ] {
   self.map(fn { x => x.to_int() })

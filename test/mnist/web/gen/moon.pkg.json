@@ -9,6 +9,16 @@
       ],
       "export-memory-name": "memory",
       "heap-start-address": 16
+    },
+    "wasm-gc": {
+      "exports": [
+        "cabi_realloc:cabi_realloc",
+        "wasmExportInfer:infer",
+        "wasmExportInferPostReturn:cabi_post_infer",
+        "wasmExportLoad:load"
+      ],
+      "export-memory-name": "memory",
+      "heap-start-address": 16
     }
   },
   "import": [

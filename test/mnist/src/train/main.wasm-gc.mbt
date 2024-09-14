@@ -53,7 +53,9 @@ fn train(model : @torch.Module, dataset : Array[Data]) -> Unit {
       let output = model.forward(input)
       optimizer.zero_grad()
       let loss = loss.forward(output, target)
-      println("step: \{step}, loss: \{loss}")
+      if step % 100 == 0 {
+        println("step: \{step}, loss: \{loss}")
+      }
       loss.backward()
       optimizer.step()
       step += 1
@@ -62,7 +64,7 @@ fn train(model : @torch.Module, dataset : Array[Data]) -> Unit {
 }
 
 fn main {
-  let model = Model::new()
+  let model = @mnist.Model::new()
   let dataset = try {
     Dataset::load!("data")
   } catch {

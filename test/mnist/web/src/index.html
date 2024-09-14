@@ -8,63 +8,16 @@
   <body>
     <h1>MNIST</h1>
     <div>
-      <canvas
-        class="mnist-canvas"
-        is="mnist-canvas"
-        width="28"
-        height="28"
-        style="border: 1px solid black; image-rendering: pixelated"
-      ></canvas>
+      <mnist-canvas></mnist-canvas>
+      <button id="mnist-canvas-clear-button">Clear</button>
     </div>
     <div>
-      <div class="mnist-chart" is="mnist-chart"></div>
+      <mnist-chart></mnist-chart>
     </div>
     <h2>Train</h2>
-    <div class="mnist-gallery" is="mnist-gallery" data-split="train"></div>
+    <mnist-gallery data-split="train"></mnist-gallery>
+    <h2>Test</h2>
+    <mnist-gallery data-split="test"></mnist-gallery>
   </body>
-  <script>
-    const mnistWorker = new Worker("/mnist-worker.mjs", {
-      type: "module",
-    });
-    const mnistGallery = document.querySelector(".mnist-gallery");
-    /** @type {HTMLCanvasElement} */
-    const mnistCanvas = document.querySelector(".mnist-canvas");
-    const mnistChart = document.querySelector(".mnist-chart");
-    mnistGallery.addEventListener(
-      "select",
-      /** @param {CustomEvent<ImageData>} event */
-      (event) => {
-        /** @type {HTMLCanvasElement} */
-        const canvas = document.querySelector(".mnist-canvas");
-        const context = canvas.getContext("2d");
-        const imageData = event.detail;
-        context.putImageData(imageData, 0, 0);
-        const data = imageData.data;
-        const input = new Float64Array(data.length / 4);
-        for (let i = 0; i < data.length; i += 4) {
-          input[i / 4] = data[i + 3] / 255;
-        }
-        mnistWorker.postMessage({ type: "infer", data: input });
-      }
-    );
-    mnistCanvas.addEventListener(
-      "draw",
-      /** @param {CustomEvent<Float64Array>} event */
-      (event) => {
-        mnistWorker.postMessage({ type: "infer", data: event.detail });
-      }
-    );
-    mnistWorker.addEventListener(
-      "message",
-      /** @param {MessageEvent<{ type: string, data: Float64Array }>} event */
-      (event) => {
-        const { type, data } = event.data;
-        if (type === "infer") {
-          const output = Array.from(data);
-          console.log("output", output);
-          mnistChart.setAttribute("data", JSON.stringify(output));
-        }
-      }
-    );
-  </script>
+  <script src="/index.mjs" type="module"></script>
 </html>

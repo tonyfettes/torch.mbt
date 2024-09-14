@@ -348,7 +348,7 @@ test "Linear Regression" {
 
 pub struct Conv2d {
   weight : Array[Array[Tensor]]
-}
+} derive(ToJson, @json.FromJson)
 
 pub fn Conv2d::new[KernelSize : ToIntArray](
   in_channels : Int,
@@ -393,6 +393,10 @@ pub fn Conv2d::forward(self : Conv2d, input : Tensor) -> Tensor {
     output.push(Tensor::new(channels).sum())
   }
   Tensor::new(output)
+}
+
+pub fn Conv2d::parameters(self : Conv2d) -> Iter[Tensor] {
+  self.weight.iter().flat_map(fn { channel => channel.iter() })
 }
 
 test "Conv2d" {

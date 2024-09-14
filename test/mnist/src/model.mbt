@@ -9,11 +9,11 @@ type Model (
 
 pub fn Model::new() -> Model {
   (
-    @torch.Linear::new(28 * 28, 14 * 14),
+    @torch.Linear::new(28 * 28, 196),
     @torch.ReLU::new(),
-    @torch.Linear::new(14 * 14, 7 * 7),
+    @torch.Linear::new(196, 49),
     @torch.ReLU::new(),
-    @torch.Linear::new(7 * 7, 11),
+    @torch.Linear::new(49, 11),
     @torch.Softmax::new(),
   )
 }
@@ -28,7 +28,7 @@ pub fn Model::forward(self : Model, input : @torch.Tensor) -> @torch.Tensor {
   output
 }
 
-fn Model::parameters(self : Model) -> Iter[@torch.Tensor] {
+pub fn Model::parameters(self : Model) -> Iter[@torch.Tensor] {
   Iter::concat(
     self._.0.parameters(),
     Iter::concat(self._.2.parameters(), self._.4.parameters()),

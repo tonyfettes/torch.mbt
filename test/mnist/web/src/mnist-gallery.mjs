@@ -1,9 +1,8 @@
 import "./mnist-card.mjs";
 
-class MnistGallery extends HTMLDivElement {
+class MnistGallery extends HTMLElement {
   constructor() {
     super();
-    this.classList.add("mnist-gallery");
   }
   attributeChangedCallback(name, _oldValue, newValue) {
     if (name === "data-split") {
@@ -25,7 +24,8 @@ class MnistGallery extends HTMLDivElement {
       rowDiv.style.justifyContent = "center";
       rowDiv.style.gap = "8px";
       for (let j = 0; j < column; j = j + 1) {
-        const card = document.createElement("div", { is: "mnist-card" });
+        /** @type {MnistCard} */
+        const card = document.createElement("mnist-card");
         card.setAttribute("data-split", this._split);
         card.setAttribute("data-id", j + i * column);
         card.addEventListener("select", (event) => {
@@ -45,10 +45,10 @@ class MnistGallery extends HTMLDivElement {
     this.style.alignItems = "center";
     this.style.justifyContent = "center";
     this.style.gap = "8px";
-    this.style.overflow = "scroll";
+    // this.style.overflow = "scroll";
     this.attachShadow({ mode: "open" });
     this.loadGallery();
   }
 }
 
-customElements.define("mnist-gallery", MnistGallery, { extends: "div" });
+customElements.define("mnist-gallery", MnistGallery);
