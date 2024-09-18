@@ -23,8 +23,13 @@ PROFILE := debug
 BUILD := target/$(TARGET)/$(PROFILE)/build
 
 ifeq ($(TARGET),wasm)
+ifeq ($(PROFILE),release)
+main: $(BUILD)/gen/gen.opt.component.wasm
+	node_modules/.bin/jco transpile $< -o src/ --name mnist
+else
 main: $(BUILD)/gen/gen.component.wasm
 	node_modules/.bin/jco transpile $< -o src/ --name mnist
+endif
 else ifeq ($(TARGET),wasm-gc)
 main: target/wasm/$(PROFILE)/build/gen/gen.component.wasm target/wasm-gc/$(PROFILE)/build/gen/gen.wasm
 	node_modules/.bin/jco transpile $< -o src/ --name mnist
@@ -33,6 +38,9 @@ endif
 
 %.wat: %.wasm
 	wasm-tools print $< > $@
+
+%.opt.wasm: %.wasm
+	wasm-opt --enable-gc --enable-multivalue --enable-reference-types --enable-bulk-memory $< -O3 -o $@
 
 %.embedded.wasm: $(WIT) %.wasm
 	wasm-tools component embed $(WIT) $*.wasm -o $@ --encoding utf16

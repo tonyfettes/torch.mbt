@@ -8,7 +8,8 @@
         "wasmExportLoad:load"
       ],
       "export-memory-name": "memory",
-      "heap-start-address": 16
+      "heap-start-address": 16,
+      "flags": ["-no-block-params"]
     },
     "wasm-gc": {
       "exports": [

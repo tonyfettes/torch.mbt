@@ -12,7 +12,7 @@ pub fn Tensor::to_json(self : Tensor) -> Json {
     if dimension >= self.shape.length() {
       return Json::Number(self.value[offset])
     }
-    let elements = []
+    let elements = Array::new(capacity=self.shape[dimension])
     for i = 0; i < self.shape[dimension]; i = i + 1 {
       elements.push(build(dimension + 1, offset + i * self.block[dimension]))
     }
@@ -34,7 +34,7 @@ pub fn Tensor::from_json(
   match json {
     Json::Number(x) => Tensor::new(x)
     Json::Array(xs) => {
-      let value : Array[Tensor] = []
+      let value : Array[Tensor] = Array::new(capacity=xs.length())
       for i, x in xs {
         value.push(Tensor::from_json!(x, @json.add_index(path, i)))
       }
@@ -216,6 +216,27 @@ pub fn Tensor::to_tensor(self : Tensor) -> Tensor {
 fn Tensor::default() -> Tensor {
   abort("Unable to construct a tensor with default shape")
 }
+
+fn simd_f64x2_loop_add(in0 : Int, in1 : Int, out : Int, len : Int) -> Double =
+  #|(func (param $in0 i32) (param $in1 i32) (param $out i32) (param $len i32)
+  #| (local $vec0 v128)
+  #| (local $vec1 v128)
+  #| (local $sum v128)
+  #| (local $end i32)
+  #|
+  #| (local.set $end (i32.add (local.get $out) (i32.mul (local.get $len) (i32.const 16))))
+  #|
+  #| (loop $loop
+  #|  (local.set $vec0 (v128.load (local.get $in0)))
+  #|  (local.set $vec1 (v128.load (local.get $in1)))
+  #|  (local.set $sum (f64x2.add (local.get $vec0) (local.get $vec1)))
+  #|  (v128.store (local.get $out) (local.get $sum))
+  #|
+  #|  (local.set $in0 (i32.add (local.get $in0) (i32.const 16)))
+  #|  (local.set $in1 (i32.add (local.get $in1) (i32.const 16)))
+  #|  (local.set $out (i32.add (local.get $out) (i32.const 16)))
+  #|
+  #|  (br_if $loop (i32.lt_u (local.get $out) (local.get $end)))))
 
 pub fn Tensor::op_add(self : Tensor, other : Tensor) -> Tensor {
   let length = self.value.length()
@@ -409,11 +430,16 @@ pub fn Tensor::matmul(self : Tensor, other : Tensor) -> Tensor {
       }
     }
   }
+  let graph =
+    match (self.graph, other.graph) {
+      (Val, Val) => Graph::Val
+      _ => Graph::MatMul(self, other)
+    }
   Tensor::{
     value: output,
-    shape: FixedArray::from_array([self.shape[0], other.shape[1]]),
-    block: FixedArray::from_array([other.shape[1], 1]),
-    graph: Graph::MatMul(self, other),
+    shape: [self.shape[0], other.shape[1]],
+    block: [other.shape[1], 1],
+    graph,
     ref: 0,
     grad: FixedArray::make(self.shape[0] * other.shape[1], 0.0),
   }
@@ -480,27 +506,22 @@ pub impl[X : Value + Default] Value for FixedArray[X] with to_tensor(
   self : FixedArray[X]
 ) -> Tensor {
   let tensors = self.map(fn { x => x.to_tensor() })
-  let shape = [self.length()]
-  if self.length() == 0 {
-    for s in X::default().to_tensor().shape {
-      shape.push(s)
-    }
+  let element = if self.length() == 0 {
+    X::default().to_tensor()
   } else {
-    for i = 0; i < tensors[0].shape.length(); i = i + 1 {
-      shape.push(tensors[0].shape[i])
-    }
+    tensors[0]
   }
-  let size = [1]
-  for i = shape.length() - 1; i > 0; i = i - 1 {
-    size.push(shape[i] * size[size.length() - 1])
+  let shape = Array::new(capacity=element.shape.length() + 1)
+  shape.push(self.length())
+  for s in element.shape {
+    shape.push(s)
   }
-  size.rev_inplace()
-  let value = []
-  let map = []
+  let shape = FixedArray::from_array(shape)
+  let block = compute_block_size(shape)
+  let value = Array::new(capacity=shape[0] * block[0])
   for i = 0; i < tensors.length(); i = i + 1 {
     for j = 0; j < tensors[i].value.length(); j = j + 1 {
       value.push(tensors[i].value[j])
-      map.push((i, j))
     }
   }
   let mut graph = Graph::Val
@@ -508,6 +529,12 @@ pub impl[X : Value + Default] Value for FixedArray[X] with to_tensor(
     match tensor.graph {
       Val => ()
       _ => {
+        let map = Array::new(capacity=shape[0] * block[0])
+        for i = 0; i < tensors.length(); i = i + 1 {
+          for j = 0; j < tensors[i].value.length(); j = j + 1 {
+            map.push((i, j))
+          }
+        }
         graph = Graph::Cat(tensors, FixedArray::from_array(map))
         break
       }
@@ -515,8 +542,8 @@ pub impl[X : Value + Default] Value for FixedArray[X] with to_tensor(
   }
   Tensor::{
     value: FixedArray::from_array(value),
-    shape: FixedArray::from_array(shape),
-    block: FixedArray::from_array(size),
+    shape,
+    block,
     graph,
     ref: 0,
     grad: FixedArray::make(value.length(), 0.0),
@@ -540,8 +567,8 @@ pub impl[X : Value + Default] Value for Array[X] with to_tensor(self : Array[X])
     size.push(shape[i] * size[size.length() - 1])
   }
   size.rev_inplace()
-  let value = []
-  let map = []
+  let value = Array::new(capacity=shape[0] * size[0])
+  let map = Array::new(capacity=shape[0] * size[0])
   for i = 0; i < tensors.length(); i = i + 1 {
     for j = 0; j < tensors[i].value.length(); j = j + 1 {
       value.push(tensors[i].value[j])
@@ -756,7 +783,7 @@ test "compute_block_size" {
 }
 
 pub fn TensorView::to_tensor(self : TensorView) -> Tensor {
-  let shape : Array[Int] = []
+  let shape : Array[Int] = Array::new(capacity=self.path.length())
   for part in self.path {
     match part {
       Index(_) => ()
@@ -1262,8 +1289,8 @@ pub fn Tensor::permute(self : Tensor, permutation : Array[Int]) -> Tensor {
     self.shape.length(),
     fn(i) { self.shape[permutation[i]] },
   )
-  let value = []
-  let index = []
+  let value = Array::new(capacity=self.value.length())
+  let index = Array::new(capacity=self.value.length())
   fn build(dimension : Int, offset : Int) -> Unit {
     if dimension == self.shape.length() {
       value.push(self.value[offset])
@@ -1369,7 +1396,9 @@ pub trait ToInt {
   to_int(Self) -> Int
 }
 
-pub impl ToIntArray for Int with to_int_array(self : Int) -> Array[Int] { [self] }
+pub impl ToIntArray for Int with to_int_array(self : Int) -> Array[Int] {
+  [self]
+}
 
 pub impl ToInt for Int with to_int(self : Int) -> Int { self }
 
