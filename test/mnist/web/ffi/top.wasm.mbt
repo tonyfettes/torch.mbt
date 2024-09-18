@@ -84,8 +84,13 @@ extern "wasm" fn copy_inline(dest : Int, src : Int, len : Int) =
 pub extern "wasm" fn str2ptr(str : String) -> Int =
   #|(func (param i32) (result i32) local.get 0 i32.const 8 i32.add)
 
-pub extern "wasm" fn ptr2str(ptr : Int) -> String =
+pub extern "wasm" fn ptr2str_ffi(ptr : Int) -> String =
   #|(func (param i32) (result i32) local.get 0 i32.const 4 i32.sub i32.const 243 i32.store8 local.get 0 i32.const 8 i32.sub)
+
+pub fn ptr2str(ptr : Int, len : Int) -> String {
+  len |> ignore
+  ptr2str_ffi(ptr)
+}
 
 pub extern "wasm" fn bytes2ptr(bytes : Bytes) -> Int =
   #|(func (param i32) (result i32) local.get 0 i32.const 8 i32.add)
@@ -139,7 +144,8 @@ pub fn ptr2int64_array(ptr : Int) -> FixedArray[Int64] {
 extern "wasm" fn ptr2double_array_ffi(ptr : Int) -> FixedArray[Double] =
   #|(func (param i32) (result i32) local.get 0 i32.const 8 i32.sub)
 
-pub fn ptr2double_array(ptr : Int) -> FixedArray[Double] {
+pub fn ptr2double_array(ptr : Int, len: Int) -> FixedArray[Double] {
+  len |> ignore
   set_64_header_ffi(ptr - 4)
   ptr2double_array_ffi(ptr)
 }

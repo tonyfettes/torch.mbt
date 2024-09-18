@@ -6,7 +6,7 @@ pub fn load(blob : String) -> Unit {
   model.val = try {
     blob |> @json.parse!() |> @json.from_json!()
   } catch {
-    _ => model.val
+    error => abort(Show::to_string(error))
   }
 }
 
