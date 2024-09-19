@@ -1,8 +1,11 @@
 // @ts-check
 import * as mnist from './mnist.js';
-import model from './mnist-model.json' with { type: 'json' };
 
-mnist.load(JSON.stringify(model));
+fetch('./mnist-model.json').then((response) => {
+  return response.text();
+}).then((model) => {
+  mnist.load(model);
+}).catch(console.error);
 
 self.onmessage =
   /** @param {MessageEvent<{ type: string, data: Float64Array }>} event */

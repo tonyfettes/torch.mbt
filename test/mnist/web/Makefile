@@ -51,7 +51,7 @@ endif
 clean:
 	moon clean
 
-serve: main
-	pnpm exec serve -s src/
+serve:
+	corepack pnpm exec serve -c ./serve.json
 
 .PHONY: main clean $(foreach target,$(TARGETS),$(foreach profile,$(PROFILES),target/$(target)/$(profile)/build/gen/gen.wasm))

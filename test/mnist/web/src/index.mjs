@@ -1,6 +1,6 @@
 import MnistCanvas from "./mnist-canvas.mjs";
 
-const mnistWorker = new Worker("/mnist-worker.mjs", {
+const mnistWorker = new Worker("./mnist-worker.mjs", {
   type: "module",
 });
 const mnistGalleries = document.querySelectorAll("mnist-gallery");
@@ -22,13 +22,6 @@ mnistGalleries.forEach((gallery) => {
     }
   );
 });
-mnistCanvas?.addEventListener(
-  "draw",
-  /** @param {CustomEvent<Float64Array>} event */
-  (event) => {
-    mnistWorker.postMessage({ type: "infer", data: event.detail });
-  }
-);
 mnistWorker.addEventListener(
   "message",
   /** @param {MessageEvent<{ type: string, data: Float64Array }>} event */
@@ -38,5 +31,12 @@ mnistWorker.addEventListener(
       const output = Array.from(data);
       mnistChart?.setAttribute("data", JSON.stringify(output));
     }
+  }
+);
+mnistCanvas?.addEventListener(
+  "draw",
+  /** @param {CustomEvent<Float64Array>} event */
+  (event) => {
+    mnistWorker.postMessage({ type: "infer", data: event.detail });
   }
 );

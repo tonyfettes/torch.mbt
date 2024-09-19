@@ -70,32 +70,34 @@ class MnistCanvas extends HTMLElement {
       return;
     }
     this.addEventListener("mousedown", (event) => {
+      const offsetX = event.clientX - canvas.getBoundingClientRect().left;
+      const offsetY = event.clientY - canvas.getBoundingClientRect().top;
       this.isDrawing = true;
-      this.lastX = (event.offsetX / 8) >>> 0;
-      this.lastY = (event.offsetY / 8) >>> 0;
+      this.lastX = (offsetX / 8) >>> 0;
+      this.lastY = (offsetY / 8) >>> 0;
     });
     this.addEventListener("mouseleave", () => {
       this.isDrawing = false;
     });
     this.addEventListener("mousemove", (event) => {
       if (this.isDrawing) {
+        const offsetX = event.clientX - canvas.getBoundingClientRect().left;
+        const offsetY = event.clientY - canvas.getBoundingClientRect().top;
         context.beginPath();
-        context.lineWidth = 2;
         context.moveTo(this.lastX, this.lastY);
-        const x = (event.offsetX / 8) >>> 0;
-        const y = (event.offsetY / 8) >>> 0;
+        const x = (offsetX / 8) >>> 0;
+        const y = (offsetY / 8) >>> 0;
         context.lineTo(x, y);
+        context.lineWidth = 2;
+        context.stroke();
         this.lastX = x;
         this.lastY = y;
-        context.stroke();
-        context.closePath();
         const imageData = context.getImageData(0, 0, 28, 28);
         this.dispatchDrawEvent(imageData);
       }
     });
     this.addEventListener("mouseup", () => {
       this.isDrawing = false;
-      // context.closePath();
     });
   }
 }
