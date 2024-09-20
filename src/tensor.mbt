@@ -38,7 +38,7 @@ pub fn Tensor::from_json(
       for i, x in xs {
         value.push(Tensor::from_json!(x, @json.add_index(path, i)))
       }
-      Tensor::new(value)
+      Tensor::stack(FixedArray::from_array(value))
     }
     _ => raise @json.JsonDecodeError((path, "Expected an array"))
   }
@@ -150,8 +150,21 @@ pub fn Tensor::op_get(self : Tensor, index : Int) -> TensorView {
   TensorView::{ tensor: self, path: [Index(index)] }
 }
 
-pub fn Tensor::op_set[X : Value](self : Tensor, index : Int, other : X) -> Unit {
-  let other = other.to_tensor()
+pub fn Tensor::op_set[X : TensorValue](
+  self : Tensor,
+  index : Int,
+  other : X
+) -> Unit {
+  if not(no_grad.val) {
+    match self.graph {
+      Val => ()
+      _ =>
+        abort(
+          "a view of a leaf Variable that requires grad is being used in an in-place operation.",
+        )
+    }
+  }
+  let other = other.to_tensor(requires_grad=false)
   let offset = index * self.block[0]
   for i = 0; i < self.block[0]; i = i + 1 {
     self.value[offset + i] = other.value[i]
@@ -212,6 +225,8 @@ test "Tensor::op_as_view - Matrix" {
 pub fn Tensor::to_tensor(self : Tensor) -> Tensor {
   self
 }
+
+pub impl ToTensor for Tensor with to_tensor(self : Tensor) -> Tensor { self }
 
 fn Tensor::default() -> Tensor {
   abort("Unable to construct a tensor with default shape")
@@ -430,16 +445,11 @@ pub fn Tensor::matmul(self : Tensor, other : Tensor) -> Tensor {
       }
     }
   }
-  let graph =
-    match (self.graph, other.graph) {
-      (Val, Val) => Graph::Val
-      _ => Graph::MatMul(self, other)
-    }
   Tensor::{
     value: output,
     shape: [self.shape[0], other.shape[1]],
     block: [other.shape[1], 1],
-    graph,
+    graph: Graph::MatMul(self, other),
     ref: 0,
     grad: FixedArray::make(self.shape[0] * other.shape[1], 0.0),
   }
@@ -473,7 +483,11 @@ test "Tensor::matmul - 1x2 * 2x2" {
   inspect!(x.reshape([1, ..x.shape]).matmul(w), content="[[8, 8]]")
 }
 
-pub trait Value: Show {
+pub trait TensorValue: Show {
+  to_tensor(Self, ~requires_grad : Bool) -> Tensor
+}
+
+pub trait ToTensor {
   to_tensor(Self) -> Tensor
 }
 
@@ -481,12 +495,19 @@ pub trait Default {
   default() -> Self
 }
 
-pub impl Value for Double with to_tensor(self : Double) -> Tensor {
+pub impl TensorValue for Double with to_tensor(
+  self : Double,
+  ~requires_grad : Bool
+) -> Tensor {
   Tensor::{
     value: [self],
     shape: [],
     block: [],
-    graph: Graph::Val,
+    graph: if requires_grad {
+      Graph::Var
+    } else {
+      Graph::Val
+    },
     ref: 0,
     grad: [0.0],
   }
@@ -494,105 +515,84 @@ pub impl Value for Double with to_tensor(self : Double) -> Tensor {
 
 pub impl Default for Double with default() -> Double { 0.0 }
 
-pub fn Tensor::new[X : Value](self : X) -> Tensor {
-  self.to_tensor()
-}
-
-pub fn tensor[X : Value](x : X) -> Tensor {
-  x.to_tensor()
-}
-
-pub impl[X : Value + Default] Value for FixedArray[X] with to_tensor(
-  self : FixedArray[X]
+pub fn Tensor::new[X : TensorValue](
+  self : X,
+  ~requires_grad : Bool = false
 ) -> Tensor {
-  let tensors = self.map(fn { x => x.to_tensor() })
+  self.to_tensor(~requires_grad)
+}
+
+pub fn tensor[X : TensorValue](x : X, ~requires_grad : Bool = false) -> Tensor {
+  x.to_tensor(~requires_grad)
+}
+
+pub impl[X : TensorValue + Default] TensorValue for FixedArray[X] with to_tensor(
+  self : FixedArray[X],
+  ~requires_grad : Bool
+) -> Tensor {
+  let tensors = self.map(fn { x => x.to_tensor(~requires_grad) })
   let element = if self.length() == 0 {
-    X::default().to_tensor()
+    X::default().to_tensor(~requires_grad)
   } else {
     tensors[0]
   }
-  let shape = Array::new(capacity=element.shape.length() + 1)
-  shape.push(self.length())
-  for s in element.shape {
-    shape.push(s)
+  let shape = FixedArray::make(element.shape.length() + 1, 0)
+  shape[0] = self.length()
+  for i, s in element.shape {
+    shape[i + 1] = s
   }
-  let shape = FixedArray::from_array(shape)
   let block = compute_block_size(shape)
-  let value = Array::new(capacity=shape[0] * block[0])
+  let value = FixedArray::make(shape[0] * block[0], 0.0)
   for i = 0; i < tensors.length(); i = i + 1 {
     for j = 0; j < tensors[i].value.length(); j = j + 1 {
-      value.push(tensors[i].value[j])
-    }
-  }
-  let mut graph = Graph::Val
-  for tensor in tensors {
-    match tensor.graph {
-      Val => ()
-      _ => {
-        let map = Array::new(capacity=shape[0] * block[0])
-        for i = 0; i < tensors.length(); i = i + 1 {
-          for j = 0; j < tensors[i].value.length(); j = j + 1 {
-            map.push((i, j))
-          }
-        }
-        graph = Graph::Cat(tensors, FixedArray::from_array(map))
-        break
-      }
+      value[i * block[0] + j] = tensors[i].value[j]
     }
   }
   Tensor::{
-    value: FixedArray::from_array(value),
+    value,
     shape,
     block,
-    graph,
+    graph: if requires_grad {
+      Graph::Var
+    } else {
+      Graph::Val
+    },
     ref: 0,
     grad: FixedArray::make(value.length(), 0.0),
   }
 }
 
-pub impl[X : Value + Default] Value for Array[X] with to_tensor(self : Array[X]) -> Tensor {
-  let tensors = self.map(fn { x => x.to_tensor() })
-  let shape = [self.length()]
-  if self.length() == 0 {
-    for s in X::default().to_tensor().shape {
-      shape.push(s)
-    }
+pub impl[X : TensorValue + Default] TensorValue for Array[X] with to_tensor(
+  self : Array[X],
+  ~requires_grad : Bool
+) -> Tensor {
+  let tensors = self.map(fn { x => x.to_tensor(~requires_grad) })
+  let element = if self.length() == 0 {
+    X::default().to_tensor(~requires_grad)
   } else {
-    for i = 0; i < tensors[0].shape.length(); i = i + 1 {
-      shape.push(tensors[0].shape[i])
-    }
+    tensors[0]
   }
-  let size = [1]
-  for i = shape.length() - 1; i > 0; i = i - 1 {
-    size.push(shape[i] * size[size.length() - 1])
+  let shape = FixedArray::make(element.shape.length() + 1, 0)
+  shape[0] = self.length()
+  for i, s in element.shape {
+    shape[i + 1] = s
   }
-  size.rev_inplace()
-  let value = Array::new(capacity=shape[0] * size[0])
-  let map = Array::new(capacity=shape[0] * size[0])
+  let block = compute_block_size(shape)
+  let value = FixedArray::make(shape[0] * block[0], 0.0)
   for i = 0; i < tensors.length(); i = i + 1 {
     for j = 0; j < tensors[i].value.length(); j = j + 1 {
-      value.push(tensors[i].value[j])
-      map.push((i, j))
-    }
-  }
-  let mut graph = Graph::Val
-  for tensor in tensors {
-    match tensor.graph {
-      Val => ()
-      _ => {
-        graph = Graph::Cat(
-          FixedArray::from_array(tensors),
-          FixedArray::from_array(map),
-        )
-        break
-      }
+      value[i * block[0] + j] = tensors[i].value[j]
     }
   }
   Tensor::{
-    value: FixedArray::from_array(value),
-    shape: FixedArray::from_array(shape),
-    block: FixedArray::from_array(size),
-    graph,
+    value,
+    shape,
+    block,
+    graph: if requires_grad {
+      Graph::Var
+    } else {
+      Graph::Val
+    },
     ref: 0,
     grad: FixedArray::make(value.length(), 0.0),
   }
@@ -687,12 +687,27 @@ pub fn TensorView::op_get(self : TensorView, index : Int) -> TensorView {
   TensorView::{ tensor: self.tensor, path: [..self.path, Index(index)] }
 }
 
+let no_grad : Ref[Bool] = Ref::new(false)
+
+pub fn with_no_grad[X](f : () -> X) -> X {
+  no_grad.protect(true, f)
+}
+
 pub fn TensorView::op_set(
   self : TensorView,
   index : Int,
-  other : Value
+  other : TensorValue
 ) -> Unit {
-  let other = other.to_tensor()
+  if not(no_grad.val) {
+    match self.tensor.graph {
+      Val => ()
+      _ =>
+        abort(
+          "a view of a leaf Variable that requires grad is being used in an in-place operation.",
+        )
+    }
+  }
+  let other = other.to_tensor(requires_grad=false)
   fn assign(
     path : ArrayView[TensorIndex],
     self_indicies : Array[Int],
@@ -764,7 +779,7 @@ pub fn TensorView::op_mul(self : TensorView, other : TensorView) -> Tensor {
 }
 
 pub fn TensorView::log(self : TensorView) -> Tensor {
-  self.to_tensor().log()
+  ToTensor::to_tensor(self).log()
 }
 
 fn compute_block_size(shape : FixedArray[Int]) -> FixedArray[Int] {
@@ -1196,6 +1211,91 @@ test "Tensor::reshape" {
   inspect!(tensor.ref, content="1")
 }
 
+pub fn Tensor::stack(tensors : FixedArray[Tensor]) -> Tensor {
+  if tensors.length() == 0 {
+    abort("No tensors to concatenate")
+  }
+  let shape = FixedArray::make(tensors[0].shape.length(), 0)
+  shape[0] = tensors.length()
+  for i, s in tensors[0].shape {
+    shape[i + 1] = s
+  }
+  let block = compute_block_size(shape)
+  let value = FixedArray::make(shape[0] * block[0], 0.0)
+  let index = FixedArray::make(shape[0] * block[0], (-1, -1))
+  for i = 0; i < tensors.length(); i = i + 1 {
+    for j = 0; j < tensors[i].value.length(); j = j + 1 {
+      value[i * block[0] + j] = tensors[i].value[j]
+      index[i * block[0] + j] = (i, j)
+    }
+  }
+  Tensor::{
+    value,
+    shape,
+    block,
+    graph: Cat(tensors, index),
+    ref: 0,
+    grad: FixedArray::make(value.length(), 0.0),
+  }
+}
+
+pub fn Tensor::cat(tensors : FixedArray[Tensor], ~dim : Int = 0) -> Tensor {
+  if tensors.length() == 0 {
+    abort("No tensors to concatenate")
+  }
+  for i = 0; i < tensors.length(); i = i + 1 {
+    if tensors[i].shape.length() != tensors[0].shape.length() {
+      abort("Inconsistent shape")
+    }
+  }
+  for i = 0; i < tensors[0].shape.length(); i = i + 1 {
+    if i != dim && tensors[i].shape[i] != tensors[0].shape[i] {
+      abort("Inconsistent shape")
+    }
+  }
+  let shape = FixedArray::make(tensors[0].shape.length(), 0)
+  for i = 0; i < tensors[0].shape.length(); i = i + 1 {
+    if i == dim {
+      for j = 0; j < tensors.length(); j = j + 1 {
+        shape[i] += tensors[j].shape[i]
+      }
+    } else {
+      shape[i] = tensors[0].shape[i]
+    }
+  }
+  let block = compute_block_size(shape)
+  let value = Array::new(capacity=shape[0] * block[0])
+  let index = Array::new(capacity=shape[0] * block[0])
+  fn build(i : Int, d : Int, p : Int) -> Unit {
+    if d == tensors[i].shape.length() {
+      value.push(tensors[i].value[p])
+      index.push((i, p))
+      return
+    }
+    if d == dim {
+      for i = 0; i < tensors.length(); i = i + 1 {
+        for j = 0; j < tensors[i].shape[d]; j = j + 1 {
+          build(i, d + 1, p + j * tensors[i].block[d])
+        }
+      }
+      return
+    }
+    for j = 0; j < tensors[i].shape[d]; j = j + 1 {
+      build(i, d + 1, p + j * tensors[i].block[d])
+    }
+  }
+
+  build(0, 0, 0)
+  Tensor::{
+    value: FixedArray::from_array(value),
+    shape,
+    block,
+    graph: Cat(tensors, FixedArray::from_array(index)),
+    ref: 0,
+    grad: FixedArray::make(value.length(), 0.0),
+  }
+}
+
 pub fn Tensor::reLU(self : Tensor) -> Tensor {
   let x = self
   let self = Tensor::{
@@ -1238,18 +1338,22 @@ pub fn cross_correlation(
   let kernel_width = kernel.shape[1]
   let output_height = (image_height - kernel_height) / stride + 1
   let output_width = (image_width - kernel_width) / stride + 1
-  let output : Array[Array[Tensor]] = []
-  for i = 0; i < output_height; i = i + 1 {
-    let row = []
-    for j = 0; j < output_width; j = j + 1 {
-      let patch = image[i * stride:i * stride + kernel_height][j * stride:j *
-      stride +
-      kernel_width].to_tensor()
-      row.push((patch * kernel).sum().sum())
-    }
-    output.push(row)
-  }
-  Tensor::new(output)
+  FixedArray::makei(
+    output_height,
+    fn(i) {
+      FixedArray::makei(
+        output_width,
+        fn(j) {
+          let patch = image[i * stride:i * stride + kernel_height][j * stride:j *
+          stride +
+          kernel_width].to_tensor()
+          (patch * kernel).sum().sum()
+        },
+      )
+      |> Tensor::stack()
+    },
+  )
+  |> Tensor::stack()
 }
 
 test "Tensor::op_as_view" {

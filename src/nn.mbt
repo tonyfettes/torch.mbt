@@ -93,12 +93,16 @@ pub fn Linear::output(self : Linear, logger : Logger) -> Unit {
 
 test "Linear" {
   let linear = Linear::new(2, 2)
-  linear.weight[0][0] = 1.0
-  linear.weight[0][1] = 3.0
-  linear.weight[1][0] = 2.0
-  linear.weight[1][1] = 4.0
-  linear.bias[0] = 5.0
-  linear.bias[1] = 6.0
+  with_no_grad(
+    fn() {
+      linear.weight[0][0] = 1.0
+      linear.weight[0][1] = 3.0
+      linear.weight[1][0] = 2.0
+      linear.weight[1][1] = 4.0
+      linear.bias[0] = 5.0
+      linear.bias[1] = 6.0
+    },
+  )
   let input = tensor([1.0, 2.0])
   let optimizer = SGD::new(linear.parameters(), learning_rate=0.1)
   let output = linear.forward(input)
@@ -120,12 +124,16 @@ test "Linear" {
 
 test "Linear with ReLU" {
   let linear = Linear::new(2, 2)
-  linear.weight[0][0] = 1.0
-  linear.weight[0][1] = 3.0
-  linear.weight[1][0] = 2.0
-  linear.weight[1][1] = 4.0
-  linear.bias[0] = 5.0
-  linear.bias[1] = 6.0
+  with_no_grad(
+    fn() {
+      linear.weight[0][0] = 1.0
+      linear.weight[0][1] = 3.0
+      linear.weight[1][0] = 2.0
+      linear.weight[1][1] = 4.0
+      linear.bias[0] = 5.0
+      linear.bias[1] = 6.0
+    },
+  )
   let layers = Sequential::new([linear, ReLU::new()])
   let optimizer = SGD::new(linear.parameters(), learning_rate=1)
   let input = tensor([2.0, 2.0])
@@ -150,12 +158,16 @@ test "Linear with ReLU" {
 
 test "Linear with Softmax" {
   let linear = Linear::new(2, 2)
-  linear.weight[0][0] = 2.0
-  linear.weight[0][1] = 2.0
-  linear.weight[1][0] = 2.0
-  linear.weight[1][1] = 2.0
-  linear.bias[0] = 1.0
-  linear.bias[1] = 2.0
+  with_no_grad(
+    fn() {
+      linear.weight[0][0] = 2.0
+      linear.weight[0][1] = 2.0
+      linear.weight[1][0] = 2.0
+      linear.weight[1][1] = 2.0
+      linear.bias[0] = 1.0
+      linear.bias[1] = 2.0
+    },
+  )
   let layers = Sequential::new([linear, Softmax::new()])
   let optimizer = SGD::new(linear.parameters(), learning_rate=1)
   let input = tensor([2.0, 2.0])
@@ -266,7 +278,7 @@ test "MLP" {
 }
 
 pub trait Loss {
-  forward(Self, Tensor, Tensor) -> Value
+  forward(Self, Tensor, Tensor) -> TensorValue
 }
 
 pub struct MSELoss {}
@@ -312,9 +324,13 @@ pub fn CrossEntropyLoss::forward(
 
 test "Linear Regression" {
   let model = Linear::new(1, 1)
+  with_no_grad(
+    fn() {
+      model.weight[0][0] = 0.0
+      model.bias[0] = 0.0
+    },
+  )
   let optimizer = SGD::new(model.parameters(), learning_rate=0.1)
-  model.weight[0][0] = 0.0
-  model.bias[0] = 0.0
   let target = fn(x : Array[Double]) { [2.0 * x[0] + 3] }
   let inputs = [
     0.8208251, 0.90000966, 0.28106993, 0.39323831, 0.43506248, 0.4969614, 0.52247973,
@@ -390,9 +406,11 @@ pub fn Conv2d::forward(self : Conv2d, input : Tensor) -> Tensor {
         cross_correlation(input[n][c].to_tensor(), self.weight[n][c]),
       )
     }
-    output.push(Tensor::new(channels).sum())
+    let channels = FixedArray::from_array(channels)
+    output.push(Tensor::stack(channels).sum())
   }
-  Tensor::new(output)
+  let output = FixedArray::from_array(output)
+  Tensor::stack(output)
 }
 
 pub fn Conv2d::parameters(self : Conv2d) -> Iter[Tensor] {
