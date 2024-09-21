@@ -24,7 +24,7 @@ pub trait Discrete {
 
 impl IContinuous for Double with _sample(self : Double) -> Double { self }
 
-pub struct Uniform {
+struct Uniform {
   lower : Double
   upper : Double
 }
@@ -33,8 +33,12 @@ pub fn Uniform::new(lower : Double, upper : Double) -> Uniform {
   Uniform::{ lower, upper }
 }
 
-fn Uniform::_sample(self : Uniform) -> Double {
+impl IContinuous for Uniform with _sample(self : Uniform) -> Double {
   rand.val.double() * (self.upper - self.lower) + self.lower
+}
+
+pub fn Uniform::sample(self : Uniform, ~shape : Array[Int]) -> Tensor {
+  Continuous::sample(self, ~shape)
 }
 
 let normal_buffer : Array[Double] = []
