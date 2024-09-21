@@ -232,7 +232,12 @@ fn Tensor::default() -> Tensor {
   abort("Unable to construct a tensor with default shape")
 }
 
-fn simd_f64x2_loop_add(in0 : Int, in1 : Int, out : Int, len : Int) -> Double =
+extern "wasm" fn simd_f64x2_loop_add(
+  in0 : Int,
+  in1 : Int,
+  out : Int,
+  len : Int
+) -> Double =
   #|(func (param $in0 i32) (param $in1 i32) (param $out i32) (param $len i32)
   #| (local $vec0 v128)
   #| (local $vec1 v128)
@@ -1215,7 +1220,7 @@ pub fn Tensor::stack(tensors : FixedArray[Tensor]) -> Tensor {
   if tensors.length() == 0 {
     abort("No tensors to concatenate")
   }
-  let shape = FixedArray::make(tensors[0].shape.length(), 0)
+  let shape = FixedArray::make(tensors[0].shape.length() + 1, 0)
   shape[0] = tensors.length()
   for i, s in tensors[0].shape {
     shape[i + 1] = s
