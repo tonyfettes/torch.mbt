@@ -44,7 +44,9 @@ fn array_double_simd_add(
 pub fn Tensor::op_add(self : Tensor, other : Tensor) -> Tensor {
   let length = self.value.length()
   let value : FixedArray[Double] = FixedArray::make(length, 0.0)
-  array_double_simd_add(self.value, other.value, value, length)
+  for i = 0; i < length; i = i + 1 {
+    value[i] = self.value[i] + other.value[i]
+  }
   Tensor::{
     value,
     shape: self.shape,
