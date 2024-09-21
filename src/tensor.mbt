@@ -828,6 +828,10 @@ test "TensorView::to_tensor" {
   inspect!(tensor, content="[3, 4, 5]")
 }
 
+fn TensorView::to_double(self : TensorView) -> Double {
+  self.to_tensor().to_double()
+}
+
 fn Tensor::ref(self : Tensor) -> Unit {
   self.ref += 1
   if self.ref > 1 {
@@ -1174,7 +1178,8 @@ test "Tensor::reshape" {
   inspect!(tensor.ref, content="1")
 }
 
-pub fn Tensor::stack(tensors : FixedArray[Tensor]) -> Tensor {
+pub impl[X: ToTensor] ToTensor for FixedArray[X] with to_tensor(self : FixedArray[X]) -> Tensor {
+  let tensors = self.map(fn(x) { x.to_tensor() })
   if tensors.length() == 0 {
     abort("No tensors to concatenate")
   }
@@ -1200,6 +1205,10 @@ pub fn Tensor::stack(tensors : FixedArray[Tensor]) -> Tensor {
     ref: 0,
     grad: FixedArray::make(value.length(), 0.0),
   }
+}
+
+pub fn Tensor::stack[X: ToTensor](tensors : FixedArray[X]) -> Tensor {
+  ToTensor::to_tensor(tensors)
 }
 
 pub fn Tensor::cat(tensors : FixedArray[Tensor], ~dim : Int = 0) -> Tensor {
@@ -1477,4 +1486,57 @@ pub impl[X : ToInt] ToIntArray for Array[X] with to_int_array(self : Array[X]) -
 
 pub fn forward(self : Tensor, module : Module) -> Tensor {
   module.forward(self)
+}
+
+pub fn avg_pool2d(
+  input : Tensor,
+  kernel : Array[Int],
+  stride : Array[Int]
+) -> Tensor {
+  if input.shape.length() != 4 {
+    abort("input should be of the shape (N, C, H, W)")
+  }
+  if kernel.length() != 2 {
+    abort("kernel should be of the shape (kH, kW)")
+  }
+  let kH = kernel[0]
+  let kW = kernel[1]
+  let output = FixedArray::makei(
+    input.shape[0],
+    fn {
+      _ =>
+        FixedArray::makei(
+          input.shape[1],
+          fn {
+            _ =>
+              FixedArray::makei(
+                input.shape[2],
+                fn { _ => FixedArray::make(input.shape[3], tensor(0.0)) },
+              )
+          },
+        )
+    },
+  )
+  for n = 0; n < input.shape[0]; n = n + 1 {
+    for c = 0; c < input.shape[1]; c = c + 1 {
+      for h = 0; h < input.shape[2]; h = h + 1 {
+        for w = 0; w < input.shape[3]; w = w + 1 {
+          let array = FixedArray::make(kH * kW, tensor(0.0))
+          for m = 0; m < kH; m = m + 1 {
+            for n = 0; n < kW; n = n + 1 {
+              array[m * kW + n] = input[n][c][stride[0] * h + m][stride[1] * w +
+              n].to_tensor()
+            }
+          }
+          output[n][c][h][w] = ToTensor::to_tensor(array).sum().sum() / tensor((kH * kW).to_double())
+        }
+      }
+    }
+  }
+  ToTensor::to_tensor(output)
+}
+
+test "avg_pool2d" {
+  let input = Uniform::new(-1, 1).sample(shape=[1, 1, 4, 4])
+  inspect!(avg_pool2d(input, [2, 2], [2, 2]))
 }
