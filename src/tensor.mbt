@@ -147,6 +147,9 @@ pub fn Tensor::op_get(self : Tensor, index : Int) -> TensorView {
   if self.shape.length() == 0 {
     abort("Tensor is a scalar")
   }
+  if index >= self.shape[0] {
+    abort("Tensor element access \{index} out of bounds [0, \{self.shape[0]}")
+  }
   TensorView::{ tensor: self, path: [Index(index)] }
 }
 
@@ -193,7 +196,14 @@ pub fn Tensor::op_as_view(
   }
   let end = match end {
     None => self.shape[0]
-    Some(end) => end
+    Some(end) => {
+      if end > self.shape[0] {
+        abort(
+          "Tensor slice [\{start}, \{end}) out of bounds: [0, \{self.shape[0]})",
+        )
+      }
+      end
+    }
   }
   let path = [TensorIndex::Slice(start, end)]
   TensorView::{ tensor: self, path }
@@ -226,7 +236,7 @@ pub fn Tensor::to_tensor(self : Tensor) -> Tensor {
   self
 }
 
-pub impl ToTensor for Tensor with to_tensor(self : Tensor) -> Tensor { self }
+pub impl TensorLike for Tensor with to_tensor(self : Tensor) -> Tensor { self }
 
 fn Tensor::default() -> Tensor {
   abort("Unable to construct a tensor with default shape")
@@ -450,7 +460,7 @@ pub trait TensorValue: Show {
   to_tensor(Self, ~requires_grad : Bool) -> Tensor
 }
 
-pub trait ToTensor {
+pub trait TensorLike {
   to_tensor(Self) -> Tensor
 }
 
@@ -647,6 +657,14 @@ pub fn TensorView::to_string(self : TensorView) -> String {
 }
 
 pub fn TensorView::op_get(self : TensorView, index : Int) -> TensorView {
+  if self.path.length() == self.tensor.shape.length() {
+    abort("Taking element at the lowerest dimension")
+  }
+  if index >= self.tensor.shape[self.path.length()] {
+    abort(
+      "Tensor element access at \{index} out of bounds [0, \{self.tensor.shape[self.path.length()]}",
+    )
+  }
   TensorView::{ tensor: self.tensor, path: [..self.path, Index(index)] }
 }
 
@@ -742,7 +760,7 @@ pub fn TensorView::op_mul(self : TensorView, other : TensorView) -> Tensor {
 }
 
 pub fn TensorView::log(self : TensorView) -> Tensor {
-  ToTensor::to_tensor(self).log()
+  TensorLike::to_tensor(self).log()
 }
 
 fn compute_block_size(shape : FixedArray[Int]) -> FixedArray[Int] {
@@ -1178,10 +1196,19 @@ test "Tensor::reshape" {
   inspect!(tensor.ref, content="1")
 }
 
-pub impl[X: ToTensor] ToTensor for FixedArray[X] with to_tensor(self : FixedArray[X]) -> Tensor {
+pub impl[X : TensorLike] TensorLike for FixedArray[X] with to_tensor(
+  self : FixedArray[X]
+) -> Tensor {
   let tensors = self.map(fn(x) { x.to_tensor() })
   if tensors.length() == 0 {
     abort("No tensors to concatenate")
+  }
+  for i in 1..<tensors.length() {
+    if tensors[i].shape != tensors[0].shape {
+      abort(
+        "Tensor at \{i} has shape \{tensors[i].shape}, which is not the same as \{tensors[0].shape}",
+      )
+    }
   }
   let shape = FixedArray::make(tensors[0].shape.length() + 1, 0)
   shape[0] = tensors.length()
@@ -1207,8 +1234,8 @@ pub impl[X: ToTensor] ToTensor for FixedArray[X] with to_tensor(self : FixedArra
   }
 }
 
-pub fn Tensor::stack[X: ToTensor](tensors : FixedArray[X]) -> Tensor {
-  ToTensor::to_tensor(tensors)
+pub fn Tensor::stack[X : TensorLike](tensors : FixedArray[X]) -> Tensor {
+  TensorLike::to_tensor(tensors)
 }
 
 pub fn Tensor::cat(tensors : FixedArray[Tensor], ~dim : Int = 0) -> Tensor {
@@ -1400,13 +1427,13 @@ test "Tensor::permute" {
   inspect!(permuted, content="[[0, 3], [1, 4], [2, 5]]")
 }
 
-pub fn Tensor::moveaxis[X : ToIntArray](
+pub fn Tensor::moveaxis[Shape : Shape](
   self : Tensor,
-  source : X,
-  destination : X
+  source : Shape,
+  destination : Shape
 ) -> Tensor {
-  let source = source.to_int_array()
-  let destination = destination.to_int_array()
+  let source = source.to_array(dim=None)
+  let destination = destination.to_array(dim=None)
   if source.length() != destination.length() {
     abort(
       "Source axes (\{source}) and destination axes (\{destination}) must have the same length",
@@ -1464,43 +1491,20 @@ test "Tensor::moveaxis" {
   )
 }
 
-pub trait ToIntArray {
-  to_int_array(Self) -> Array[Int]
-}
-
-pub trait ToInt {
-  to_int(Self) -> Int
-}
-
-pub impl ToIntArray for Int with to_int_array(self : Int) -> Array[Int] {
-  [self]
-}
-
-pub impl ToInt for Int with to_int(self : Int) -> Int { self }
-
-pub impl[X : ToInt] ToIntArray for Array[X] with to_int_array(self : Array[X]) -> Array[
-  Int,
-] {
-  self.map(fn { x => x.to_int() })
-}
-
 pub fn forward(self : Tensor, module : Module) -> Tensor {
   module.forward(self)
 }
 
 pub fn avg_pool2d(
   input : Tensor,
-  kernel : Array[Int],
-  stride : Array[Int]
+  ~kernel_size : (Int, Int),
+  ~stride : (Int, Int)
 ) -> Tensor {
   if input.shape.length() != 4 {
     abort("input should be of the shape (N, C, H, W)")
   }
-  if kernel.length() != 2 {
-    abort("kernel should be of the shape (kH, kW)")
-  }
-  let kH = kernel[0]
-  let kW = kernel[1]
+  let kH = kernel_size.0
+  let kW = kernel_size.1
   let output = FixedArray::makei(
     input.shape[0],
     fn {
@@ -1510,33 +1514,39 @@ pub fn avg_pool2d(
           fn {
             _ =>
               FixedArray::makei(
-                input.shape[2],
-                fn { _ => FixedArray::make(input.shape[3], tensor(0.0)) },
+                input.shape[2] / stride.0,
+                fn {
+                  _ => FixedArray::make(input.shape[3] / stride.1, tensor(0.0))
+                },
               )
           },
         )
     },
   )
-  for n = 0; n < input.shape[0]; n = n + 1 {
+  for b = 0; b < input.shape[0]; b = b + 1 {
     for c = 0; c < input.shape[1]; c = c + 1 {
-      for h = 0; h < input.shape[2]; h = h + 1 {
-        for w = 0; w < input.shape[3]; w = w + 1 {
+      for h = 0; h < input.shape[2] / stride.0; h = h + 1 {
+        for w = 0; w < input.shape[3] / stride.1; w = w + 1 {
           let array = FixedArray::make(kH * kW, tensor(0.0))
           for m = 0; m < kH; m = m + 1 {
             for n = 0; n < kW; n = n + 1 {
-              array[m * kW + n] = input[n][c][stride[0] * h + m][stride[1] * w +
-              n].to_tensor()
+              array[m * kW + n] = input[b][c][stride.0 * h + m][stride.1 * w + n].to_tensor()
             }
           }
-          output[n][c][h][w] = ToTensor::to_tensor(array).sum().sum() / tensor((kH * kW).to_double())
+          output[b][c][h][w] = TensorLike::to_tensor(array).sum() /
+            tensor((kH * kW).to_double())
         }
       }
     }
   }
-  ToTensor::to_tensor(output)
+  TensorLike::to_tensor(output)
 }
 
 test "avg_pool2d" {
+  seed(b"12345678223456783234567842345678")
   let input = Uniform::new(-1, 1).sample(shape=[1, 1, 4, 4])
-  inspect!(avg_pool2d(input, [2, 2], [2, 2]))
+  inspect!(
+    avg_pool2d(input, kernel_size=(2, 2), stride=(2, 2)),
+    content="[[[[-0.44003578153032763, -0.04338125044803742], [0.3602031952870989, 0.17430781904809295]]]]",
+  )
 }

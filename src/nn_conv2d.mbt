@@ -2,12 +2,12 @@ pub struct Conv2d {
   weight : Array[Array[Tensor]]
 } derive(ToJson, @json.FromJson)
 
-pub fn Conv2d::new[KernelSize : ToIntArray](
+pub fn Conv2d::new[KernelSize : Shape2d](
   in_channels : Int,
   out_channels : Int,
   ~kernel_size : KernelSize
 ) -> Conv2d {
-  let kernel_size = kernel_size.to_int_array()
+  let kernel_size = kernel_size.to_array()
   let weight_distribution : Continuous = {
     let mut n = in_channels
     for k in kernel_size {
@@ -60,7 +60,7 @@ test "Conv2d" {
   let image = Tensor::stack([image])
   inspect!(image.shape, content="[1, 8, 8, 3]")
   let image = image.moveaxis(3, 0)
-  let layer = Conv2d::new(3, 3, kernel_size=[3, 3])
+  let layer = Conv2d::new(3, 3, kernel_size=(3, 3))
   let output = layer.forward(image)
   inspect!(
     output,
