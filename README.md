@@ -14,7 +14,6 @@ PyTorch-like API implemented in MoonBit.
 
    ```json
    {
-     // ...
      "import": {
        "tonyfettes/torch"
      }
@@ -33,23 +32,23 @@ PyTorch-like API implemented in MoonBit.
 ## Roadmap
 
 - [x] Use `Tensor` for everything, remove `Value` type
-- [ ] Use `ToIntArray` for passing shape-like object (`kernel_size`, etc.)
+- [x] Use `Shape`, `Shape2d`, etc. for passing shape-like object (`kernel_size`, etc.)
 - [ ] PyTorch tensor operations
-  - [ ] `torch.stack`
+  - [x] `torch.stack`
   - [ ] `torch.sum` along any dimension
-  - [ ] `torch.cat` along any dimension
+  - [x] `torch.cat` along any dimension
   - [ ] `torch.transpose`
-  - [ ] `torch.swapaxis`
+  - [x] `torch.swapaxis` (implemented by `Tensor::permute` and `Tensor::moveaxis`)
   - [ ] `torch.sigmoid`
   - [ ] Broadcast addition, multiplication, etc.
 - [ ] PyTorch module
   - [ ] `Sigmoid`
+  - [x] `AvgPool2d`
 - [ ] PyTorch functional module
-  - [ ] `F.relu`
-  - [ ] `F.conv2d`
-  - [ ] `F.max_pool2d`
-  - [ ] `F.avg_pool2d`
 - [ ] Module/model saving and loading
+  - [x] Static JSON format.
+  - [ ] Dynamic JSON format. "Dynamic" means saving/loading a trait object (`Module` here)
+  - [ ] Binary format
 - [ ] Computation graph optimization
   - [ ] `Get` operation fusing
   - [ ] Make `Sum` operate on `Array[Tensor]` directly
@@ -58,4 +57,5 @@ PyTorch-like API implemented in MoonBit.
   - [ ] KL-divergence
 - [ ] Distributions reparametrisation trick
 - [ ] `Adam*` optimizers
-- [ ] WASM-SIMD `v128`
+- [ ] **blocked: MoonBit inline WASM does not support SIMD yet.** WASM-SIMD `v128`
+  - [x] `add`
