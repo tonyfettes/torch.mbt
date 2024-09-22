@@ -50,7 +50,7 @@ test "Tensor::from_json" {
   inspect!(tensor, content="[[0, 1, 2], [3, 4, 5]]")
 }
 
-pub enum Graph {
+enum Graph {
   Val
   Var
   Add(Tensor, Tensor)
@@ -65,8 +65,14 @@ pub enum Graph {
   MatMul(Tensor, Tensor)
   Get(Tensor, FixedArray[Int])
   Cat(FixedArray[Tensor], FixedArray[(Int, Int)])
-  Any(~ref : () -> Unit, ~propagate : () -> Unit, ~check : () -> Unit)
+  Ops(GraphOps)
 } derive(Show)
+
+trait GraphOps: Show {
+  ref(Self) -> Unit
+  propagate(Self, Tensor) -> Unit
+  check(Self) -> Unit
+}
 
 pub fn Tensor::get(self : Tensor, index : Array[Int]) -> Double {
   if index.length() != self.shape.length() {
@@ -888,7 +894,7 @@ fn Tensor::ref(self : Tensor) -> Unit {
         x.ref()
       }
     Get(x, _) => x.ref()
-    Any(~ref, ..) => ref()
+    Ops(ops) => ops.ref()
   }
 }
 
@@ -1047,7 +1053,7 @@ fn Tensor::propagate(self : Tensor) -> Unit {
         xs[x].grad[m] += self.grad[i]
         xs[x].propagate()
       }
-    Any(~propagate, ..) => propagate()
+    Ops(ops) => ops.propagate(self)
   }
 }
 
@@ -1088,7 +1094,7 @@ fn Tensor::check(self : Tensor) -> Unit {
       for x in xs {
         x.check()
       }
-    Any(~check, ..) => check()
+    Ops(ops) => ops.check()
   }
 }
 
@@ -1295,28 +1301,38 @@ pub fn Tensor::cat(tensors : FixedArray[Tensor], ~dim : Int = 0) -> Tensor {
   }
 }
 
+type GraphReLU Tensor
+
+pub fn GraphReLU::ref(self : GraphReLU) -> Unit {
+  self._.ref()
+}
+
+pub fn GraphReLU::propagate(self : GraphReLU, parent : Tensor) -> Unit {
+  for i = 0; i < parent.grad.length(); i = i + 1 {
+    self._.grad[i] += parent.grad[i] * (if parent.value[i] > 0.0 { 1.0 } else { 0.0 })
+  }
+  self._.propagate()
+}
+
+pub fn GraphReLU::check(self : GraphReLU) -> Unit {
+  self._.check()
+}
+
+impl Show for GraphReLU with output(self : GraphReLU, logger : Logger) {
+  logger.write_string("ReLU(")
+  Show::output(self._, logger)
+  logger.write_char(')')
+}
+
 pub fn Tensor::reLU(self : Tensor) -> Tensor {
-  let x = self
-  let self = Tensor::{
+  Tensor::{
     value: self.value.map(fn { x => if x > 0.0 { x } else { 0.0 } }),
     shape: self.shape,
     block: self.block,
-    graph: Graph::Val,
+    graph: Graph::Ops(GraphReLU(self)),
     ref: 0,
     grad: FixedArray::make(self.value.length(), 0.0),
   }
-  self.graph = Any(
-    ref=fn() { x.ref() },
-    propagate=fn() {
-      for i = 0; i < self.grad.length(); i = i + 1 {
-        x.grad[i] += self.grad[i] *
-          (if self.value[i] > 0.0 { 1.0 } else { 0.0 })
-      }
-      x.propagate()
-    },
-    check=fn() { x.check() },
-  )
-  self
 }
 
 pub fn Tensor::to_double(self : Tensor) -> Double {
