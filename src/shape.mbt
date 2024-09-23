@@ -1,46 +1,42 @@
 pub trait Shape {
-  to_array(Self, ~dim : Int?) -> Array[Int]
+  to_fixed_array(Self) -> FixedArray[Int]
 }
 
-pub impl Shape for Int with to_array(self : Int, ~dim : Int?) -> Array[Int] {
-  match dim {
-    None => [self]
-    Some(dim) => Array::make(dim, self)
-  }
+pub impl Shape for Int with to_fixed_array(self : Int) -> FixedArray[Int] {
+  [self]
 }
 
-pub impl Shape for Array[Int] with to_array(self : Array[Int], ~dim : Int?) -> Array[
+pub impl Shape for Array[Int] with to_fixed_array(self : Array[Int]) -> FixedArray[
   Int,
 ] {
-  match dim {
-    Some(dim) =>
-      if self.length() != dim {
-        abort(
-          "Array has \{self.length()} elements, which does not agree with dimension \{dim}",
-        )
-      }
-    None => ()
-  }
+  FixedArray::from_array(self)
+}
+
+pub impl Shape for FixedArray[Int] with to_fixed_array(self : FixedArray[Int]) -> FixedArray[
+  Int,
+] {
   self
 }
 
 pub trait Shape2d {
-  to_array(Self) -> Array[Int]
+  to_fixed_array(Self) -> Array[Int]
   to_tuple(Self) -> (Int, Int)
+}
+
+impl Shape2d with to_fixed_array(self : Self) -> Array[Int] {
+  let (s0, s1) = self.to_tuple()
+  [s0, s1]
 }
 
 pub impl Shape2d for (Int, Int) with to_tuple(self : (Int, Int)) -> (Int, Int) {
   self
 }
 
-pub impl Shape2d for (Int, Int) with to_array(self : (Int, Int)) -> Array[Int] {
-  [self.0, self.1]
-}
-
 pub impl Shape2d for Int with to_tuple(self : Int) -> (Int, Int) {
   (self, self)
 }
 
-pub impl Shape2d for Int with to_array(self : Int) -> Array[Int] {
-  [self, self]
+pub impl Shape2d for Unit with to_tuple(self : Unit) -> (Int, Int) {
+  self |> ignore
+  abort("Coerce Unit to Shape2d")
 }

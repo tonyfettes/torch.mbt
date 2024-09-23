@@ -38,7 +38,7 @@ pub fn Sequential::to_string(self : Sequential) -> String {
 pub struct Linear {
   weight : Tensor
   bias : Tensor
-} derive(ToJson, @json.FromJson)
+} derive(Show, ToJson, FromJson)
 
 pub fn Linear::of(weight : Tensor, bias : Tensor) -> Linear {
   Linear::{ weight, bias }
@@ -186,7 +186,7 @@ test "Linear with Softmax" {
   inspect!(output, content="[0.9999947593218812, 0.00000524067811873532]")
 }
 
-pub struct ReLU {} derive(ToJson, @json.FromJson)
+pub struct ReLU {} derive(Show, ToJson, FromJson)
 
 pub fn ReLU::new() -> ReLU {
   ReLU::{  }
@@ -206,7 +206,7 @@ pub fn ReLU::parameters(_self : ReLU) -> Iter[Tensor] {
 
 pub struct ReLU6 {}
 
-pub struct Softmax {} derive(ToJson, @json.FromJson)
+pub struct Softmax {} derive(Show, ToJson, FromJson)
 
 pub fn Softmax::new() -> Softmax {
   Softmax::{  }
@@ -360,4 +360,39 @@ test "Linear Regression" {
   }
   inspect!(model.weight[0][0], content="1.981059015531822")
   inspect!(model.bias[0], content="3.01049253711016")
+}
+
+struct Sigmoid {} derive(Show, ToJson, FromJson)
+
+pub fn Sigmoid::new() -> Sigmoid {
+  Sigmoid::{}
+}
+
+pub fn Sigmoid::forward(_self : Sigmoid, input : Tensor) -> Tensor {
+  input.sigmoid()
+}
+
+test "Sigmoid" {
+  let input = Uniform::new(-1, 1).sample(shape=[3, 3])
+  inspect!(
+    input,
+    content="[[0.2319395440585279, -0.9572423457468497, -0.6499392928503491], [-0.9692349476337747, -0.336211990156319, -0.4338535669388379], [-0.823622634469118, 0.6791392055258318, 0.6082472705301512]]",
+  )
+  inspect!(
+    input.sigmoid(),
+    content="[[0.557726330835273, 0.27743066277923567, 0.3430032176743278], [0.27503301963520144, 0.41672992238725565, 0.39320651178251564], [0.3049952166966975, 0.6635465499260016, 0.6475408771950667]]",
+  )
+}
+
+struct Flatten {
+  start : Int
+  end : Int?
+} derive(Show, ToJson, FromJson)
+
+pub fn Flatten::new(~start : Int = 1, ~end? : Int) -> Flatten {
+  Flatten::{ start, end }
+}
+
+pub fn Flatten::forward(self : Flatten, input : Tensor) -> Tensor {
+  input.flatten(start=self.start, end?=self.end)
 }

@@ -1,13 +1,15 @@
 pub struct Conv2d {
   weight : Array[Array[Tensor]]
-} derive(ToJson, @json.FromJson)
+  padding : (Int, Int)
+} derive(Show, ToJson, FromJson)
 
 pub fn Conv2d::new[KernelSize : Shape2d](
   in_channels : Int,
   out_channels : Int,
-  ~kernel_size : KernelSize
+  ~kernel_size : KernelSize,
+  ~padding : Shape2d = 0
 ) -> Conv2d {
-  let kernel_size = kernel_size.to_array()
+  let kernel_size = kernel_size.to_fixed_array()
   let weight_distribution : Continuous = {
     let mut n = in_channels
     for k in kernel_size {
@@ -26,7 +28,7 @@ pub fn Conv2d::new[KernelSize : Shape2d](
         )
     },
   )
-  Conv2d::{ weight, }
+  Conv2d::{ weight, padding: padding.to_tuple() }
 }
 
 pub fn Conv2d::output(self : Conv2d, logger : Logger) -> Unit {
@@ -36,13 +38,13 @@ pub fn Conv2d::output(self : Conv2d, logger : Logger) -> Unit {
 pub fn Conv2d::forward(self : Conv2d, input : Tensor) -> Tensor {
   let output = []
   for n = 0; n < input.shape[0]; n = n + 1 {
-    let channels = []
+    let channels = FixedArray::make(input.shape[1], tensor(0.0))
     for c = 0; c < input.shape[1]; c = c + 1 {
-      channels.push(
-        cross_correlation(input[n][c].to_tensor(), self.weight[n][c]),
+      channels[c] = cross_correlation(
+        input[n][c].to_tensor(),
+        self.weight[n][c],
       )
     }
-    let channels = FixedArray::from_array(channels)
     output.push(Tensor::stack(channels).sum())
   }
   let output = FixedArray::from_array(output)

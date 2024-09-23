@@ -1309,7 +1309,8 @@ pub fn GraphReLU::ref(self : GraphReLU) -> Unit {
 
 pub fn GraphReLU::propagate(self : GraphReLU, parent : Tensor) -> Unit {
   for i = 0; i < parent.grad.length(); i = i + 1 {
-    self._.grad[i] += parent.grad[i] * (if parent.value[i] > 0.0 { 1.0 } else { 0.0 })
+    self._.grad[i] += parent.grad[i] *
+      (if parent.value[i] > 0.0 { 1.0 } else { 0.0 })
   }
   self._.propagate()
 }
@@ -1345,23 +1346,32 @@ pub fn Tensor::to_double(self : Tensor) -> Double {
 pub fn cross_correlation(
   image : Tensor,
   kernel : Tensor,
-  ~stride : Int = 1
+  ~stride : Int = 1,
+  ~padding : Int = 0
 ) -> Tensor {
   let image_height = image.shape[0]
   let image_width = image.shape[1]
   let kernel_height = kernel.shape[0]
   let kernel_width = kernel.shape[1]
-  let output_height = (image_height - kernel_height) / stride + 1
-  let output_width = (image_width - kernel_width) / stride + 1
+  let output_height = (image_height + 2 * padding - kernel_height) / stride + 1
+  let output_width = (image_width + 2 * padding - kernel_width) / stride + 1
   FixedArray::makei(
     output_height,
     fn(i) {
       FixedArray::makei(
         output_width,
         fn(j) {
-          let patch = image[i * stride:i * stride + kernel_height][j * stride:j *
-          stride +
-          kernel_width].to_tensor()
+          let i_start = @math.maximum(0, i * stride - padding)
+          let i_end = @math.minimum(
+            i * stride + kernel_height - padding,
+            image_height,
+          )
+          let j_start = @math.maximum(0, j * stride - padding)
+          let j_end = @math.minimum(
+            j * stride + kernel_width - padding,
+            image_width,
+          )
+          let patch = image[i_start:i_end][j_start:j_end].to_tensor()
           (patch * kernel).sum().sum()
         },
       )
@@ -1448,8 +1458,8 @@ pub fn Tensor::moveaxis[Shape : Shape](
   source : Shape,
   destination : Shape
 ) -> Tensor {
-  let source = source.to_array(dim=None)
-  let destination = destination.to_array(dim=None)
+  let source = source.to_fixed_array()
+  let destination = destination.to_fixed_array()
   if source.length() != destination.length() {
     abort(
       "Source axes (\{source}) and destination axes (\{destination}) must have the same length",
@@ -1511,42 +1521,40 @@ pub fn forward(self : Tensor, module : Module) -> Tensor {
   module.forward(self)
 }
 
-pub fn avg_pool2d(
-  input : Tensor,
+pub fn Tensor::avg_pool2d(
+  self : Tensor,
   ~kernel_size : (Int, Int),
   ~stride : (Int, Int)
 ) -> Tensor {
-  if input.shape.length() != 4 {
+  if self.shape.length() != 4 {
     abort("input should be of the shape (N, C, H, W)")
   }
   let kH = kernel_size.0
   let kW = kernel_size.1
+  let output_height = (self.shape[2] - kernel_size.0 + stride.0) / stride.0
+  let output_width = (self.shape[3] - kernel_size.1 + stride.1) / stride.1
   let output = FixedArray::makei(
-    input.shape[0],
-    fn {
-      _ =>
-        FixedArray::makei(
-          input.shape[1],
-          fn {
-            _ =>
-              FixedArray::makei(
-                input.shape[2] / stride.0,
-                fn {
-                  _ => FixedArray::make(input.shape[3] / stride.1, tensor(0.0))
-                },
-              )
-          },
-        )
+    self.shape[0],
+    fn(__) {
+      FixedArray::makei(
+        self.shape[1],
+        fn(__) {
+          FixedArray::makei(
+            output_height,
+            fn(__) { FixedArray::make(output_width, tensor(0.0)) },
+          )
+        },
+      )
     },
   )
-  for b = 0; b < input.shape[0]; b = b + 1 {
-    for c = 0; c < input.shape[1]; c = c + 1 {
-      for h = 0; h < input.shape[2] / stride.0; h = h + 1 {
-        for w = 0; w < input.shape[3] / stride.1; w = w + 1 {
+  for b = 0; b < self.shape[0]; b = b + 1 {
+    for c = 0; c < self.shape[1]; c = c + 1 {
+      for h = 0; h < output_height; h = h + 1 {
+        for w = 0; w < output_width; w = w + 1 {
           let array = FixedArray::make(kH * kW, tensor(0.0))
           for m = 0; m < kH; m = m + 1 {
             for n = 0; n < kW; n = n + 1 {
-              array[m * kW + n] = input[b][c][stride.0 * h + m][stride.1 * w + n].to_tensor()
+              array[m * kW + n] = self[b][c][stride.0 * h + m][stride.1 * w + n].to_tensor()
             }
           }
           output[b][c][h][w] = TensorLike::to_tensor(array).sum() /
@@ -1559,10 +1567,93 @@ pub fn avg_pool2d(
 }
 
 test "avg_pool2d" {
-  seed(b"12345678223456783234567842345678")
-  let input = Uniform::new(-1, 1).sample(shape=[1, 1, 4, 4])
+  let input = Tensor::new(
+    [
+      [
+        [
+          [1.0, 2.0, 3.0, 4.0],
+          [2.0, 3.0, 4.0, 5.0],
+          [3.0, 4.0, 5.0, 6.0],
+          [4.0, 5.0, 6.0, 7.0],
+        ],
+      ],
+    ],
+  )
   inspect!(
     avg_pool2d(input, kernel_size=(2, 2), stride=(2, 2)),
-    content="[[[[-0.44003578153032763, -0.04338125044803742], [0.3602031952870989, 0.17430781904809295]]]]",
+    content="[[[[2, 4], [4, 6]]]]",
   )
+  inspect!(
+    avg_pool2d(input, kernel_size=(2, 2), stride=(1, 1)),
+    content="[[[[2, 3, 4], [3, 4, 5], [4, 5, 6]]]]",
+  )
+}
+
+fn Tensor::ones[Shape : Shape](
+  shape : Shape,
+  ~requires_grad : Bool = false
+) -> Tensor {
+  let shape = shape.to_fixed_array()
+  let block = compute_block_size(shape)
+  let total = if shape.length() == 0 { 1 } else { shape[0] * block[0] }
+  let value = FixedArray::make(total, 1.0)
+  Tensor::{
+    shape,
+    block,
+    value,
+    ref: 0,
+    graph: if requires_grad {
+      Graph::Var
+    } else {
+      Graph::Val
+    },
+    grad: FixedArray::make(total, 0.0),
+  }
+}
+
+pub fn Tensor::sigmoid(self : Tensor) -> Tensor {
+  let ones = ones(self.shape)
+  ones / (ones + exp(-self))
+}
+
+test "sigmoid" {
+  inspect!(tensor(0.0).sigmoid(), content="0.5")
+  inspect!(tensor(-1.0).sigmoid(), content="0.2689414213699951")
+  inspect!(tensor(1.0).sigmoid(), content="0.7310585786300049")
+  inspect!(
+    tensor([-4.0, -2.0, -1.0, 0.0, 1.0, 2.0, 4.0]).sigmoid(),
+    content="[0.01798620996209156, 0.11920292202211755, 0.2689414213699951, 0.5, 0.7310585786300049, 0.8807970779778823, 0.9820137900379085]",
+  )
+}
+
+pub fn Tensor::flatten(self : Tensor, ~start : Int = 0, ~end? : Int) -> Tensor {
+  let end = match end {
+    Some(end) => end
+    None => self.shape.length()
+  }
+  let shape = []
+  for i = 0; i < start; i = i + 1 {
+    shape.push(self.shape[i])
+  }
+  if start < end {
+    let mut flat_size = 1
+    for i = start; i < end; i = i + 1 {
+      flat_size *= self.shape[i]
+    }
+    shape.push(flat_size)
+  }
+  for i = end; i < self.shape.length(); i = i + 1 {
+    shape.push(self.shape[i])
+  }
+  let shape = FixedArray::from_array(shape)
+  let block = compute_block_size(shape)
+  println("shape: \{shape}")
+  println("block: \{block}")
+  Tensor::{ ..self, block, shape }
+}
+
+test "flatten" {
+  let input = tensor([[[1.0, 2.0], [3.0, 4.0]], [[5.0, 6.0], [7.0, 8.0]]])
+  inspect!(input.flatten(), content="[1, 2, 3, 4, 5, 6, 7, 8]")
+  inspect!(input.flatten(start=1), content="[[1, 2, 3, 4], [5, 6, 7, 8]]")
 }
