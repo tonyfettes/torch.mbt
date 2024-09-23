@@ -1647,8 +1647,6 @@ pub fn Tensor::flatten(self : Tensor, ~start : Int = 0, ~end? : Int) -> Tensor {
   }
   let shape = FixedArray::from_array(shape)
   let block = compute_block_size(shape)
-  println("shape: \{shape}")
-  println("block: \{block}")
   Tensor::{ ..self, block, shape }
 }
 
