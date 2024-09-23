@@ -1,6 +1,6 @@
 # tonyfettes/torch
 
-PyTorch-like API implemented in MoonBit.
+PyTorch-like tensor operations implemented in MoonBit.
 
 ## Usage
 
@@ -39,10 +39,12 @@ PyTorch-like API implemented in MoonBit.
   - [x] `torch.cat` along any dimension
   - [ ] `torch.transpose`
   - [x] `torch.swapaxis` (implemented by `Tensor::permute` and `Tensor::moveaxis`)
-  - [ ] `torch.sigmoid`
+  - [x] `torch.sigmoid`
   - [ ] Broadcast addition, multiplication, etc.
+  - [ ] `torch.zeros`
+  - [x] `torch.ones`
 - [ ] PyTorch module
-  - [ ] `Sigmoid`
+  - [x] `Sigmoid`
   - [x] `AvgPool2d`
 - [ ] PyTorch functional module
 - [ ] Module/model saving and loading
