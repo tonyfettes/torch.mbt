@@ -2,7 +2,9 @@
   "name": "tonyfettes/torch/iris",
   "version": "0.2.1",
   "deps": {
-    "tonyfettes/torch": "0.2.0"
+    "tonyfettes/torch": {
+      "path": "../.."
+    }
   },
   "readme": "README.md",
   "repository": "",

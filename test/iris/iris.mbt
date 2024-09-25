@@ -1065,7 +1065,29 @@ let dataset : Array[Data] = [
   },
 ]
 
-test {
+fn evaluate[Model: @torch.Module](model : Model, dataset : ArrayView[Data]) -> Double {
+  let mut accuracy = 0.0
+  for datum in dataset {
+    let input = @torch.tensor(
+      [
+        datum.sepal_length,
+        datum.sepal_width,
+        datum.petal_length,
+        datum.petal_width,
+      ],
+    )
+    let target = match datum.species {
+      Setosa => @torch.tensor([1.0, 0.0, 0.0])
+      Versicolor => @torch.tensor([0.0, 1.0, 0.0])
+      Virginica => @torch.tensor([0.0, 0.0, 1.0])
+    }
+    let output = model.forward(input)
+    accuracy += (output * target).sum().value[0]
+  }
+  return accuracy / dataset.length().to_double()
+}
+
+fn main {
   let rand = @random.Rand::new()
   let model = [
       @torch.Linear::new(4, 4),
@@ -1080,6 +1102,8 @@ test {
   let split = (dataset.length().to_double() * 0.8).floor().to_int()
   let train = dataset[:split]
   let validate = dataset[split:]
+  let accuracy = evaluate(model, validate)
+  println(accuracy)
   let loss = @torch.CrossEntropyLoss::new()
   let total_epoch = 128
   let total_step = total_epoch * train.length()
@@ -1109,26 +1133,6 @@ test {
       step = step + 1
     }
   }
-  let mut accuracy = 0.0
-  for datum in validate {
-    let input = @torch.tensor(
-      [
-        datum.sepal_length,
-        datum.sepal_width,
-        datum.petal_length,
-        datum.petal_width,
-      ],
-    )
-    let target = match datum.species {
-      Setosa => @torch.tensor([1.0, 0.0, 0.0])
-      Versicolor => @torch.tensor([0.0, 1.0, 0.0])
-      Virginica => @torch.tensor([0.0, 0.0, 1.0])
-    }
-    let output = model.forward(input)
-    accuracy += (output * target).sum().value[0]
-  }
-  inspect!(
-    accuracy / validate.length().to_double(),
-    content="0.965300824134553",
-  )
+  let accuracy = evaluate(model, validate)
+  println(accuracy) // 0.965300824134553
 }
