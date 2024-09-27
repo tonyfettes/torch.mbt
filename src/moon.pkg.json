@@ -1,1 +1,6 @@
-{}
+{
+  "targets": {
+    "tensor_add.wasm.mbt": ["not", ["or", ["js", "wasm", "wasm-gc", "native"]]],
+    "tensor_add.mbt": ["or", ["js", "wasm", "wasm-gc", "native"]]
+  }
+}

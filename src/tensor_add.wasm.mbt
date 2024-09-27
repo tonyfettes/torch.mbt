@@ -1,9 +1,4 @@
-extern "wasm" fn simd_f64x2_loop_add(
-  in0 : Int,
-  in1 : Int,
-  out : Int,
-  len : Int
-) =
+extern "wasm" fn simd_f64x2_add(in0 : Int, in1 : Int, out : Int, len : Int) =
   #|(func (param $in0 i32) (param $in1 i32) (param $out i32) (param $len i32)
   #| (local $vec0 v128)
   #| (local $vec1 v128)
@@ -24,29 +19,33 @@ extern "wasm" fn simd_f64x2_loop_add(
   #|
   #|  (br_if $loop (i32.lt_u (local.get $out) (local.get $end)))))
 
-extern "wasm" fn array_double_address(array : FixedArray[Double]) -> Int =
+extern "wasm" fn address_fixed_array_double(array : FixedArray[Double]) -> Int =
   #|(func (param i32) (result i32) local.get 0 i32.const 8 i32.add)
 
-fn array_double_simd_add(
+fn fixed_array_simd_add(
   in0 : FixedArray[Double],
   in1 : FixedArray[Double],
   out : FixedArray[Double],
   len : Int
 ) -> Unit {
-  simd_f64x2_loop_add(
-    array_double_address(in0),
-    array_double_address(in1),
-    array_double_address(out),
-    len,
-  )
+  if len % 2 != 0 {
+    let i = len - 1
+    out[i] = in0[i] + in1[i]
+  }
+  if len / 2 != 0 {
+    simd_f64x2_add(
+      address_fixed_array_double(in0),
+      address_fixed_array_double(in1),
+      address_fixed_array_double(out),
+      len / 2,
+    )
+  }
 }
 
 pub fn Tensor::op_add(self : Tensor, other : Tensor) -> Tensor {
   let length = self.value.length()
   let value : FixedArray[Double] = FixedArray::make(length, 0.0)
-  for i = 0; i < length; i = i + 1 {
-    value[i] = self.value[i] + other.value[i]
-  }
+  fixed_array_simd_add(self.value, other.value, value, length)
   Tensor::{
     value,
     shape: self.shape,
