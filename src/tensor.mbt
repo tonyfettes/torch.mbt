@@ -25,7 +25,7 @@ pub fn Tensor::to_json(self : Tensor) -> Json {
 }
 
 test "Tensor::to_json" {
-  let tensor = tensor([[0.0, 1, 2], [3, 4, 5]])
+  let tensor = tensor([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]])
   inspect!(tensor, content="[[0, 1, 2], [3, 4, 5]]")
 }
 

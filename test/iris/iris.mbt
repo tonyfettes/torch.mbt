@@ -1065,7 +1065,10 @@ let dataset : Array[Data] = [
   },
 ]
 
-fn evaluate[Model: @torch.Module](model : Model, dataset : ArrayView[Data]) -> Double {
+fn evaluate[Model : @torch.Module](
+  model : Model,
+  dataset : ArrayView[Data]
+) -> Double {
   let mut accuracy = 0.0
   for datum in dataset {
     let input = @torch.tensor(
