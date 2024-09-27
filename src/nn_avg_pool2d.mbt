@@ -19,8 +19,12 @@ pub fn AvgPool2d::forward(self : AvgPool2d, input : Tensor) -> Tensor {
   avg_pool2d(input, kernel_size=self.kernel_size, stride=self.stride)
 }
 
+pub fn AvgPool2d::parameters(_self : AvgPool2d) -> Iter[Tensor] {
+  Iter::empty()
+}
+
 test "AvgPool2d" {
   let input = tensor([[[[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]]]])
-  let avg_pool2d = AvgPool2d::new(2, ~stride=(1, 1))
+  let avg_pool2d = AvgPool2d::new(2, stride=(1, 1))
   inspect!(avg_pool2d.forward(input), content="[[[[3, 4], [6, 7]]]]")
 }
