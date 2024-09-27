@@ -72,7 +72,7 @@ pub fn Linear::new(
 }
 
 pub fn Linear::forward(self : Linear, input : Tensor) -> Tensor {
-  (input.reshape([1, ..input.shape]).matmul(self.weight) + self.bias)[0].to_tensor()
+  (input.upgrade().matmul(self.weight) + self.bias)[0].to_tensor()
 }
 
 pub fn Linear::parameters(self : Linear) -> Iter[Tensor] {

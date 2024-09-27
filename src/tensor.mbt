@@ -65,6 +65,7 @@ enum Graph {
   MatMul(Tensor, Tensor)
   Get(Tensor, FixedArray[Int])
   Cat(FixedArray[Tensor], FixedArray[(Int, Int)])
+  Nop(Tensor)
   Ops(GraphOps)
 } derive(Show)
 
@@ -453,13 +454,13 @@ test "Tensor::matmul - 2x3 * 3x2" {
 test "Tensor::matmul - 1x2 * 2x2" {
   let x = Tensor::new([1.0, 2.0])
   let w = Tensor::new([[1.0, 2.0], [3.0, 4.0]])
-  inspect!(x.reshape([1, ..x.shape]).matmul(w), content="[[7, 10]]")
+  inspect!(x.upgrade().matmul(w), content="[[7, 10]]")
 }
 
 test "Tensor::matmul - 1x2 * 2x2" {
   let x = Tensor::new([2.0, 2.0])
   let w = Tensor::new([[2.0, 2.0], [2.0, 2.0]])
-  inspect!(x.reshape([1, ..x.shape]).matmul(w), content="[[8, 8]]")
+  inspect!(x.upgrade().matmul(w), content="[[8, 8]]")
 }
 
 pub trait TensorValue: Show {
@@ -894,6 +895,7 @@ fn Tensor::ref(self : Tensor) -> Unit {
         x.ref()
       }
     Get(x, _) => x.ref()
+    Nop(x) => x.ref()
     Ops(ops) => ops.ref()
   }
 }
@@ -1053,6 +1055,7 @@ fn Tensor::propagate(self : Tensor) -> Unit {
         xs[x].grad[m] += self.grad[i]
         xs[x].propagate()
       }
+    Nop(x) => x.propagate()
     Ops(ops) => ops.propagate(self)
   }
 }
@@ -1094,6 +1097,7 @@ fn Tensor::check(self : Tensor) -> Unit {
       for x in xs {
         x.check()
       }
+    Nop(x) => x.check()
     Ops(ops) => ops.check()
   }
 }
@@ -1174,19 +1178,15 @@ test "Tensor::bacward - MatMul" {
   inspect!(y.grad, content="[5, 5, 7, 7, 9, 9]")
 }
 
-pub fn Tensor::reshape(self : Tensor, shape : Array[Int]) -> Tensor {
-  let size = [1]
-  for i = shape.length() - 1; i > 0; i = i - 1 {
-    size.push(shape[i] * size[size.length() - 1])
-  }
-  size.rev_inplace()
+pub fn Tensor::reshape(self : Tensor, shape : FixedArray[Int]) -> Tensor {
+  let block = compute_block_size(shape)
   Tensor::{
-    value: self.value.copy(),
-    shape: FixedArray::from_array(shape),
-    block: FixedArray::from_array(size),
+    value: self.value,
+    shape,
+    block,
     ref: 0,
-    graph: Get(self, FixedArray::makei(self.value.length(), fn { i => i })),
-    grad: FixedArray::make(self.value.length(), 0.0),
+    graph: Nop(self),
+    grad: self.grad,
   }
 }
 
@@ -1194,10 +1194,7 @@ test "Tensor::reshape" {
   let tensor = Tensor::new([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]])
   let reshaped = tensor.reshape([3, 2])
   inspect!(reshaped, content="[[0, 1], [2, 3], [4, 5]]")
-  inspect!(
-    reshaped.graph,
-    content="Get([[0, 1, 2], [3, 4, 5]], [0, 1, 2, 3, 4, 5])",
-  )
+  inspect!(reshaped.graph, content="Nop([[0, 1, 2], [3, 4, 5]])")
   reshaped.ref()
   inspect!(tensor.ref, content="1")
 }
@@ -1208,6 +1205,9 @@ pub impl[X : TensorLike] TensorLike for FixedArray[X] with to_tensor(
   let tensors = self.map(fn(x) { x.to_tensor() })
   if tensors.length() == 0 {
     abort("No tensors to concatenate")
+  }
+  if tensors.length() == 1 {
+    return tensors[0].upgrade()
   }
   for i in 1..<tensors.length() {
     if tensors[i].shape != tensors[0].shape {
@@ -1654,4 +1654,13 @@ test "flatten" {
   let input = tensor([[[1.0, 2.0], [3.0, 4.0]], [[5.0, 6.0], [7.0, 8.0]]])
   inspect!(input.flatten(), content="[1, 2, 3, 4, 5, 6, 7, 8]")
   inspect!(input.flatten(start=1), content="[[1, 2, 3, 4], [5, 6, 7, 8]]")
+}
+
+pub fn Tensor::upgrade(self : Tensor, ~dim : Int = 1) -> Tensor {
+  let old_dim = self.shape.length()
+  let shape = FixedArray::make(old_dim + dim, 1)
+  for i = 0; i < old_dim; i = i + 1 {
+    shape[i + dim] = self.shape[i]
+  }
+  self.reshape(shape)
 }
