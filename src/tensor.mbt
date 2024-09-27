@@ -1209,6 +1209,50 @@ test "Tensor::reshape" {
   inspect!(tensor.ref, content="1")
 }
 
+test "Tensor::reshape - backward" {
+  let tensor = Tensor::new([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]])
+  inspect!(tensor.sum(), content="[3, 5, 7]")
+  let reshaped = tensor.reshape([3, 2])
+  inspect!(reshaped, content="[[0, 1], [2, 3], [4, 5]]")
+  let sum = reshaped.sum()
+  inspect!(sum, content="[6, 9]")
+  let sum_sum = sum.sum()
+  inspect!(sum_sum, content="15")
+  sum_sum.backward()
+  inspect!(sum_sum.grad, content="[1]")
+  inspect!(sum.grad, content="[1, 1]")
+  inspect!(reshaped.grad, content="[1, 1, 1, 1, 1, 1]")
+  inspect!(tensor.grad, content="[1, 1, 1, 1, 1, 1]")
+}
+
+test "Tensor::reshape - backward with matrix multiplication" {
+  let x = Tensor::new([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]])
+  let w = Tensor::new([[6.0, 7.0], [8.0, 9.0], [10.0, 11.0]])
+  let y = x.matmul(w)
+  inspect!(y, content="[[28, 31], [100, 112]]")
+  y.sum().sum().backward()
+  inspect!(y.grad, content="[1, 1, 1, 1]")
+  inspect!(x.grad, content="[13, 17, 21, 13, 17, 21]")
+  inspect!(w.grad, content="[3, 3, 5, 5, 7, 7]")
+  let xs = x.reshape([3, 2])
+  let ws = w.reshape([2, 3])
+  inspect!(xs, content="[[0, 1], [2, 3], [4, 5]]")
+  inspect!(ws, content="[[6, 7, 8], [9, 10, 11]]")
+  let ys = xs.matmul(ws)
+  inspect!(ys, content="[[9, 10, 11], [39, 44, 49], [69, 78, 87]]")
+  ys.sum().sum().backward()
+  inspect!(ys.grad, content="[1, 1, 1, 1, 1, 1, 1, 1, 1]")
+  inspect!(xs.grad, content="[34, 47, 42, 43, 38, 51]")
+  inspect!(ws.grad, content="[9, 9, 11, 14, 16, 16]")
+  inspect!(x.grad, content="[34, 47, 42, 43, 38, 51]")
+  inspect!(w.grad, content="[9, 9, 11, 14, 16, 16]")
+}
+
+pub impl[X : TensorLike] TensorLike for Array[X] with to_tensor(self : Array[X]) -> Tensor {
+  let tensors = FixedArray::from_array(self)
+  TensorLike::to_tensor(tensors)
+}
+
 pub impl[X : TensorLike] TensorLike for FixedArray[X] with to_tensor(
   self : FixedArray[X]
 ) -> Tensor {
