@@ -1059,12 +1059,15 @@ fn Tensor::propagate(self : Tensor) -> Unit {
       }
       x.propagate()
     }
-    Cat(xs, m) =>
+    Cat(xs, m) => {
       for i = 0; i < self.grad.length(); i = i + 1 {
         let (x, m) = m[i]
         xs[x].grad[m] += self.grad[i]
-        xs[x].propagate()
       }
+      for x in xs {
+        x.propagate()
+      }
+    }
     Nop(x) => x.propagate()
     Ops(ops) => ops.propagate(self)
   }
