@@ -1664,3 +1664,26 @@ pub fn Tensor::upgrade(self : Tensor, ~dim : Int = 1) -> Tensor {
   }
   self.reshape(shape)
 }
+
+pub fn Tensor::broadcast[Shape : Shape](self : Tensor, shape : Shape) -> Tensor {
+  if self.shape.length() != 0 {
+    abort("Broadcasting a non-scalar value")
+  }
+  let shape = shape.to_fixed_array()
+  let block = compute_block_size(shape)
+  let total = shape[0] * block[0]
+  let value = self.value[0]
+  Tensor::{
+    value: FixedArray::make(total, value),
+    shape,
+    block,
+    ref: 0,
+    graph: Get(self, FixedArray::make(total, 0)),
+    grad: FixedArray::make(total, 0.0),
+  }
+}
+
+test "Tensor::broadcast" {
+  let zero = tensor(0.0)
+  inspect!(zero.broadcast([1, 2, 3]), content="[[[0, 0, 0], [0, 0, 0]]]")
+}
