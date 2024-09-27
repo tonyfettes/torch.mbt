@@ -1366,8 +1366,10 @@ pub fn cross_correlation(
   let image_width = image.shape[1]
   let kernel_height = kernel.shape[0]
   let kernel_width = kernel.shape[1]
-  let output_height = (image_height + 2 * padding - kernel_height) / stride + 1
-  let output_width = (image_width + 2 * padding - kernel_width) / stride + 1
+  let output_height = (image_height + 2 * padding - kernel_height + stride) /
+    stride
+  let output_width = (image_width + 2 * padding - kernel_width + stride) /
+    stride
   FixedArray::makei(
     output_height,
     fn(i) {
