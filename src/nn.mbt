@@ -66,8 +66,8 @@ pub fn Linear::new(
     Some(distrib) => distrib
   }
   Linear::{
-    weight: weight_distribution.sample(shape=[in_features, out_features]),
-    bias: bias_distribution.sample(shape=[out_features]),
+    weight: weight_distribution.sample([in_features, out_features]),
+    bias: bias_distribution.sample([out_features]),
   }
 }
 
@@ -374,7 +374,7 @@ pub fn Sigmoid::forward(_self : Sigmoid, input : Tensor) -> Tensor {
 
 test "Sigmoid" {
   seed(b"12345678223456783234567842345678")
-  let input = Uniform::new(-1, 1).sample(shape=[3, 3])
+  let input = Uniform::new(-1, 1).sample([3, 3])
   inspect!(
     input,
     content="[[-0.29557028390369, -0.8177422144361883, -0.8997844018869048], [-0.1545487762608706, -0.5520054503667071, -0.09482517741472507], [0.6609056774831252, 0.21990249887250046, 0.4313355035432884]]",

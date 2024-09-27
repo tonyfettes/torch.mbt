@@ -3,10 +3,10 @@ pub trait IContinuous {
 }
 
 pub trait Continuous: IContinuous {
-  sample(Self, ~shape : Array[Int]) -> Tensor
+  sample(Self, FixedArray[Int]) -> Tensor
 }
 
-impl Continuous with sample(self : Self, ~shape : Array[Int]) -> Tensor {
+impl Continuous with sample(self : Self, shape : FixedArray[Int]) -> Tensor {
   let mut size = 1
   for s in shape {
     size *= s
@@ -37,8 +37,8 @@ impl IContinuous for Uniform with _sample(self : Uniform) -> Double {
   rand.val.double() * (self.upper - self.lower) + self.lower
 }
 
-pub fn Uniform::sample(self : Uniform, ~shape : Array[Int]) -> Tensor {
-  Continuous::sample(self, ~shape)
+pub fn Uniform::sample(self : Uniform, shape : FixedArray[Int]) -> Tensor {
+  Continuous::sample(self, shape)
 }
 
 let normal_buffer : Array[Double] = []

@@ -19,13 +19,12 @@ pub fn Conv2d::new[KernelSize : Shape2d](
     Uniform::new(-stdv, stdv)
   }
   let weight = Array::makei(
-    in_channels,
-    fn {
-      _ =>
-        Array::makei(
-          out_channels,
-          fn { _ => weight_distribution.sample(shape=kernel_size) },
-        )
+    out_channels,
+    fn(__) {
+      Array::makei(
+        in_channels,
+        fn(__) { weight_distribution.sample(kernel_size) },
+      )
     },
   )
   Conv2d::{ weight, padding: padding.to_tuple() }
@@ -58,7 +57,7 @@ pub fn Conv2d::parameters(self : Conv2d) -> Iter[Tensor] {
 test "Conv2d" {
   seed(b"12345678223456783234567842345678")
   let distribution = Uniform::new(-1.0, 1.0)
-  let image = distribution.sample(shape=[8, 8, 3])
+  let image = distribution.sample([8, 8, 3])
   let image = Tensor::stack([image])
   inspect!(image.shape, content="[1, 8, 8, 3]")
   let image = image.moveaxis(3, 0)
