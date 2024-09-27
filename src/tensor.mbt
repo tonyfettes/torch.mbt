@@ -7,6 +7,8 @@ pub struct Tensor {
   priv mut grad : FixedArray[Double]
 }
 
+let nan : Tensor = tensor(@double.not_a_number, requires_grad=false)
+
 pub fn Tensor::to_json(self : Tensor) -> Json {
   fn build(dimension : Int, offset : Int) -> Json {
     if dimension >= self.shape.length() {
