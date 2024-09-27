@@ -41,7 +41,7 @@ PyTorch-like tensor operations implemented in MoonBit.
   - [x] `torch.swapaxis` (implemented by `Tensor::permute` and `Tensor::moveaxis`)
   - [x] `torch.sigmoid`
   - [ ] Broadcast addition, multiplication, etc.
-  - [ ] `torch.zeros`
+  - [x] `torch.zeros`
   - [x] `torch.ones`
 - [ ] PyTorch module
   - [x] `Sigmoid`
@@ -57,7 +57,9 @@ PyTorch-like tensor operations implemented in MoonBit.
   - [ ] Eliminate `Cat(Get(...))`
 - [ ] Loss
   - [ ] KL-divergence
-- [ ] Distributions reparametrisation trick
+- [ ] Distributions re-parametrization trick
 - [ ] `Adam*` optimizers
-- [ ] **blocked: MoonBit inline WASM does not support SIMD yet.** WASM-SIMD `v128`
+- [ ] WASM-SIMD `v128`
   - [x] `add`
+  - [ ] `mul`
+  - [ ] `matmul`
