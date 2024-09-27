@@ -390,10 +390,14 @@ struct Flatten {
   end : Int?
 } derive(Show, ToJson, FromJson)
 
-pub fn Flatten::new(~start : Int = 1, ~end? : Int) -> Flatten {
+pub fn Flatten::new(~start : Int = 0, ~end? : Int) -> Flatten {
   Flatten::{ start, end }
 }
 
 pub fn Flatten::forward(self : Flatten, input : Tensor) -> Tensor {
   input.flatten(start=self.start, end?=self.end)
+}
+
+pub fn Flatten::parameters(_self : Flatten) -> Iter[Tensor] {
+  Iter::empty()
 }
