@@ -1,4 +1,4 @@
-trait IContinuous {
+pub trait IContinuous {
   _sample(Self) -> Double
 }
 
