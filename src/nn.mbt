@@ -296,6 +296,9 @@ pub fn MSELoss::forward(
   input : Tensor,
   target : Tensor
 ) -> Tensor {
+  if input.length() != target.length() {
+    abort("Input and target tensors should have the same length")
+  }
   let diff = input - target
   diff.pow(2).sum() / tensor(diff.length().to_double())
 }
