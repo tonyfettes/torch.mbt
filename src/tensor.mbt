@@ -865,6 +865,9 @@ fn TensorView::to_double(self : TensorView) -> Double {
 }
 
 fn Tensor::ref(self : Tensor) -> Unit {
+  if self.ref == -1 {
+    self.ref = 0
+  }
   self.ref += 1
   if self.ref > 1 {
     return
@@ -1074,6 +1077,9 @@ fn Tensor::propagate(self : Tensor) -> Unit {
 }
 
 fn Tensor::check(self : Tensor) -> Unit {
+  if self.ref == -1 {
+    return
+  }
   if self.ref != 0 {
     abort("ref != 0")
   }
@@ -1113,6 +1119,7 @@ fn Tensor::check(self : Tensor) -> Unit {
     Nop(x) => x.check()
     Ops(ops) => ops.check()
   }
+  self.ref = -1
 }
 
 pub fn Tensor::backward(self : Tensor) -> Unit {
