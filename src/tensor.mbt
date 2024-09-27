@@ -1298,6 +1298,19 @@ pub fn Tensor::stack[X : TensorLike](tensors : FixedArray[X]) -> Tensor {
   TensorLike::to_tensor(tensors)
 }
 
+test "Tensor::stack" {
+  let input : FixedArray[_] = [
+    [[tensor(0.0), tensor(1.0), tensor(2.0)]],
+    [[tensor(3.0), tensor(4.0), tensor(5.0)]],
+  ]
+  let input = stack(input)
+  inspect!(input, content="[[[0, 1, 2]], [[3, 4, 5]]]")
+  inspect!(
+    input.graph,
+    content="Cat([[[0, 1, 2]], [[3, 4, 5]]], [(0, 0), (0, 1), (0, 2), (1, 0), (1, 1), (1, 2)])",
+  )
+}
+
 pub fn Tensor::cat(tensors : FixedArray[Tensor], ~dim : Int = 0) -> Tensor {
   if tensors.length() == 0 {
     abort("No tensors to concatenate")
