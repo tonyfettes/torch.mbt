@@ -5,7 +5,7 @@
     "tonyfettes/torch": {
       "path": "../.."
     },
-    "moonbitlang/x": "0.4.7"
+    "moonbitlang/x": "0.4.9"
   },
   "readme": "README.md",
   "repository": "",
