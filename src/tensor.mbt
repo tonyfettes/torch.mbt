@@ -1387,7 +1387,7 @@ pub fn GraphReLU::ref(self : GraphReLU) -> Unit {
   self._.ref()
 }
 
-pub fn GraphReLU::propagate(self : GraphReLU, parent : Tensor) -> Unit {
+fn GraphReLU::propagate(self : GraphReLU, parent : Tensor) -> Unit {
   for i = 0; i < parent.grad.length(); i = i + 1 {
     self._.grad[i] += parent.grad[i] *
       (if parent.value[i] > 0.0 { 1.0 } else { 0.0 })
@@ -1395,7 +1395,7 @@ pub fn GraphReLU::propagate(self : GraphReLU, parent : Tensor) -> Unit {
   self._.propagate()
 }
 
-pub fn GraphReLU::check(self : GraphReLU) -> Unit {
+fn GraphReLU::check(self : GraphReLU) -> Unit {
   self._.check()
 }
 
