@@ -413,6 +413,11 @@ pub fn Tensor::matmul(self : Tensor, other : Tensor) -> Tensor {
   if self.shape.length() != 2 || other.shape.length() != 2 {
     abort("Cannot matrix multiply non-matrices")
   }
+  if self.shape[1] != other.shape[0] {
+    abort(
+      "Matrix dimensions do not match: \{self.shape[0]}x\{self.shape[1]} * \{other.shape[0]}x\{other.shape[1]}",
+    )
+  }
   let output : FixedArray[Double] = FixedArray::make(
     self.shape[0] * other.shape[1],
     0.0,
@@ -951,6 +956,9 @@ pub fn Tensor::pow(self : Tensor, exponent : Int) -> Tensor {
 }
 
 fn Tensor::propagate(self : Tensor) -> Unit {
+  if self.ref == 0 {
+    abort("Propagate through a dead tensor: \{self}")
+  }
   self.ref -= 1
   if self.ref != 0 {
     return
@@ -1248,6 +1256,9 @@ pub fn Tensor::cat(tensors : FixedArray[Tensor], ~dim : Int = 0) -> Tensor {
   if tensors.length() == 0 {
     abort("No tensors to concatenate")
   }
+  if tensors.length() == 1 {
+    abort("Meaningless Tensor::cat called")
+  }
   for i = 0; i < tensors.length(); i = i + 1 {
     if tensors[i].shape.length() != tensors[0].shape.length() {
       abort("Inconsistent shape")
@@ -1527,7 +1538,7 @@ pub fn Tensor::avg_pool2d(
   ~stride : (Int, Int)
 ) -> Tensor {
   if self.shape.length() != 4 {
-    abort("input should be of the shape (N, C, H, W)")
+    abort("Input should be of the shape (N, C, H, W)")
   }
   let kH = kernel_size.0
   let kW = kernel_size.1
