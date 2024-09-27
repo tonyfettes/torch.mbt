@@ -3,7 +3,7 @@ pub trait Module: Show {
   parameters(Self) -> Iter[Tensor]
 }
 
-pub struct Sequential {
+struct Sequential {
   modules : Array[Module]
 }
 
