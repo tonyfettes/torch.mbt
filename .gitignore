@@ -5,3 +5,4 @@
 /.envrc
 /.python-version
 /node_modules/
+/_coverage/
