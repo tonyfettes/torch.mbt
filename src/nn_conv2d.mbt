@@ -34,7 +34,10 @@ pub fn Conv2d::new[KernelSize : Shape2d](
       )
     },
   )
-  let bias = Array::makei(out_channels, fn(_i) { tensor(0.0) })
+  let bias = Array::makei(
+    out_channels,
+    fn(__) { weight_distribution.sample([]) },
+  )
   Conv2d::{ weight, bias, padding: padding.to_tuple() }
 }
 
