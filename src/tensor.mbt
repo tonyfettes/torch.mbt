@@ -300,15 +300,11 @@ pub fn Tensor::op_mul(self : Tensor, other : Tensor) -> Tensor {
 }
 
 pub fn Tensor::op_div(self : Tensor, other : Tensor) -> Tensor {
-  let other_value = if other.shape.length() == 0 {
-    FixedArray::make(self.value.length(), other.value[0])
-  } else {
-    other.value
-  }
+  let (self, other) = Tensor::broadcast(self, other)
   let length = self.value.length()
   let output : FixedArray[Double] = FixedArray::make(length, 0.0)
   for i = 0; i < self.value.length(); i = i + 1 {
-    output[i] = self.value[i] / other_value[i]
+    output[i] = self.value[i] / other.value[i]
   }
   Tensor::{
     value: output,
@@ -1769,25 +1765,167 @@ pub fn Tensor::upgrade(self : Tensor, ~dim : Int = 1) -> Tensor {
   self.reshape(shape)
 }
 
-pub fn Tensor::broadcast[Shape : Shape](self : Tensor, shape : Shape) -> Tensor {
-  if self.shape.length() != 0 {
-    abort("Broadcasting a non-scalar value")
+pub fn Tensor::broadcast(self : Tensor, other : Tensor) -> (Tensor, Tensor) {
+  let self_dim = self.shape.length()
+  let other_dim = other.shape.length()
+  let dim = @math.maximum(self_dim, other_dim)
+  let self_shape = FixedArray::make(dim, 1)
+  let other_shape = FixedArray::make(dim, 1)
+  let broad_shape = FixedArray::make(dim, 1)
+  let this_offset = dim - self_dim
+  for i = 0; i < self_dim; i = i + 1 {
+    self_shape[i + this_offset] = self.shape[i]
   }
-  let shape = shape.to_fixed_array()
-  let block = compute_block_size(shape)
-  let total = shape[0] * block[0]
-  let value = self.value[0]
-  Tensor::{
-    value: FixedArray::make(total, value),
-    shape,
-    block,
-    ref: 0,
-    graph: Get(self, FixedArray::make(total, 0)),
-    grad: FixedArray::make(total, 0.0),
+  let that_offset = dim - other_dim
+  for i = 0; i < other_dim; i = i + 1 {
+    other_shape[i + that_offset] = other.shape[i]
   }
+  for i = 0; i < dim; i = i + 1 {
+    broad_shape[i] = @math.maximum(self_shape[i], other_shape[i])
+  }
+  let self_block = compute_block_size(self_shape)
+  let other_block = compute_block_size(other_shape)
+  let broad_block = compute_block_size(broad_shape)
+  let total = if dim == 0 { 1 } else { broad_shape[0] * broad_block[0] }
+  let self_value = Array::new(capacity=total)
+  let self_index = Array::new(capacity=total)
+  let other_value = Array::new(capacity=total)
+  let other_index = Array::new(capacity=total)
+  fn build_self(d : Int, p : Int) -> Unit {
+    if d == dim {
+      self_value.push(self.value[p])
+      self_index.push(p)
+      return
+    }
+    if self_shape[d] == 1 {
+      for i = 0; i < other_shape[d]; i = i + 1 {
+        build_self(d + 1, p)
+      }
+      return
+    }
+    if other_shape[d] != 1 && self_shape[d] != other_shape[d] {
+      abort("Shapes \{self_shape} and \{other_shape} are not broadcastable")
+    }
+    for i = 0; i < self_shape[d]; i = i + 1 {
+      build_self(d + 1, p + i * self_block[d])
+    }
+  }
+
+  fn build_other(d : Int, p : Int) -> Unit {
+    if d == dim {
+      other_value.push(other.value[p])
+      other_index.push(p)
+      return
+    }
+    if other_shape[d] == 1 {
+      for i = 0; i < self_shape[d]; i = i + 1 {
+        build_other(d + 1, p)
+      }
+      return
+    }
+    if self_shape[d] != 1 && self_shape[d] != other_shape[d] {
+      abort("Shapes \{self_shape} and \{other_shape} are not broadcastable")
+    }
+    for i = 0; i < other_shape[d]; i = i + 1 {
+      build_other(d + 1, p + i * other_block[d])
+    }
+  }
+
+  build_self(0, 0)
+  build_other(0, 0)
+  (
+    Tensor::{
+      value: FixedArray::from_array(self_value),
+      shape: broad_shape,
+      block: broad_block,
+      graph: Graph::Get(self, FixedArray::from_array(self_index)),
+      ref: 0,
+      grad: FixedArray::make(total, 0.0),
+    },
+    Tensor::{
+      value: FixedArray::from_array(other_value),
+      shape: broad_shape,
+      block: broad_block,
+      graph: Graph::Get(other, FixedArray::from_array(other_index)),
+      ref: 0,
+      grad: FixedArray::make(total, 0.0),
+    },
+  )
+  // if self.shape.length() != 0 {
+  //   abort("Broadcasting a non-scalar value")
+  // }
+  // let shape = shape.to_fixed_array()
+  // let block = compute_block_size(shape)
+  // let total = shape[0] * block[0]
+  // let value = self.value[0]
+  // Tensor::{
+  //   value: FixedArray::make(total, value),
+  //   shape,
+  //   block,
+  //   ref: 0,
+  //   graph: Get(self, FixedArray::make(total, 0)),
+  //   grad: FixedArray::make(total, 0.0),
+  // }
+}
+
+test "Tensor::broadcast - same shape" {
+  let x = zeros([5, 7, 3])
+  let y = zeros([5, 7, 3])
+  let (bx, by) = broadcast(x, y)
+  inspect!(bx.shape, content="[5, 7, 3]")
+  inspect!(by.shape, content="[5, 7, 3]")
+}
+
+test "Tensor::broadcast - scalar" {
+  let x = tensor(1.0)
+  let y = zeros([3, 1, 7])
+  let (bx, _) = broadcast(x, y)
+  inspect!(bx.shape, content="[3, 1, 7]")
+  inspect!(
+    bx,
+    content="[[[1, 1, 1, 1, 1, 1, 1]], [[1, 1, 1, 1, 1, 1, 1]], [[1, 1, 1, 1, 1, 1, 1]]]",
+  )
+}
+
+test "Tensor::broadcast - vector" {
+  let x = tensor([1.0, 2.0, 3.0])
+  let y = zeros([7, 1, 3])
+  let (bx, _) = broadcast(x, y)
+  inspect!(bx.shape, content="[7, 1, 3]")
+  inspect!(
+    bx,
+    content="[[[1, 2, 3]], [[1, 2, 3]], [[1, 2, 3]], [[1, 2, 3]], [[1, 2, 3]], [[1, 2, 3]], [[1, 2, 3]]]",
+  )
+}
+
+test "Tensor::broadcast - matrix" {
+  let x = tensor([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+  let y = zeros([7, 2, 3])
+  let (bx, _) = broadcast(x, y)
+  inspect!(bx.shape, content="[7, 2, 3]")
+  inspect!(
+    bx,
+    content="[[[1, 2, 3], [4, 5, 6]], [[1, 2, 3], [4, 5, 6]], [[1, 2, 3], [4, 5, 6]], [[1, 2, 3], [4, 5, 6]], [[1, 2, 3], [4, 5, 6]], [[1, 2, 3], [4, 5, 6]], [[1, 2, 3], [4, 5, 6]]]",
+  )
 }
 
 test "Tensor::broadcast" {
-  let zero = tensor(0.0)
-  inspect!(zero.broadcast([1, 2, 3]), content="[[[0, 0, 0], [0, 0, 0]]]")
+  let x = zeros([5, 3, 4, 1])
+  let y = zeros([3, 1, 1])
+  let (bx, by) = broadcast(x, y)
+  inspect!(bx.shape, content="[5, 3, 4, 1]")
+  inspect!(by.shape, content="[5, 3, 4, 1]")
+  let x = zeros([5, 1, 4, 1])
+  let y = zeros([3, 1, 1])
+  let (bx, by) = broadcast(x, y)
+  inspect!(bx.shape, content="[5, 3, 4, 1]")
+  inspect!(by.shape, content="[5, 3, 4, 1]")
+}
+
+test "panic Tensor::broadcast - shapes mismatch" {
+  let x = zeros([5, 2, 4, 1])
+  let y = zeros([3, 1, 1])
+  let (bx, by) = broadcast(x, y)
+  inspect!(bx.shape)
+  inspect!(by.shape)
 }
