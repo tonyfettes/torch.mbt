@@ -1794,13 +1794,23 @@ test "Tensor::broadcast" {
 
 pub fn Tensor::iter(self : Tensor, ~dim : Int = 0) -> Iter[Tensor] {
   let shape = self.shape
+  if shape.length() == 0 {
+    abort("Iterating over a scalar tensor is not allowed.")
+  }
   let block = self.block
   let shape_length = self.shape.length()
+  let dimension = if dim < 0 { shape_length + dim } else { dim }
+  if dimension < 0 || dimension >= shape_length {
+    abort("Dimension \{dimension} out of range [0, \{shape_length})")
+  }
   Iter::new(
     fn(yield) {
       fn build(d : Int, p : Int) -> IterResult {
-        if d == dim {
-          let shape = FixedArray::makei(shape_length - d, fn(i) { shape[i] })
+        if d == dimension + 1 {
+          let shape = FixedArray::makei(
+            shape_length - d,
+            fn(i) { shape[i + d] },
+          )
           let block = compute_block_size(shape)
           let total = if shape.length() == 0 { 1 } else { shape[0] * block[0] }
           let value = FixedArray::makei(total, fn(i) { self.value[i + p] })
@@ -1824,7 +1834,9 @@ pub fn Tensor::iter(self : Tensor, ~dim : Int = 0) -> Iter[Tensor] {
           IterContinue
         }
       }
-      build(0, 0)
+
+      ignore(build(0, 0))
+      IterEnd
     },
   )
 }
