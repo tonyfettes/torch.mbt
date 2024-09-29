@@ -72,7 +72,29 @@ pub fn Linear::new(
 }
 
 pub fn Linear::forward(self : Linear, input : Tensor) -> Tensor {
-  (input.upgrade().matmul(self.weight) + self.bias)[0].to_tensor()
+  let input_shape = input.shape
+  let dimension = input_shape.length()
+  if dimension == 0 {
+    abort("Input tensor should have at least one dimension")
+  }
+  let mut di = 0
+  let mut length = 1
+  while di < dimension - 1 {
+    length *= input_shape[di]
+    di += 1
+  }
+  let in_features = self.weight.shape[0]
+  let out_features = self.weight.shape[1]
+  if input_shape[di] != in_features {
+    abort(
+      "The shape of last dimension of input tensor \{input_shape[di]} does not match the number of input features \{in_features}",
+    )
+  }
+  let input = input.reshape([length, input_shape[di]])
+  let output = (input.matmul(self.weight) + self.bias).to_tensor()
+  let output_shape = input_shape.copy()
+  output_shape[di] = out_features
+  output.reshape(output_shape)
 }
 
 pub fn Linear::parameters(self : Linear) -> Iter[Tensor] {
