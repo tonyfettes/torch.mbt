@@ -35,12 +35,12 @@ PyTorch-like tensor operations implemented in MoonBit.
 - [x] Use `Shape`, `Shape2d`, etc. for passing shape-like object (`kernel_size`, etc.)
 - [ ] PyTorch tensor operations
   - [x] `torch.stack`
-  - [ ] `torch.sum` along any dimension
+  - [x] `torch.sum` along any dimension
   - [x] `torch.cat` along any dimension
   - [ ] `torch.transpose`
   - [x] `torch.swapaxis` (implemented by `Tensor::permute` and `Tensor::moveaxis`)
   - [x] `torch.sigmoid`
-  - [ ] Broadcast addition, multiplication, etc.
+  - [x] ~~Broadcast addition, multiplication, etc.~~ `torch.broadcast`
   - [x] `torch.zeros`
   - [x] `torch.ones`
 - [ ] PyTorch module
