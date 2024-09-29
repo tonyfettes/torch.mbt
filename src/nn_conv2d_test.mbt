@@ -1,3 +1,45 @@
+test "Conv2d - train average kernel" {
+  @torch.seed(b"12345678223456783234567842345678")
+  let model = @torch.Conv2d::new(1, 1, kernel_size=(2, 2))
+  let refer = @torch.AvgPool2d::new(2, stride=1)
+  let optimizer = @torch.SGD::new(model.parameters(), ~learning_rate=0.001)
+  for i = 0; i < 10; i = i + 1 {
+    let input = @torch.Uniform::new(-1, 1).sample([1, 1, 28, 28])
+    let output = model.forward(input)
+    let target = refer.forward(input)
+    let loss = @torch.MSELoss::new()
+    let loss = loss.forward(output, target)
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+  }
+  inspect!(model.weight, content="[[[[0.24951828728242156, 0.24915767929954544], [0.24916431321837323, 0.24957281780088242]]]]")
+}
+
+test "Conv2d - train random kernel" {
+  @torch.seed(b"12345678223456783234567842345678")
+  let model = @torch.Conv2d::new(1, 1, kernel_size=2)
+  let refer = @torch.Conv2d::new(1, 1, kernel_size=2)
+  let optimizer = @torch.SGD::new(model.parameters(), ~learning_rate=0.001)
+  @torch.with_no_grad_error!(fn() {
+    let distrib = @torch.Uniform::new(-8, 8)
+    let kernel = distrib.sample([2, 2])
+    inspect!(kernel, content="[[3.4506840283463074, 7.665928995786066], [5.783092436246298, -4.1505954275667545]]")
+    refer.weight[0][0] = kernel
+  })
+  let loss = @torch.MSELoss::new()
+  for i = 0; i < 10; i = i + 1 {
+    let input = @torch.Uniform::new(-1, 1).sample([1, 1, 28, 28])
+    let output = model.forward(input)
+    let target = refer.forward(input)
+    let loss = loss.forward(output, target)
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+  }
+  inspect!(model.weight, content="[[[[3.446457008898044, 7.655470760754497], [5.776585147705067, -4.1464605688272425]]]]")
+}
+
 test "Conv2d - Sigmoid - AvgPool2d" {
   @torch.seed(b"12345678223456783234567842345678")
   let image = @torch.tensor(
