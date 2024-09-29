@@ -171,7 +171,7 @@ pub fn CrossEntropyLoss::forward(
   target : Tensor
 ) -> Tensor {
   let diff = -target * input.log()
-  diff.sum()
+  diff.sum() / tensor(input.length().to_double())
 }
 
 test "Linear Regression" {
