@@ -62,7 +62,7 @@ enum Graph {
   Neg(Tensor)
   Exp(Tensor)
   Log(Tensor)
-  Sum(Tensor)
+  Sum(Tensor, FixedArray[Array[Int]])
   Pow(Tensor, Int)
   MatMul(Tensor, Tensor)
   Get(Tensor, FixedArray[Int])
@@ -348,32 +348,66 @@ pub fn Tensor::log(self : Tensor) -> Tensor {
   }
 }
 
-pub fn Tensor::sum(self : Tensor) -> Tensor {
-  if self.block.length() == 0 {
-    abort("Cannot sum a scalar")
+pub fn Tensor::sum(self : Tensor, ~dim : Shape = ()) -> Tensor {
+  let dim = dim.to_fixed_array()
+  let dim = if dim.length() == 0 {
+    FixedArray::makei(self.shape.length(), fn(i) { i })
+  } else {
+    dim
   }
-  let value : FixedArray[Double] = FixedArray::make(self.block[0], 0.0)
-  for i = 0; i < self.shape[0]; i = i + 1 {
-    for j = 0; j < self.block[0]; j = j + 1 {
-      value[j] = value[j] + self.value[i * self.block[0] + j]
+  let do_sum = FixedArray::make(self.shape.length(), false)
+  for d in dim {
+    do_sum[d] = true
+  }
+  let shape = []
+  for d in 0..<self.shape.length() {
+    if not(do_sum[d]) {
+      shape.push(self.shape[d])
     }
   }
-  let shape : FixedArray[Int] = FixedArray::make(self.shape.length() - 1, 0)
-  for i = 1; i < self.shape.length(); i = i + 1 {
-    shape[i - 1] = self.shape[i]
+  let shape = FixedArray::from_array(shape)
+  let block = compute_block_size(shape)
+  let total = if shape.length() == 0 { 1 } else { shape[0] * block[0] }
+  let value : FixedArray[Double] = FixedArray::make(total, 0.0)
+  let index : FixedArray[Array[Int]] = FixedArray::makei(total, fn(__) { [] })
+  fn build(d : Int, sum_pos : Int, val_pos : Int) -> Unit {
+    if d == self.shape.length() {
+      value[sum_pos] += self.value[val_pos]
+      index[sum_pos].push(val_pos)
+      return
+    }
+    if do_sum[d] {
+      for i in 0..<self.shape[d] {
+        build(d + 1, sum_pos, val_pos + i * self.block[d])
+      }
+    } else {
+      for i in 0..<self.shape[d] {
+        build(d + 1, sum_pos + i * self.block[d], val_pos + i * self.block[d])
+      }
+    }
   }
-  let size : FixedArray[Int] = FixedArray::make(self.shape.length() - 1, 0)
-  for i = 1; i < self.block.length(); i = i + 1 {
-    size[i - 1] = self.block[i]
-  }
+
+  build(0, 0, 0)
   Tensor::{
     value,
     shape,
-    block: size,
-    graph: Graph::Sum(self),
+    block,
+    graph: Graph::Sum(self, index),
     ref: 0,
-    grad: FixedArray::make(self.block[0], 0.0),
+    grad: FixedArray::make(total, 0.0),
   }
+}
+
+test "Tensor::sum - scalar" {
+  let tensor = Tensor::new(1.0)
+  let sum = tensor.sum()
+  inspect!(sum.value, content="[1]")
+  inspect!(sum.shape, content="[]")
+  inspect!(sum.block, content="[]")
+  inspect!(sum.graph, content="Sum(1, [[0]])")
+  inspect!(sum.ref, content="0")
+  inspect!(sum.grad, content="[0]")
+  inspect!(sum, content="1")
 }
 
 test "Tensor::sum - Vector" {
@@ -382,7 +416,7 @@ test "Tensor::sum - Vector" {
   inspect!(sum.value, content="[6]")
   inspect!(sum.shape, content="[]")
   inspect!(sum.block, content="[]")
-  inspect!(sum.graph, content="Sum([0, 1, 2, 3])")
+  inspect!(sum.graph, content="Sum([0, 1, 2, 3], [[0, 1, 2, 3]])")
   inspect!(sum.ref, content="0")
   inspect!(sum.grad, content="[0]")
   inspect!(sum, content="6")
@@ -390,11 +424,14 @@ test "Tensor::sum - Vector" {
 
 test "Tensor::sum - Matrix" {
   let tensor = Tensor::new([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]])
-  let sum = tensor.sum()
+  let sum = tensor.sum(dim=0)
   inspect!(sum.value, content="[3, 5, 7]")
   inspect!(sum.shape, content="[3]")
   inspect!(sum.block, content="[1]")
-  inspect!(sum.graph, content="Sum([[0, 1, 2], [3, 4, 5]])")
+  inspect!(
+    sum.graph,
+    content="Sum([[0, 1, 2], [3, 4, 5]], [[0, 3], [1, 4], [2, 5]])",
+  )
   inspect!(sum.ref, content="0")
   inspect!(sum.grad, content="[0, 0, 0]")
   inspect!(sum, content="[3, 5, 7]")
@@ -890,7 +927,7 @@ fn Tensor::ref(self : Tensor) -> Unit {
     Neg(x) => x.ref()
     Exp(x) => x.ref()
     Log(x) => x.ref()
-    Sum(x) => x.ref()
+    Sum(x, _) => x.ref()
     Pow(x, _) => x.ref()
     MatMul(a, b) => {
       a.ref()
@@ -1024,10 +1061,10 @@ fn Tensor::propagate(self : Tensor) -> Unit {
       }
       a.propagate()
     }
-    Sum(x) => {
-      for i = 0; i < x.shape[0]; i = i + 1 {
-        for j = 0; j < x.block[0]; j = j + 1 {
-          x.grad[i * x.block[0] + j] += self.grad[j]
+    Sum(x, m) => {
+      for i = 0; i < self.grad.length(); i = i + 1 {
+        for j = 0; j < m[i].length(); j = j + 1 {
+          x.grad[m[i][j]] += self.grad[i]
         }
       }
       x.propagate()
@@ -1101,7 +1138,7 @@ fn Tensor::check(self : Tensor) -> Unit {
     Neg(x) => x.check()
     Exp(x) => x.check()
     Log(x) => x.check()
-    Sum(x) => x.check()
+    Sum(x, _) => x.check()
     Pow(x, _) => x.check()
     MatMul(x, y) => {
       x.check()
@@ -1217,12 +1254,12 @@ test "Tensor::reshape" {
 
 test "Tensor::reshape - backward" {
   let tensor = Tensor::new([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]])
-  inspect!(tensor.sum(), content="[3, 5, 7]")
+  inspect!(tensor.sum(dim=0), content="[3, 5, 7]")
   let reshaped = tensor.reshape([3, 2])
   inspect!(reshaped, content="[[0, 1], [2, 3], [4, 5]]")
-  let sum = reshaped.sum()
+  let sum = reshaped.sum(dim=0)
   inspect!(sum, content="[6, 9]")
-  let sum_sum = sum.sum()
+  let sum_sum = sum.sum(dim=0)
   inspect!(sum_sum, content="15")
   sum_sum.backward()
   inspect!(sum_sum.grad, content="[1]")
@@ -1236,7 +1273,7 @@ test "Tensor::reshape - backward with matrix multiplication" {
   let w = Tensor::new([[6.0, 7.0], [8.0, 9.0], [10.0, 11.0]])
   let y = x.matmul(w)
   inspect!(y, content="[[28, 31], [100, 112]]")
-  y.sum().sum().backward()
+  y.sum(dim=0).sum(dim=0).backward()
   inspect!(y.grad, content="[1, 1, 1, 1]")
   inspect!(x.grad, content="[13, 17, 21, 13, 17, 21]")
   inspect!(w.grad, content="[3, 3, 5, 5, 7, 7]")
@@ -1246,7 +1283,7 @@ test "Tensor::reshape - backward with matrix multiplication" {
   inspect!(ws, content="[[6, 7, 8], [9, 10, 11]]")
   let ys = xs.matmul(ws)
   inspect!(ys, content="[[9, 10, 11], [39, 44, 49], [69, 78, 87]]")
-  ys.sum().sum().backward()
+  ys.sum(dim=0).sum(dim=0).backward()
   inspect!(ys.grad, content="[1, 1, 1, 1, 1, 1, 1, 1, 1]")
   inspect!(xs.grad, content="[34, 47, 42, 43, 38, 51]")
   inspect!(ws.grad, content="[9, 9, 11, 14, 16, 16]")
@@ -1450,7 +1487,7 @@ pub fn cross_correlation(
             image_width,
           )
           let patch = image[i_start:i_end][j_start:j_end].to_tensor()
-          (patch * kernel).sum().sum()
+          (patch * kernel).sum()
         },
       )
       |> Tensor::stack()

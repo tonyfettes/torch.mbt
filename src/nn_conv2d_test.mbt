@@ -14,10 +14,11 @@ test "Conv2d - Sigmoid - AvgPool2d" {
   )
   let optimizer = @torch.SGD::new(model.parameters(), learning_rate=0.1)
   let output = model.forward(image)
+  let output = output[0].to_tensor()
   inspect!(output.shape, content="[4]")
   inspect!(
     output,
-    content="[-1.2789491239843496, -1.6064487625600816, -0.34380314318724736, -0.1323962292267683]",
+    content="[-1.2789491239843496, -1.6064487625600816, -0.34380314318724736, -0.13239622922676836]",
   )
   let target = @torch.tensor([0.0, 1.0, 0.0, 0.0])
   let loss = @torch.MSELoss::new()
@@ -28,7 +29,7 @@ test "Conv2d - Sigmoid - AvgPool2d" {
   let output = model.forward(image)
   inspect!(
     output,
-    content="[-0.14598239736741625, 0.23782881911438317, 0.16662795600735936, 0.2167174758912816]",
+    content="[[-0.14598239736741625, 0.2378288191143832, 0.1666279560073594, 0.2167174758912817]]",
   )
 }
 
@@ -94,7 +95,7 @@ test "MNIST" {
   let optimizer = @torch.SGD::new(model.parameters(), learning_rate=0.1)
   let loss = @torch.CrossEntropyLoss::new()
   let output = model.forward(image)
-  inspect!(output[label], content="0.10304751517401778")
+  inspect!(output[0][label], content="0.10304751517401779")
   let target = FixedArray::make(10, 0.0)
   target[label] = 1.0
   let loss = loss.forward(output, @torch.tensor(target))
@@ -103,5 +104,5 @@ test "MNIST" {
   loss.backward()
   optimizer.step()
   let output = model.forward(image)
-  inspect!(output[label], content="0.5337019792418568")
+  inspect!(output[0][label], content="0.5337019792418567")
 }

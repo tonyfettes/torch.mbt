@@ -68,7 +68,7 @@ pub fn Conv2d::forward(self : Conv2d, input : Tensor) -> Tensor {
           padding=self.padding.0,
         )
       }
-      channels[oc] = Tensor::stack(correlations).sum() + self.bias[oc]
+      channels[oc] = Tensor::stack(correlations).sum(dim=0) + self.bias[oc]
     }
     batch[n] = Tensor::stack(channels)
   }
@@ -218,7 +218,7 @@ test "Conv2d - Backward" {
   let output = layer.forward(image)
   inspect!(output[0][0], content="[[47, 51, 55], [63, 67, 71], [79, 83, 87]]")
   inspect!(output[0][1], content="[[37, 41, 45], [53, 57, 61], [69, 73, 77]]")
-  let loss = output.sum().sum().sum().sum()
+  let loss = output.sum()
   inspect!(loss, content="1116")
   loss.backward()
   inspect!(layer.weight[0][0].grad, content="[45, 54, 81, 90]")

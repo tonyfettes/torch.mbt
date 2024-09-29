@@ -2,6 +2,10 @@ pub trait Shape {
   to_fixed_array(Self) -> FixedArray[Int]
 }
 
+pub impl Shape for Unit with to_fixed_array(_self : Unit) -> FixedArray[Int] {
+  FixedArray::make(0, 0)
+}
+
 pub impl Shape for Int with to_fixed_array(self : Int) -> FixedArray[Int] {
   [self]
 }
