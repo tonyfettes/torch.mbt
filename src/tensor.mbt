@@ -1518,7 +1518,7 @@ pub fn Tensor::permute(self : Tensor, permutation : Array[Int]) -> Tensor {
     value: FixedArray::from_array(value),
     shape,
     block: compute_block_size(shape),
-    graph: Graph::Val,
+    graph: Graph::Get(self, FixedArray::from_array(index)),
     ref: 0,
     grad: FixedArray::make(value.length(), 0.0),
   }
