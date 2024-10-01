@@ -15,7 +15,7 @@ test "Conv2d - train average kernel" {
   }
   inspect!(
     model.weight,
-    content="[[[[0.24951828728242156, 0.24915767929954544], [0.24916431321837323, 0.24957281780088242]]]]",
+    content="[[[[0.2398214365174994, 0.23837034340298877], [0.2372611163600896, 0.237249868299508]]]]",
   )
 }
 
@@ -30,7 +30,7 @@ test "Conv2d - train random kernel" {
       let kernel = distrib.sample([2, 2])
       inspect!(
         kernel,
-        content="[[3.4506840283463074, 7.665928995786066], [5.783092436246298, -4.1505954275667545]]",
+        content="[[5.783092436246298, -4.1505954275667545], [2.1609196096634022, -1.7510303846086117]]",
       )
       refer.weight[0][0] = kernel
     },
@@ -47,7 +47,7 @@ test "Conv2d - train random kernel" {
   }
   inspect!(
     model.weight,
-    content="[[[[3.446457008898044, 7.655470760754497], [5.776585147705067, -4.1464605688272425]]]]",
+    content="[[[[5.734003024208306, -4.1928148324930925], [2.115193989982714, -1.7950790294008958]]]]",
   )
 }
 
@@ -71,18 +71,18 @@ test "Conv2d - Sigmoid - AvgPool2d" {
   inspect!(output.shape, content="[4]")
   inspect!(
     output,
-    content="[-1.2789491239843496, -1.6064487625600816, -0.34380314318724736, -0.13239622922676836]",
+    content="[0.4052299802353421, -1.2087408488805544, 0.2599913853969742, -0.08152780176751948]",
   )
   let target = @torch.tensor([0.0, 1.0, 0.0, 0.0])
   let loss = @torch.MSELoss::new()
   let loss = loss.forward(output, target)
-  inspect!(loss, content="2.1412538440925535")
+  inspect!(loss, content="1.2792474443342026")
   loss.backward()
   optimizer.step()
   let output = model.forward(image)
   inspect!(
     output,
-    content="[[-0.14598239736741625, 0.2378288191143832, 0.1666279560073594, 0.2167174758912817]]",
+    content="[[0.0055807694974617725, 0.6621095254158275, 0.0995642683094404, -0.05257892536220428]]",
   )
 }
 
@@ -148,14 +148,14 @@ test "MNIST" {
   let optimizer = @torch.SGD::new(model.parameters(), learning_rate=0.1)
   let loss = @torch.CrossEntropyLoss::new()
   let output = model.forward(image)
-  inspect!(output[0][label], content="0.10304751517401779")
+  inspect!(output[0][label], content="0.06886561719734109")
   let target = FixedArray::make(10, 0.0)
   target[label] = 1.0
   let loss = loss.forward(output, @torch.tensor(target))
-  inspect!(loss, content="2.272565084755235")
+  inspect!(loss, content="2.675598250228825")
   optimizer.zero_grad()
   loss.backward()
   optimizer.step()
   let output = model.forward(image)
-  inspect!(output[0][label], content="0.5337019792418567")
+  inspect!(output[0][label], content="0.44713147154564087")
 }

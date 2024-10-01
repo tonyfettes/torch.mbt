@@ -82,6 +82,34 @@ pub fn Conv2d::parameters(self : Conv2d) -> Iter[Tensor] {
   self.weight.iter().flat_map(fn { channel => channel.iter() })
 }
 
+test "Conv2d" {
+  seed(b"12345678223456783234567842345678")
+  let image = tensor(FixedArray::makei(4 * 4, fn(i) { i.to_double() }))
+  inspect!(
+    image.reshape([4, 4]),
+    content="[[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11], [12, 13, 14, 15]]",
+  )
+  let image = image.reshape([1, 1, 4, 4])
+  inspect!(image.shape, content="[1, 1, 4, 4]")
+  let layer = Conv2d::new(1, 1, kernel_size=(2, 2))
+  with_no_grad(
+    fn() {
+      // kernel[0]:
+      // 0 1
+      // 0 1
+      layer.weight[0][0][0][0] = 0.0
+      layer.weight[0][0][0][1] = 1.0
+      layer.weight[0][0][1][0] = 0.0
+      layer.weight[0][0][1][1] = 1.0
+      layer.bias[0] = tensor(0.0)
+    },
+  )
+  inspect!(layer.weight[0][0], content="[[0, 1], [0, 1]]")
+  let output = layer.forward(image)
+  inspect!(output.shape, content="[1, 1, 3, 3]")
+  inspect!(output[0][0], content="[[6, 8, 10], [14, 16, 18], [22, 24, 26]]")
+}
+
 test "Conv2d - Multiple output channels" {
   seed(b"12345678223456783234567842345678")
   let image = tensor(FixedArray::makei(4 * 4, fn(i) { i.to_double() }))
@@ -115,6 +143,9 @@ test "Conv2d - Multiple output channels" {
       layer.weight[2][0][0][1] = 0.0
       layer.weight[2][0][1][0] = 0.0
       layer.weight[2][0][1][1] = 1.0
+      layer.bias[0] = tensor(0.0)
+      layer.bias[1] = tensor(0.0)
+      layer.bias[2] = tensor(0.0)
     },
   )
   inspect!(layer.weight[0][0], content="[[0, 1], [0, 1]]")
@@ -167,6 +198,7 @@ test "Conv2d - Multiple input channels" {
       layer.weight[0][2][0][1] = 0.0
       layer.weight[0][2][1][0] = 0.0
       layer.weight[0][2][1][1] = 1.0
+      layer.bias[0] = tensor(0.0)
     },
   )
   let output = layer.forward(image)
@@ -216,6 +248,8 @@ test "Conv2d - Backward" {
       layer.weight[1][1][0][1] = 1.0
       layer.weight[1][1][1][0] = 0.0
       layer.weight[1][1][1][1] = 0.0
+      layer.bias[0] = tensor(0.0)
+      layer.bias[1] = tensor(0.0)
     },
   )
   let output = layer.forward(image)
