@@ -75,12 +75,6 @@ enum Graph {
   ReLU(Tensor)
 } derive(Show)
 
-trait GraphOps: Show {
-  ref(Self) -> Unit
-  propagate(Self, Tensor) -> Unit
-  check(Self) -> Unit
-}
-
 pub fn Tensor::get(self : Tensor, index : Array[Int]) -> Double {
   if index.length() != self.shape.length() {
     abort("Index length does not match tensor shape")
