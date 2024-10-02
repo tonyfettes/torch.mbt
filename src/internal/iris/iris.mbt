@@ -1125,7 +1125,7 @@ test {
       Virginica => @torch.tensor([0.0, 0.0, 1.0])
     }
     let output = model.forward(input)
-    accuracy += (output * target).sum().value[0]
+    accuracy += (output * target).sum().to_double()
   }
   inspect!(
     accuracy / validate.length().to_double(),

@@ -68,7 +68,7 @@ test "Conv2d - Sigmoid - AvgPool2d" {
   let optimizer = @torch.SGD::new(model.parameters(), learning_rate=0.1)
   let output = model.forward(image)
   let output = output[0].to_tensor()
-  inspect!(output.shape, content="[4]")
+  inspect!(output.shape(), content="[4]")
   inspect!(
     output,
     content="[0.4052299802353421, -1.2087408488805544, 0.2599913853969742, -0.08152780176751948]",

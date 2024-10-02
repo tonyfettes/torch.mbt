@@ -1,10 +1,14 @@
-pub struct Tensor {
-  priv mut value : FixedArray[Double]
-  priv shape : FixedArray[Int]
-  priv block : FixedArray[Int]
-  priv mut graph : Graph
-  priv mut ref : Int
-  priv mut grad : FixedArray[Double]
+struct Tensor {
+  mut value : FixedArray[Double]
+  shape : FixedArray[Int]
+  block : FixedArray[Int]
+  mut graph : Graph
+  mut ref : Int
+  mut grad : FixedArray[Double]
+}
+
+pub fn Tensor::shape(self : Tensor) -> FixedArray[Int] {
+  self.shape
 }
 
 let nan : Tensor = tensor(@double.not_a_number, requires_grad=false)
