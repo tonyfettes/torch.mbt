@@ -68,7 +68,7 @@ enum Graph {
   Get(Tensor, FixedArray[Int])
   Cat(FixedArray[Tensor], FixedArray[(Int, Int)])
   Nop(Tensor)
-  Ops(GraphOps)
+  ReLU(Tensor)
 } derive(Show)
 
 trait GraphOps: Show {
@@ -947,7 +947,7 @@ fn Tensor::ref(self : Tensor) -> Unit {
       }
     Get(x, _) => x.ref()
     Nop(x) => x.ref()
-    Ops(ops) => ops.ref()
+    ReLU(x) => x.ref()
   }
 }
 
@@ -1113,7 +1113,12 @@ fn Tensor::propagate(self : Tensor) -> Unit {
       }
     }
     Nop(x) => x.propagate()
-    Ops(ops) => ops.propagate(self)
+    ReLU(x) => {
+      for i = 0; i < self.grad.length(); i = i + 1 {
+        x.grad[i] += self.grad[i] * (if self.value[i] > 0.0 { 1.0 } else { 0.0 })
+      }
+      x.propagate()
+    }
   }
 }
 
@@ -1158,7 +1163,7 @@ fn Tensor::check(self : Tensor) -> Unit {
         x.check()
       }
     Nop(x) => x.check()
-    Ops(ops) => ops.check()
+    ReLU(x) => x.check()
   }
   self.ref = -1
 }
@@ -1422,36 +1427,12 @@ pub fn Tensor::cat(tensors : FixedArray[Tensor], ~dim : Int = 0) -> Tensor {
   }
 }
 
-type GraphReLU Tensor
-
-pub fn GraphReLU::ref(self : GraphReLU) -> Unit {
-  self._.ref()
-}
-
-fn GraphReLU::propagate(self : GraphReLU, parent : Tensor) -> Unit {
-  for i = 0; i < parent.grad.length(); i = i + 1 {
-    self._.grad[i] += parent.grad[i] *
-      (if parent.value[i] > 0.0 { 1.0 } else { 0.0 })
-  }
-  self._.propagate()
-}
-
-fn GraphReLU::check(self : GraphReLU) -> Unit {
-  self._.check()
-}
-
-impl Show for GraphReLU with output(self : GraphReLU, logger : Logger) {
-  logger.write_string("ReLU(")
-  Show::output(self._, logger)
-  logger.write_char(')')
-}
-
 pub fn Tensor::reLU(self : Tensor) -> Tensor {
   Tensor::{
     value: self.value.map(fn { x => if x > 0.0 { x } else { 0.0 } }),
     shape: self.shape,
     block: self.block,
-    graph: Graph::Ops(GraphReLU(self)),
+    graph: Graph::ReLU(self),
     ref: 0,
     grad: FixedArray::make(self.value.length(), 0.0),
   }
