@@ -136,7 +136,7 @@ pub fn Tensor::op_get(self : Tensor, index : Int) -> TensorView {
   if index >= self.shape[0] {
     abort("Tensor element access \{index} out of bounds [0, \{self.shape[0]}")
   }
-  TensorView::{ tensor: self, path: [Index(index)] }
+  TensorView::{ tensor: self, index: [Index(index)] }
 }
 
 pub fn Tensor::op_set[X : TensorValue](
@@ -191,8 +191,8 @@ pub fn Tensor::op_as_view(
       end
     }
   }
-  let path = [TensorIndex::Slice(start, end)]
-  TensorView::{ tensor: self, path }
+  let index = [TensorIndex::Slice(start, end)]
+  TensorView::{ tensor: self, index }
 }
 
 test "panic Tensor::op_as_view - Scalar" {
@@ -669,7 +669,7 @@ pub enum TensorIndex {
 
 pub struct TensorView {
   tensor : Tensor
-  path : Array[TensorIndex]
+  index : Array[TensorIndex]
 }
 
 pub fn TensorView::output(self : TensorView, logger : Logger) -> Unit {
@@ -681,8 +681,8 @@ pub fn TensorView::output(self : TensorView, logger : Logger) -> Unit {
       Show::output(value[p], logger)
       return
     }
-    let (start, end) = if d < self.path.length() {
-      match self.path[d] {
+    let (start, end) = if d < self.index.length() {
+      match self.index[d] {
         Index(index) => {
           build(d + 1, p + index * block[d])
           return
@@ -710,15 +710,15 @@ pub fn TensorView::to_string(self : TensorView) -> String {
 }
 
 pub fn TensorView::op_get(self : TensorView, index : Int) -> TensorView {
-  if self.path.length() == self.tensor.shape.length() {
+  if self.index.length() == self.tensor.shape.length() {
     abort("Taking element at the lowerest dimension")
   }
-  if index >= self.tensor.shape[self.path.length()] {
+  if index >= self.tensor.shape[self.index.length()] {
     abort(
-      "Tensor element access at \{index} out of bounds [0, \{self.tensor.shape[self.path.length()]}",
+      "Tensor element access at \{index} out of bounds [0, \{self.tensor.shape[self.index.length()]}",
     )
   }
-  TensorView::{ tensor: self.tensor, path: [..self.path, Index(index)] }
+  TensorView::{ tensor: self.tensor, index: [..self.index, Index(index)] }
 }
 
 let no_grad : Ref[Bool] = Ref::new(false)
@@ -750,38 +750,52 @@ pub fn TensorView::op_set(
     }
   }
   let other = other.to_tensor(requires_grad=false)
-  fn assign(
-    path : ArrayView[TensorIndex],
-    self_indicies : Array[Int],
-    other_indicies : Array[Int]
-  ) -> Unit {
-    if self_indicies.length() == self.tensor.shape.length() {
-      let mut self_offset = 0
-      for i = 0; i < self_indicies.length(); i = i + 1 {
-        self_offset += self_indicies[i] * self.tensor.block[i]
+  let index = [..self.index, Index(index)]
+  let shape = self.tensor.shape
+  let block = self.tensor.block
+  let value = self.tensor.value
+  fn assign(self_dim : Int, self_pos : Int, other_dim : Int, other_pos : Int) {
+    if self_dim == shape.length() {
+      if other_dim != other.shape.length() {
+        abort(
+          "Dimension does not match: expecting \{other_dim}, got \{other.shape.length()}",
+        )
       }
-      let mut other_offset = 0
-      for i = 0; i < other_indicies.length(); i = i + 1 {
-        other_offset += other_indicies[i] * other.block[i]
-      }
-      self.tensor.value[self_offset] = other.value[other_offset]
+      value[self_pos] = other.value[other_pos]
       return
     }
-    match path {
-      [Index(index), .. as path] =>
-        assign(path, [..self_indicies, index], other_indicies)
-      [Slice(start, end), .. as path] =>
-        for i = start; i < end; i = i + 1 {
-          assign(path, [..self_indicies, i], [..other_indicies, i - start])
+    let (start, end) = if self_dim < index.length() {
+      match index[self_dim] {
+        Index(index) => {
+          assign(
+            self_dim + 1,
+            self_pos + index * block[self_dim],
+            other_dim,
+            other_pos,
+          )
+          return
         }
-      [] =>
-        for i = 0; i < self.tensor.shape[self_indicies.length()]; i = i + 1 {
-          assign(path, [..self_indicies, i], [..other_indicies, i])
-        }
+        Slice(start, end) => (start, end)
+      }
+    } else {
+      (0, shape[self_dim])
+    }
+    if end - start != other.shape[other_dim] {
+      abort(
+        "\{other_dim}-th dimension should have length \{end - start}, got \{other.shape[other_dim]}",
+      )
+    }
+    for i in start..<end {
+      assign(
+        self_dim + 1,
+        self_pos + i * block[self_dim],
+        other_dim + 1,
+        other_pos + (i - start) * other.block[other_dim],
+      )
     }
   }
 
-  assign([..self.path, Index(index)][:], [], [])
+  assign(0, 0, 0, 0)
 }
 
 test "TensorView::op_set" {
@@ -802,10 +816,10 @@ pub fn TensorView::op_as_view(
   ~end? : Int
 ) -> TensorView {
   let end = match end {
-    None => self.tensor.shape[self.path.length()]
+    None => self.tensor.shape[self.index.length()]
     Some(end) => end
   }
-  TensorView::{ tensor: self.tensor, path: [..self.path, Slice(start, end)] }
+  TensorView::{ tensor: self.tensor, index: [..self.index, Slice(start, end)] }
 }
 
 pub fn TensorView::op_add(self : TensorView, other : TensorView) -> Tensor {
@@ -840,14 +854,14 @@ test "compute_block_size" {
 }
 
 pub fn TensorView::to_tensor(self : TensorView) -> Tensor {
-  let shape : Array[Int] = Array::new(capacity=self.path.length())
-  for part in self.path {
+  let shape : Array[Int] = Array::new(capacity=self.index.length())
+  for part in self.index {
     match part {
       Index(_) => ()
       Slice(start, stop) => shape.push(stop - start)
     }
   }
-  for i = self.path.length(); i < self.tensor.shape.length(); i = i + 1 {
+  for i = self.index.length(); i < self.tensor.shape.length(); i = i + 1 {
     shape.push(self.tensor.shape[i])
   }
   // We can't avoid this allocation because we don't know the length of the
@@ -867,13 +881,13 @@ pub fn TensorView::to_tensor(self : TensorView) -> Tensor {
       index_length += 1
       return
     }
-    if dimension >= self.path.length() {
+    if dimension >= self.index.length() {
       for i in 0..<self.tensor.shape[dimension] {
         build(dimension + 1, offset + i * self.tensor.block[dimension])
       }
       return
     }
-    match self.path[dimension] {
+    match self.index[dimension] {
       Index(index) =>
         build(dimension + 1, offset + index * self.tensor.block[dimension])
       Slice(start, end) =>
