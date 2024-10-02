@@ -103,47 +103,26 @@ pub fn Tensor::set(self : Tensor, index : Array[Int], value : Double) -> Unit {
   self.value[offset] = value
 }
 
-fn Tensor::_output(
-  self : Tensor,
-  logger : Logger,
-  range : Array[TensorIndex],
-  index : Array[Int]
-) -> Unit {
-  if index.length() == self.shape.length() {
-    logger.write_string(self.get(index).to_string())
-    return
-  }
-  let dimension = index.length()
-  fn output_range(start : Int, end : Int) {
-    logger.write_string("[")
-    index.push(0)
-    for i = start; i < end; i = i + 1 {
-      index[dimension] = i
-      self._output(logger, range, index)
-      if i < end - 1 {
+pub fn Tensor::output(self : Tensor, logger : Logger) -> Unit {
+  let shape = self.shape
+  let dimension = shape.length()
+  let value = self.value
+  fn build(d : Int, p : Int) {
+    if d == dimension {
+      Show::output(value[p], logger)
+      return
+    }
+    logger.write_char('[')
+    for i = 0; i < shape[d]; i = i + 1 {
+      build(d + 1, p + i * self.block[d])
+      if i < shape[d] - 1 {
         logger.write_string(", ")
       }
     }
-    index.unsafe_pop() |> ignore
-    logger.write_string("]")
+    logger.write_char(']')
   }
 
-  if dimension >= range.length() {
-    output_range(0, self.shape[dimension])
-  } else {
-    match range[dimension] {
-      Index(range_index) => {
-        index.push(range_index)
-        self._output(logger, range, index)
-        index.unsafe_pop() |> ignore
-      }
-      Slice(start, end) => output_range(start, end)
-    }
-  }
-}
-
-pub fn Tensor::output(self : Tensor, logger : Logger) -> Unit {
-  self._output(logger, [], [])
+  build(0, 0)
 }
 
 pub fn Tensor::to_string(self : Tensor) -> String {
@@ -694,7 +673,36 @@ pub struct TensorView {
 }
 
 pub fn TensorView::output(self : TensorView, logger : Logger) -> Unit {
-  self.tensor._output(logger, self.path, [])
+  let shape = self.tensor.shape
+  let block = self.tensor.block
+  let value = self.tensor.value
+  fn build(d : Int, p : Int) {
+    if d == shape.length() {
+      Show::output(value[p], logger)
+      return
+    }
+    let (start, end) = if d < self.path.length() {
+      match self.path[d] {
+        Index(index) => {
+          build(d + 1, p + index * block[d])
+          return
+        }
+        Slice(start, end) => (start, end)
+      }
+    } else {
+      (0, shape[d])
+    }
+    logger.write_char('[')
+    for i in start..<end {
+      build(d + 1, p + i * block[d])
+      if i < end - 1 {
+        logger.write_string(", ")
+      }
+    }
+    logger.write_char(']')
+  }
+
+  build(0, 0)
 }
 
 pub fn TensorView::to_string(self : TensorView) -> String {
@@ -1113,7 +1121,8 @@ fn Tensor::propagate(self : Tensor) -> Unit {
     Nop(x) => x.propagate()
     ReLU(x) => {
       for i = 0; i < self.grad.length(); i = i + 1 {
-        x.grad[i] += self.grad[i] * (if self.value[i] > 0.0 { 1.0 } else { 0.0 })
+        x.grad[i] += self.grad[i] *
+          (if self.value[i] > 0.0 { 1.0 } else { 0.0 })
       }
       x.propagate()
     }
