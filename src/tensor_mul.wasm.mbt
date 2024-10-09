@@ -30,7 +30,7 @@ fn fixed_array_simd_mul(
     out[i] = in0[i] * in1[i]
   }
   if len / 2 != 0 {
-    simd_f64x2_add(
+    simd_f64x2_mul(
       address_fixed_array_double(in0),
       address_fixed_array_double(in1),
       address_fixed_array_double(out),
@@ -42,7 +42,7 @@ fn fixed_array_simd_mul(
 pub fn Tensor::op_mul(self : Tensor, other : Tensor) -> Tensor {
   let length = self.value.length()
   let output : FixedArray[Double] = FixedArray::make(length, 0.0)
-  fixed_array_simd_add(self.value, other.value, output, length)
+  fixed_array_simd_mul(self.value, other.value, output, length)
   Tensor::{
     value: output,
     shape: self.shape,
