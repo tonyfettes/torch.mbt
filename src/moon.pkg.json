@@ -13,13 +13,6 @@
     "tensor_mul.mbt": [
       "not",
       "wasm"
-    ],
-    "tensor_matmul.wasm.mbt": [
-      "wasm"
-    ],
-    "tensor_matmul.mbt": [
-      "not",
-      "wasm"
     ]
   }
 }
