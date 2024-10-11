@@ -1901,3 +1901,7 @@ test "panic Tensor::broadcast - shapes mismatch" {
   inspect!(bx.shape)
   inspect!(by.shape)
 }
+
+pub fn Tensor::value(self : Tensor) -> FixedArray[Double] {
+  self.value
+}
