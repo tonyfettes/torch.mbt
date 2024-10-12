@@ -1,5 +1,5 @@
 struct Data {
-  image : Array[Int]
+  image : FixedArray[Int]
   label : Int
 } derive(FromJson)
 
@@ -44,35 +44,20 @@ fn eval(model : @torch.Module, dataset : Array[Data]) -> Double {
 }
 
 fn train(model : @mnist.Model, dataset : Array[Data]) -> Unit {
-  let loss = @torch.CrossEntropyLoss::new()
   let optimizer = @torch.SGD::new(model.parameters(), learning_rate=0.01)
   let mut step = 0
-  let batch = 10
+  let batch = 1
   for epoch = 0; epoch < 3; epoch = epoch + 1 {
     for i = 0; i < dataset.length(); i = i + batch {
-      let input = FixedArray::makei(
+      let batch = FixedArray::makei(
         batch,
         fn(b) {
           let data = dataset[i + b]
-          @torch.tensor(data.image.map(fn(x) { x.to_double() / 255.0 })).reshape(
-            [1, 28, 28],
-          )
+          @mnist.Data::{ input: data.image, label: data.label }
         },
       )
-      let input = @torch.stack(input)
-      println("input.shape = \{input.shape}")
-      let target = FixedArray::makei(batch, fn(b) {
-        let target = FixedArray::make(10, 0.0)
-        target[dataset[i + b].label] = 1.0
-        target
-      })
-      let target = @torch.tensor(target)
-      let output = model.forward(input)
-      optimizer.zero_grad()
-      let loss = loss.forward(output, target)
+      let loss = @mnist.train(model, optimizer, batch)
       println("step: \{step}, loss: \{loss}")
-      loss.backward()
-      optimizer.step()
       step += 1
     }
   }

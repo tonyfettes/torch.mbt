@@ -1,0 +1,10 @@
+{
+  "import": [
+    {
+      "path": "tonyfettes/torch/mnist/wasi/ffi",
+      "alias": "wasi/ffi"
+    },
+    "tonyfettes/torch",
+    "tonyfettes/torch/mnist"
+  ]
+}

@@ -1,10 +1,10 @@
 struct Tensor {
-  mut value : FixedArray[Double]
+  value : FixedArray[Double]
   shape : FixedArray[Int]
   block : FixedArray[Int]
   mut graph : Graph
   mut ref : Int
-  mut grad : FixedArray[Double]
+  grad : FixedArray[Double]
 }
 
 pub fn Tensor::shape(self : Tensor) -> FixedArray[Int] {
@@ -1975,4 +1975,8 @@ test "panic Tensor::broadcast - shapes mismatch" {
   let (bx, by) = broadcast(x, y)
   inspect!(bx.shape)
   inspect!(by.shape)
+}
+
+pub fn Tensor::value(self : Tensor) -> FixedArray[Double] {
+  self.value
 }
