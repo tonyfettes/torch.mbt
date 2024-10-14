@@ -60,7 +60,6 @@ fn train(model : @mnist.Model, dataset : Array[Data]) -> Unit {
         },
       )
       let input = @torch.stack(input)
-      println("input.shape = \{input.shape}")
       let target = FixedArray::makei(batch, fn(b) {
         let target = FixedArray::make(10, 0.0)
         target[dataset[i + b].label] = 1.0

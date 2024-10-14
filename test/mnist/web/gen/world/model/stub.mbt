@@ -11,5 +11,5 @@ pub fn load(blob : String) -> Unit {
 }
 
 pub fn infer(input : FixedArray[Double]) -> FixedArray[Double] {
-  model.val.forward(@torch.tensor(input)).value
+  model.val.forward(@torch.tensor(input)).value()
 }
