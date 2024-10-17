@@ -1,6 +1,6 @@
-/src/mnist.js
-/src/mnist.d.ts
-/src/mnist.core.wasm
+/src/mnist-model.js
+/src/mnist-model.d.ts
+/src/mnist-model.core.wasm
 /src/mnist-model.json
 /src/data/
 /.mooncakes/

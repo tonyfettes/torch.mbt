@@ -1,0 +1,14 @@
+package tonyfettes:torch;
+
+world mnist {
+  type input = list<u8>;
+  record data {
+    input: input,
+    label: s32,
+  }
+  type batch = list<data>;
+  export load: func(blob: string);
+  export save: func() -> string;
+  export infer: func(input: input) -> list<f64>;
+  export train: func(batch: batch, learning-rate: f64) -> f64;
+}

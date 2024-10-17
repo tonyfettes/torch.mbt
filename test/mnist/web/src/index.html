@@ -1,23 +1,34 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
-    <script src="/mnist-gallery.mjs" type="module"></script>
-    <script src="/mnist-canvas.mjs" type="module"></script>
-    <script src="/mnist-chart.mjs" type="module"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6"></script>
+    <script src="./index.mjs" type="module"></script>
+    <link rel="stylesheet" href="./index.css" />
   </head>
   <body>
     <h1>MNIST</h1>
-    <div>
+    <blockquote>
+      The MNIST database of handwritten digits, available from this page, has a
+      training set of 60,000 examples, and a test set of 10,000 examples. It is
+      a subset of a larger set available from NIST. The digits have been
+      size-normalized and centered in a fixed-size image. (<cite
+        ><a href="https://yann.lecun.com/exdb/mnist/"
+          >THE MNIST DATABASE of handwritten digits</a
+        ></cite
+      >)
+    </blockquote>
+    <h2>Inference</h2>
+    <div class="mnist-infer">
       <mnist-canvas></mnist-canvas>
-      <button id="mnist-canvas-clear-button">Clear</button>
-    </div>
-    <div>
       <mnist-chart></mnist-chart>
     </div>
-    <h2>Train</h2>
-    <mnist-gallery data-split="train"></mnist-gallery>
-    <h2>Test</h2>
-    <mnist-gallery data-split="test"></mnist-gallery>
+    <h2>Dataset</h2>
+    <h3>Train</h3>
+    <mnist-gallery src="train"></mnist-gallery>
+    <h3>Test</h3>
+    <mnist-gallery src="test"></mnist-gallery>
+    <h2>Training</h2>
+    <mnist-trainer></mnist-trainer>
   </body>
-  <script src="/index.mjs" type="module"></script>
 </html>

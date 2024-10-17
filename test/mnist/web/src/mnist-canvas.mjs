@@ -1,10 +1,30 @@
+import mnistWorker from "./mnist-worker.mjs";
+
 // @ts-check
 const template = document.createElement("template");
-template.innerHTML = `<canvas
-  width="28"
-  height="28"
-  style="border: 1px solid black; image-rendering: pixelated"
-></canvas>`;
+template.innerHTML = `<style>
+  .mnist-canvas {
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    gap: 8px;
+  }
+  .mnist-canvas-toolbar {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+  }
+</style>
+<div class="mnist-canvas">
+  <canvas
+    width="28"
+    height="28"
+    style="border: 1px solid black; image-rendering: pixelated"
+  ></canvas>
+  <div class="mnist-canvas-toolbar">
+    <button id="clear">Clear</button>
+  </div>
+</div>`;
 
 class MnistCanvas extends HTMLElement {
   constructor() {
@@ -46,15 +66,11 @@ class MnistCanvas extends HTMLElement {
    */
   dispatchDrawEvent(imageData) {
     const data = imageData.data;
-    const input = new Float64Array(data.length / 4);
+    const input = new Uint8Array(data.length / 4);
     for (let i = 0; i < data.length; i += 4) {
-      input[i / 4] = data[i + 3] / 255;
+      input[i / 4] = data[i + 3];
     }
-    this.dispatchEvent(
-      new CustomEvent("draw", {
-        detail: input,
-      })
-    );
+    mnistWorker.postMessage({ type: "infer", data: input });
   }
   connectedCallback() {
     this.attachShadow({ mode: "open" });
@@ -69,6 +85,12 @@ class MnistCanvas extends HTMLElement {
     if (!context) {
       return;
     }
+    const clearButton = this.shadowRoot?.querySelector("button#clear");
+    clearButton?.addEventListener("click", () => {
+      context.clearRect(0, 0, 28, 28);
+      const imageData = context.getImageData(0, 0, 28, 28);
+      this.dispatchDrawEvent(imageData);
+    });
     this.addEventListener("mousedown", (event) => {
       const offsetX = event.clientX - canvas.getBoundingClientRect().left;
       const offsetY = event.clientY - canvas.getBoundingClientRect().top;

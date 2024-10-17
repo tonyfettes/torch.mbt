@@ -1,1 +1,6 @@
-{}
+{
+  "targets": {
+    "top.mbt": ["not", "wasm-gc"],
+    "top.wasm-gc.mbt": ["wasm-gc"]
+  }
+}

@@ -241,6 +241,15 @@ pub fn realloc(ptr : Int, size : Int) -> Int {
 extern "wasm" fn copy_inline(dest : Int, src : Int, len : Int) =
   #|(func (param i32) (param i32) (param i32) local.get 0 local.get 1 local.get 2 memory.copy)
 
+pub fn str2ptr(str : String) -> Int {
+  let ptr = malloc(str.length() * 2)
+  let bytes = str.to_bytes()
+  for i in 0..<bytes.length() {
+    store8(ptr + i, bytes[i].to_int())
+  }
+  ptr
+}
+
 pub fn ptr2str(ptr : Int, len : Int) -> String {
   let buf = @buffer.Buffer::new()
   for i = 0; i < len * 2; i = i + 1 {
@@ -248,6 +257,15 @@ pub fn ptr2str(ptr : Int, len : Int) -> String {
   }
   free(ptr)
   buf.to_string()
+}
+
+pub fn ptr2bytes(ptr : Int, len : Int) -> Bytes {
+  let bytes = Bytes::new(len)
+  for i = 0; i < len; i = i + 1 {
+    bytes[i] = load8_u(ptr + i).to_byte()
+  }
+  free(ptr)
+  bytes
 }
 
 pub fn double_array2ptr(array : FixedArray[Double]) -> Int {

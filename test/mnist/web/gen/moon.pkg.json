@@ -5,7 +5,10 @@
         "cabi_realloc:cabi_realloc",
         "wasmExportInfer:infer",
         "wasmExportInferPostReturn:cabi_post_infer",
-        "wasmExportLoad:load"
+        "wasmExportLoad:load",
+        "wasmExportSave:save",
+        "wasmExportSavePostReturn:cabi_post_save",
+        "wasmExportTrain:train"
       ],
       "export-memory-name": "memory",
       "heap-start-address": 16,
@@ -16,20 +19,23 @@
         "cabi_realloc:cabi_realloc",
         "wasmExportInfer:infer",
         "wasmExportInferPostReturn:cabi_post_infer",
-        "wasmExportLoad:load"
+        "wasmExportLoad:load",
+        "wasmExportSave:save",
+        "wasmExportSavePostReturn:cabi_post_save",
+        "wasmExportTrain:train"
       ],
       "export-memory-name": "memory",
-      "heap-start-address": 16
+      "heap-start-address": 16,
+      "flags": ["-no-block-params"]
     }
   },
   "import": [
-    {
-      "path": "tonyfettes/torch/mnist/web/ffi",
-      "alias": "ffi"
-    },
-    {
-      "path": "tonyfettes/torch/mnist/web/gen/world/model",
-      "alias": "model"
-    }
-  ]
+    { "path": "tonyfettes/torch/mnist/web/ffi", "alias": "ffi" },
+    { "path": "tonyfettes/torch/mnist/web/gen/world/mnist", "alias": "mnist" },
+    { "path": "tonyfettes/torch/mnist/web/world/mnist", "alias": "mnist0" }
+  ],
+  "targets": {
+    "ffi.wasm-gc.mbt": ["wasm-gc"],
+    "ffi.mbt": ["not", "wasm-gc"]
+  }
 }

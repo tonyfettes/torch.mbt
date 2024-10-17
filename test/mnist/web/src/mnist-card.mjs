@@ -1,6 +1,7 @@
-// @ts-check
-import MnistImage from "./mnist-image.mjs";
+import WebComponent from "./web-component.mjs";
+import "./mnist-image.mjs";
 
+// @ts-check
 const template = document.createElement("template");
 template.innerHTML = `<div
   id="wrapper"
@@ -29,72 +30,93 @@ labelTemplate.innerHTML = `<style>
 </style>
 <div class="mnist-label"></div>`;
 
-class MnistCard extends HTMLElement {
-  constructor() {
-    super();
-  }
-  loadImage() {
-    const image = document.createElement("mnist-image");
-    if (!(image instanceof MnistImage)) {
-      return;
-    }
-    image.setAttribute("src", `/data/${this._split}_${this._id}.json`);
-    image.addEventListener("load", () => {
-      const template = labelTemplate.content.cloneNode(true);
-      const shadowRoot = this.shadowRoot;
-      if (!shadowRoot) {
-        return;
-      }
-      shadowRoot.querySelector("#wrapper")?.appendChild(template);
-      const label = shadowRoot.querySelector(".mnist-label");
-      if (!label) {
-        return;
-      }
-      label.innerHTML = image.getAttribute("label") ?? "";
-      const context = image.getContext();
+/**
+ * MNIST Card.
+ */
+class MnistCard extends WebComponent(HTMLElement) {
+  /**
+   * @override
+   */
+  static observedAttributes = ["image", "label"];
+  /**
+   * Load the image.
+   * @param {string?} url - The URL of the image
+   * @returns {Promise<void>}
+   * @private
+   */
+  async loadImage(url) {
+    const onClick = () => {
+      const context = this._image?.getContext();
       if (!context) {
         return;
       }
-      this.addEventListener("mousedown", () => {
-        this.dispatchEvent(
-          new CustomEvent("select", {
-            detail: context.getImageData(0, 0, 28, 28),
-          })
-        );
-      });
-    });
+      this.dispatchEvent(
+        new CustomEvent("mnist-select", {
+          detail: context.getImageData(0, 0, 28, 28),
+        }),
+      );
+    };
     if (!this._image) {
+      const image = document.createElement("mnist-image");
       this.shadowRoot?.querySelector("#wrapper")?.appendChild(image);
+      this._image = image;
+    }
+    if (url) {
+      this._image.setAttribute("src", url);
+      this._image.addEventListener("mnist-image-load", () => {
+        this.addEventListener("click", onClick);
+      });
     } else {
-      this.shadowRoot
-        ?.querySelector("#wrapper")
-        ?.replaceChild(image, this._image);
+      this.removeEventListener("click", onClick);
+      this._image.removeAttribute("src");
     }
-    this._image = image;
   }
+  /**
+   * @param {string} label
+   */
+  async createLabel(label) {
+    const template = labelTemplate.content.cloneNode(true);
+    const shadowRoot = this.shadowRoot;
+    if (!shadowRoot) {
+      return;
+    }
+    shadowRoot.querySelector("#wrapper")?.appendChild(template);
+    const labelDiv = shadowRoot.querySelector(".mnist-label");
+    if (!labelDiv) {
+      return;
+    }
+    labelDiv.innerHTML = label;
+  }
+  /**
+   * @param {string} label
+   */
+  async loadLabel(label) {
+    const labelElement = this.shadowRoot?.querySelector(".mnist-label");
+    if (!labelElement) {
+      return await this.createLabel(label);
+    }
+    labelElement.innerHTML = label;
+  }
+  /**
+   * @param {string} name
+   * @param {any} _oldValue
+   * @param {any} newValue
+   * @override
+   */
   attributeChangedCallback(name, _oldValue, newValue) {
-    let updated = false;
-    if (name === "data-id") {
-      this._id = newValue;
-      updated = true;
-    }
-    if (name === "data-split") {
-      this._split = newValue;
-      updated = true;
-    }
-    if (updated && this._id && this._split) {
-      this.loadImage();
+    if (name === "image") {
+      this.loadImage(newValue);
+    } else if (name === "label") {
+      this.loadLabel(newValue);
     }
   }
   connectedCallback() {
     this.attachShadow({ mode: "open" });
     this.shadowRoot?.appendChild(template.content.cloneNode(true));
-
-    this._split = this.getAttribute("data-split");
-    this._id = this.getAttribute("data-id");
-
-    if (this._split && this._id) {
-      this.loadImage();
+    this.loadImage(this.getAttribute("image"));
+    const label = this.getAttribute("label");
+    if (label) {
+      this.loadLabel(label);
     }
   }
 }

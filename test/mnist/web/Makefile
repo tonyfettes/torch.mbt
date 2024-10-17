@@ -1,6 +1,10 @@
 TARGETS := wasm wasm-gc
 PROFILES := debug release
 MOON_FLAGS :=
+PACKAGE := gen/gen
+OUT := src
+NAME := mnist-model
+JCO_FLAGS :=
 
 default: main
 
@@ -14,7 +18,7 @@ target/$(1)/$(2)/build/$(3).wasm:
 endif
 endef
 
-$(foreach target,$(TARGETS),$(foreach profile,$(PROFILES),$(eval $(call make_moon_rules,$(target),$(profile),gen/gen))))
+$(foreach target,$(TARGETS),$(foreach profile,$(PROFILES),$(eval $(call make_moon_rules,$(target),$(profile),$(PACKAGE)))))
 
 WIT  := wit
 
@@ -24,16 +28,16 @@ BUILD := target/$(TARGET)/$(PROFILE)/build
 
 ifeq ($(TARGET),wasm)
 ifeq ($(PROFILE),release)
-main: $(BUILD)/gen/gen.opt.component.wasm
-	node_modules/.bin/jco transpile $< -o src/ --name mnist
+main: $(BUILD)/$(PACKAGE).opt.component.wasm
+	node_modules/.bin/jco transpile $(JCO_FLAGS) $< -o $(OUT)/ --name $(NAME)
 else
-main: $(BUILD)/gen/gen.component.wasm
-	node_modules/.bin/jco transpile $< -o src/ --name mnist
+main: $(BUILD)/$(PACKAGE).component.wasm
+	node_modules/.bin/jco transpile $(JCO_FLAGS) $< -o $(OUT)/ --name $(NAME)
 endif
 else ifeq ($(TARGET),wasm-gc)
-main: target/wasm/$(PROFILE)/build/gen/gen.component.wasm target/wasm-gc/$(PROFILE)/build/gen/gen.wasm
-	node_modules/.bin/jco transpile $< -o src/ --name mnist
-	cp target/wasm-gc/$(PROFILE)/build/gen/gen.wasm src/mnist.core.wasm
+main: target/wasm/$(PROFILE)/build/$(PACKAGE).component.wasm target/wasm-gc/$(PROFILE)/build/$(PACKAGE).wasm
+	node_modules/.bin/jco transpile $(JCO_FLAGS) $< -o $(OUT)/ --name $(NAME)
+	cp target/wasm-gc/$(PROFILE)/build/$(PACKAGE).wasm $(OUT)/$(NAME).core.wasm
 endif
 
 %.wat: %.wasm
@@ -48,10 +52,13 @@ endif
 %.component.wasm: %.embedded.wasm
 	wasm-tools component new $< -o $@
 
+wit-bindgen:
+	wit-bindgen moonbit wit --derive-show --derive-eq --derive-error --ignore-stub --out-dir .
+
 clean:
 	moon clean
 
 serve:
 	corepack pnpm exec serve -c ./serve.json
 
-.PHONY: main clean $(foreach target,$(TARGETS),$(foreach profile,$(PROFILES),target/$(target)/$(profile)/build/gen/gen.wasm))
+.PHONY: main clean $(foreach target,$(TARGETS),$(foreach profile,$(PROFILES),target/$(target)/$(profile)/build/$(PACKAGE).wasm))

@@ -1,0 +1,14 @@
+{
+  "import": [
+    {
+      "path": "tonyfettes/torch/mnist/web/ffi",
+      "alias": "ffi"
+    },
+    {
+      "path": "tonyfettes/torch/mnist",
+      "alias": "mnist"
+    },
+    "tonyfettes/torch",
+    { "path": "tonyfettes/torch/mnist/web/world/mnist", "alias": "export" }
+  ]
+}

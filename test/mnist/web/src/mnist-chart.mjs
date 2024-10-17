@@ -1,38 +1,27 @@
 // @ts-check
 
-const template = document.createElement("template");
-template.innerHTML = `<div
-  id="wrapper"
-  style="display: flex; flex-direction: row; align-items: end; height: 252px; width: fit-content;"
-></div>`;
+import mnistWorker from "./mnist-worker.mjs";
+import WebComponent from "./web-component.mjs";
 
-class MnistChart extends HTMLElement {
-  static observedAttributes = ["data"];
-  constructor() {
-    super();
-    /**
-     * @private
-     * @type {number[]}
-     */
-    this._data = Array(11).fill(0);
+const template = document.createElement("template");
+template.innerHTML = `<style>
+  div#wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: end;
+    height: 252px;
+    width: fit-content;
   }
+</style>
+<div id="wrapper"></div>`;
+
+class MnistChart extends WebComponent(HTMLElement) {
   /**
-   * @param {string} name
-   * @param {any} _oldValue
-   * @param {any} newValue
+   * @param {number[]} data
    * @returns {void}
    */
-  attributeChangedCallback(name, _oldValue, newValue) {
-    if (name === "data") {
-      this._data = JSON.parse(newValue);
-      this.loadChart();
-    }
-  }
-  loadChart() {
-    if (!this._data) {
-      return;
-    }
-    const wrapper = this.shadowRoot?.querySelector("#wrapper");
+  loadChart(data) {
+    const wrapper = this.shadowRoot?.querySelector("div#wrapper");
     if (!wrapper) {
       return;
     }
@@ -48,7 +37,7 @@ class MnistChart extends HTMLElement {
       column.style.width = "28px";
       const bar = document.createElement("div");
       bar.style.width = "28px";
-      bar.style.height = `${(28 * 8 * this._data[i]) >>> 0}px`;
+      bar.style.height = `${(28 * 8 * data[i]) >>> 0}px`;
       bar.style.backgroundColor = "rgba(0, 0, 0, 1.0)";
       bar.style.display = "flex";
       bar.style.flexDirection = "column";
@@ -64,11 +53,18 @@ class MnistChart extends HTMLElement {
   connectedCallback() {
     this.attachShadow({ mode: "open" });
     this.shadowRoot?.appendChild(template.content.cloneNode(true));
-    const data = this.getAttribute("data");
-    if (data) {
-      this._data = JSON.parse(data);
-    }
-    this.loadChart();
+    this.loadChart(Array(10).fill(0.0));
+    mnistWorker.addEventListener(
+      "message",
+      /** @param {MessageEvent<{ type: string, data: Float64Array }>} event */
+      (event) => {
+        const { type, data } = event.data;
+        if (type === "infer") {
+          const output = Array.from(data);
+          this.loadChart(output);
+        }
+      },
+    );
   }
 }
 
