@@ -4,9 +4,8 @@ MOON_FLAGS :=
 PACKAGE := gen/gen
 OUT := src
 NAME := mnist-model
+JCO := corepack pnpm exec jco
 JCO_FLAGS :=
-
-default: main
 
 define make_moon_rules
 ifeq ($(2),debug)
@@ -26,17 +25,21 @@ TARGET := wasm
 PROFILE := debug
 BUILD := target/$(TARGET)/$(PROFILE)/build
 
+JCO_OUTPUTS := $(OUT)/$(NAME).core.wasm $(OUT)/$(NAME).d.ts $(OUT)/$(NAME).js
+
+default: $(JCO_OUTPUTS)
+
 ifeq ($(TARGET),wasm)
 ifeq ($(PROFILE),release)
-main: $(BUILD)/$(PACKAGE).opt.component.wasm
-	node_modules/.bin/jco transpile $(JCO_FLAGS) $< -o $(OUT)/ --name $(NAME)
+$(JCO_OUTPUTS) &: $(BUILD)/$(PACKAGE).opt.component.wasm
+	$(JCO) transpile $(JCO_FLAGS) $< -o $(OUT)/ --name $(NAME)
 else
-main: $(BUILD)/$(PACKAGE).component.wasm
-	node_modules/.bin/jco transpile $(JCO_FLAGS) $< -o $(OUT)/ --name $(NAME)
+$(JCO_OUTPUTS) &: $(BUILD)/$(PACKAGE).component.wasm
+	$(JCO) transpile $(JCO_FLAGS) $< -o $(OUT)/ --name $(NAME)
 endif
 else ifeq ($(TARGET),wasm-gc)
-main: target/wasm/$(PROFILE)/build/$(PACKAGE).component.wasm target/wasm-gc/$(PROFILE)/build/$(PACKAGE).wasm
-	node_modules/.bin/jco transpile $(JCO_FLAGS) $< -o $(OUT)/ --name $(NAME)
+$(JCO_OUTPUTS) &: target/wasm/$(PROFILE)/build/$(PACKAGE).component.wasm target/wasm-gc/$(PROFILE)/build/$(PACKAGE).wasm
+	$(JCO) transpile $(JCO_FLAGS) $< -o $(OUT)/ --name $(NAME)
 	cp target/wasm-gc/$(PROFILE)/build/$(PACKAGE).wasm $(OUT)/$(NAME).core.wasm
 endif
 
@@ -61,4 +64,4 @@ clean:
 serve:
 	corepack pnpm exec serve -c ./serve.json
 
-.PHONY: main clean $(foreach target,$(TARGETS),$(foreach profile,$(PROFILES),target/$(target)/$(profile)/build/$(PACKAGE).wasm))
+.PHONY: default clean $(foreach target,$(TARGETS),$(foreach profile,$(PROFILES),target/$(target)/$(profile)/build/$(PACKAGE).wasm))

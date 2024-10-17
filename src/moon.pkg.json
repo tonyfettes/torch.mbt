@@ -1,18 +1,8 @@
 {
   "targets": {
-    "tensor_add.wasm.mbt": [
-      "wasm"
-    ],
-    "tensor_add.mbt": [
-      "not",
-      "wasm"
-    ],
-    "tensor_mul.wasm.mbt": [
-      "wasm"
-    ],
-    "tensor_mul.mbt": [
-      "not",
-      "wasm"
-    ]
+    "tensor_add.wasm.mbt": ["wasm"],
+    "tensor_add.mbt": ["not", "wasm"],
+    "tensor_mul.wasm.mbt": ["wasm"],
+    "tensor_mul.mbt": ["not", "wasm"]
   }
 }
