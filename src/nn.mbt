@@ -30,7 +30,7 @@ pub fn Sequential::output(self : Sequential, logger : Logger) -> Unit {
 }
 
 pub fn Sequential::to_string(self : Sequential) -> String {
-  let logger = Buffer::new()
+  let logger = StringBuilder::new()
   self.output(logger)
   logger.to_string()
 }

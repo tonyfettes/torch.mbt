@@ -83,7 +83,7 @@ fn main {
     Dataset::load!("data")
   } catch {
     error => {
-      let buffer = Buffer::new()
+      let buffer = StringBuilder::new()
       Show::output(error, buffer)
       abort("error: \{buffer.to_string()}")
     }

@@ -242,7 +242,7 @@ extern "wasm" fn copy_inline(dest : Int, src : Int, len : Int) =
   #|(func (param i32) (param i32) (param i32) local.get 0 local.get 1 local.get 2 memory.copy)
 
 pub fn ptr2str(ptr : Int, len : Int) -> String {
-  let buf = Buffer::new()
+  let buf = @buffer.Buffer::new()
   for i = 0; i < len * 2; i = i + 1 {
     buf.write_byte(load8_u(ptr + i).to_byte())
   }
