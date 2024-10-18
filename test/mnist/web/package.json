@@ -11,6 +11,7 @@
   "license": "ISC",
   "devDependencies": {
     "@bytecodealliance/jco": "^1.7.0",
-    "serve": "^14.2.3"
+    "serve": "^14.2.3",
+    "@observablehq/plot": "^0.6.16"
   }
 }

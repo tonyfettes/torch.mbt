@@ -1,6 +1,7 @@
 import mnistDatabase from "./mnist-database.mjs";
 import mnistWorker from "./mnist-worker.mjs";
 import WebComponent from "./web-component.mjs";
+import * as Plot from "https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6/+esm";
 
 /**
  * Create a template.

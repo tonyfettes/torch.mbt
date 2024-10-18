@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "baseUrl": "node_modules",
     "module": "esnext",
     "target": "esnext",
     "moduleResolution": "node",
@@ -12,8 +13,18 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "paths": {
+      "https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6/+esm": [
+        "@observablehq/plot"
+      ]
+    }
   },
-  "include": ["web/**/*.mjs", "web/**/*.d.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "src/**/*.mjs",
+    "src/**/*.d.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }
