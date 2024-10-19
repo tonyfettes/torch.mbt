@@ -168,6 +168,36 @@ test "Conv2d - Multiple input channels" {
   )
 }
 
+test "Conv2d - Padding" {
+  let image = @torch.tensor(FixedArray::makei(4 * 4, fn(i) { i.to_double() })).reshape(
+    [1, 1, 4, 4],
+  )
+  let layer = @torch.Conv2d::new(1, 1, kernel_size=(2, 2), padding=(1, 1))
+  @torch.with_no_grad(
+    fn() {
+      // kernel:
+      // 0 1
+      // 0 1
+      layer.weight[0][0][0][0] = 0.0
+      layer.weight[0][0][0][1] = 1.0
+      layer.weight[0][0][1][0] = 0.0
+      layer.weight[0][0][1][1] = 1.0
+      layer.bias[0] = @torch.tensor(0.0)
+    },
+  )
+  let output = layer.forward(image)
+  @json.inspect!(
+    output[0][0],
+    content=[
+      [0, 1, 2, 3, 0],
+      [4, 6, 8, 10, 0],
+      [12, 14, 16, 18, 0],
+      [20, 22, 24, 26, 0],
+      [12, 13, 14, 15, 0],
+    ],
+  )
+}
+
 test "Conv2d - Backward" {
   @torch.seed(b"12345678223456783234567842345678")
   let image = @torch.tensor(
