@@ -152,33 +152,6 @@ pub fn MSELoss::forward(
   diff.pow(2).sum() / tensor(diff.value.length().to_double())
 }
 
-struct Sigmoid {} derive(Show, ToJson, FromJson)
-
-pub fn Sigmoid::new() -> Sigmoid {
-  Sigmoid::{  }
-}
-
-pub fn Sigmoid::forward(_self : Sigmoid, input : Tensor) -> Tensor {
-  input.sigmoid()
-}
-
-pub fn Sigmoid::parameters(_self : Sigmoid) -> Iter[Tensor] {
-  return Iter::empty()
-}
-
-test "Sigmoid" {
-  seed(b"12345678223456783234567842345678")
-  let input = Uniform::new(-1, 1).sample([3, 3])
-  inspect!(
-    input,
-    content="[[-0.29557028390369, -0.8177422144361883, -0.8997844018869048], [-0.1545487762608706, -0.5520054503667071, -0.09482517741472507], [0.6609056774831252, 0.21990249887250046, 0.4313355035432884]]",
-  )
-  inspect!(
-    input.sigmoid(),
-    content="[[0.4266407195423779, 0.30624313516780693, 0.28909480486844663], [0.4614395278462282, 0.36539925445953875, 0.47631145323784313], [0.6594638069803208, 0.5547551522746634, 0.6061925292136984]]",
-  )
-}
-
 struct Flatten {
   start : Int
   end : Int?
