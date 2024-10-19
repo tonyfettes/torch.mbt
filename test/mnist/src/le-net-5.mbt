@@ -10,8 +10,7 @@ type LeNet5 (
   @torch.Sigmoid,
   @torch.Linear,
   @torch.Sigmoid,
-  @torch.Linear,
-  @torch.Softmax,
+  @torch.Linear
 ) derive(Show, ToJson, FromJson)
 
 pub fn LeNet5::new() -> LeNet5 {
@@ -27,8 +26,7 @@ pub fn LeNet5::new() -> LeNet5 {
     @torch.Sigmoid::new(),
     @torch.Linear::new(120, 84),
     @torch.Sigmoid::new(),
-    @torch.Linear::new(84, 10),
-    @torch.Softmax::new(),
+    @torch.Linear::new(84, 10)
   )
 }
 
@@ -45,7 +43,6 @@ pub fn LeNet5::forward(self : LeNet5, input : @torch.Tensor) -> @torch.Tensor {
   let output = self._.9.forward(output)
   let output = self._.10.forward(output)
   let output = self._.11.forward(output)
-  let output = self._.12.forward(output)
   output
 }
 

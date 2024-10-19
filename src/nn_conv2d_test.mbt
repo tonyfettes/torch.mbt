@@ -141,21 +141,20 @@ test "MNIST" {
       @torch.Sigmoid::new(),
       @torch.Linear::new(120, 84),
       @torch.Sigmoid::new(),
-      @torch.Linear::new(84, 10),
-      @torch.Softmax::new(),
+      @torch.Linear::new(84, 10)
     ],
   )
   let optimizer = @torch.SGD::new(model.parameters(), learning_rate=0.1)
   let loss = @torch.CrossEntropyLoss::new()
   let output = model.forward(image)
-  inspect!(output[0][label], content="0.06886561719734109")
+  inspect!(output[0][label], content="-0.3365644644720264")
   let target = FixedArray::make(10, 0.0)
   target[label] = 1.0
   let loss = loss.forward(output, @torch.tensor(target))
-  inspect!(loss, content="2.675598250228825")
+  inspect!(loss, content="0.7805945528623369")
   optimizer.zero_grad()
   loss.backward()
   optimizer.step()
   let output = model.forward(image)
-  inspect!(output[0][label], content="0.44713147154564087")
+  inspect!(output[0][label], content="1.9621323785131335")
 }

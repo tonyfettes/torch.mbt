@@ -3,7 +3,6 @@ type Simard (
   @torch.Linear,
   @torch.ReLU,
   @torch.Linear,
-  @torch.Softmax,
 ) derive(Show, ToJson, FromJson)
 
 pub fn Simard::new() -> Simard {
@@ -11,8 +10,7 @@ pub fn Simard::new() -> Simard {
     @torch.Flatten::new(),
     @torch.Linear::new(28 * 28, 800),
     @torch.ReLU::new(),
-    @torch.Linear::new(800, 10),
-    @torch.Softmax::new(),
+    @torch.Linear::new(800, 10)
   )
 }
 
@@ -21,7 +19,6 @@ pub fn Simard::forward(self : Simard, input : @torch.Tensor) -> @torch.Tensor {
   let output = self._.1.forward(output)
   let output = self._.2.forward(output)
   let output = self._.3.forward(output)
-  let output = self._.4.forward(output)
   output
 }
 
