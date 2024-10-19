@@ -176,6 +176,14 @@ pub fn CrossEntropyLoss::forward(
   nl.sum()
 }
 
+test "CrossEntropyLoss" {
+  let input = tensor([0.0, 1.0e3, 0.0])
+  let target = tensor([0.3, 0.3, 0.4])
+  let loss = CrossEntropyLoss::new()
+  let output = loss.forward(input, target)
+  inspect!(output, content="700")
+}
+
 struct Sigmoid {} derive(Show, ToJson, FromJson)
 
 pub fn Sigmoid::new() -> Sigmoid {
