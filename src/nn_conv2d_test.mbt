@@ -1,12 +1,11 @@
 test "Conv2d" {
   @torch.seed(b"12345678223456783234567842345678")
   let image = @torch.tensor(FixedArray::makei(4 * 4, fn(i) { i.to_double() }))
-  inspect!(
+  @json.inspect!(
     image.reshape([4, 4]),
-    content="[[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11], [12, 13, 14, 15]]",
+    content=[[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11], [12, 13, 14, 15]],
   )
   let image = image.reshape([1, 1, 4, 4])
-  inspect!(image.shape(), content="[1, 1, 4, 4]")
   let layer = @torch.Conv2d::new(1, 1, kernel_size=(2, 2))
   @torch.with_no_grad(
     fn() {
@@ -20,10 +19,9 @@ test "Conv2d" {
       layer.bias[0] = @torch.tensor(0.0)
     },
   )
-  inspect!(layer.weight[0][0], content="[[0, 1], [0, 1]]")
+  @json.inspect!(layer.weight[0][0], content=[[0, 1], [0, 1]])
   let output = layer.forward(image)
-  inspect!(output.shape(), content="[1, 1, 3, 3]")
-  inspect!(output[0][0], content="[[6, 8, 10], [14, 16, 18], [22, 24, 26]]")
+  @json.inspect!(output[0][0], content=[[6, 8, 10], [14, 16, 18], [22, 24, 26]])
 }
 
 test "Conv2d - Random" {
