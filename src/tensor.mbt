@@ -635,6 +635,33 @@ pub fn TensorView::to_string(self : TensorView) -> String {
   Show::to_string(self)
 }
 
+pub fn TensorView::to_json(self : TensorView) -> Json {
+  let shape = self.tensor.shape
+  let dimension = shape.length()
+  let block = self.tensor.block
+  let value = self.tensor.value
+  fn build(d : Int, p : Int) {
+    if d == dimension {
+      return Json::Number(value[p])
+    }
+    let (start, end) = if d < self.index.length() {
+      match self.index[d] {
+        Index(index) => return build(d + 1, p + index * block[d])
+        Slice(start, end) => (start, end)
+      }
+    } else {
+      (0, shape[d])
+    }
+    let elements = Array::new(capacity=end - start)
+    for i in start..<end {
+      elements.push(build(d + 1, p + i * block[d]))
+    }
+    Json::Array(elements)
+  }
+
+  build(0, 0)
+}
+
 pub fn TensorView::op_get(self : TensorView, index : Int) -> TensorView {
   if self.index.length() == self.tensor.shape.length() {
     abort("Taking element at the lowerest dimension")
