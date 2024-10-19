@@ -52,3 +52,36 @@ test "CrossEntropyLoss/Backward" {
     ],
   )
 }
+
+test "CrossEntropyLoss/Batch" {
+  let input = @torch.tensor(
+    FixedArray::makei(2 * 4 * 2 * 2, fn(i) { i.to_double() }),
+  ).reshape([2, 4, 2, 2])
+  let target = @torch.zeros([2, 4, 2, 2])
+  target[0][:][0][0] = [1.0, 0.0, 0.0, 0.0]
+  target[0][:][0][1] = [0.0, 1.0, 0.0, 0.0]
+  target[0][:][1][0] = [0.0, 0.0, 1.0, 0.0]
+  target[0][:][1][1] = [0.0, 0.0, 0.0, 1.0]
+  target[1][:][0][0] = [0.5, 0.0, 0.5, 0.0]
+  target[1][:][0][1] = [0.0, 0.5, 0.0, 0.5]
+  target[1][:][1][0] = [0.5, 0.0, 0.0, 0.5]
+  target[1][:][1][1] = [0.0, 0.5, 0.5, 0.0]
+  @json.inspect!(
+    target,
+    content=[
+      [[[1, 0], [0, 0]], [[0, 1], [0, 0]], [[0, 0], [1, 0]], [[0, 0], [0, 1]]],
+      [
+        [[0.5, 0], [0.5, 0]],
+        [[0, 0.5], [0, 0.5]],
+        [[0.5, 0], [0, 0.5]],
+        [[0, 0.5], [0.5, 0]],
+      ],
+    ],
+  )
+  let criterion = @torch.CrossEntropyLoss::new()
+  let output = criterion.forward(input, target)
+  @json.inspect!(
+    output,
+    content=6.018485334290704,
+  )
+}
