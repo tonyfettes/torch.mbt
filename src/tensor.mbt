@@ -1618,7 +1618,7 @@ test "avg_pool2d" {
   )
 }
 
-fn Tensor::zeros[Shape : Shape](
+pub fn Tensor::zeros[Shape : Shape](
   shape : Shape,
   ~requires_grad : Bool = false
 ) -> Tensor {
