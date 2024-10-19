@@ -72,3 +72,11 @@ test "Tensor::permute" {
   let tensor = @torch.tensor([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]])
   inspect!(tensor.permute([1, 0]), content="[[0, 3], [1, 4], [2, 5]]")
 }
+
+test "TensorView::to_json" {
+  let tensor = @torch.Tensor::new(
+    [[[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]], [[6.0, 7.0, 8.0], [9.0, 10.0, 11.0]]],
+  )
+  let view = tensor[1][:][2]
+  @json.inspect!(view, content=[8, 11])
+}
