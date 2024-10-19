@@ -231,12 +231,12 @@ fn Tensor::default() -> Tensor {
 pub fn Tensor::op_sub(self : Tensor, other : Tensor) -> Tensor {
   let (self, other) = Tensor::broadcast(self, other)
   let length = self.value.length()
-  let output : FixedArray[Double] = FixedArray::make(length, 0.0)
+  let value : FixedArray[Double] = FixedArray::make(length, 0.0)
   for i = 0; i < self.value.length(); i = i + 1 {
-    output[i] = self.value[i] - other.value[i]
+    value[i] = self.value[i] - other.value[i]
   }
   Tensor::{
-    value: output,
+    value,
     shape: self.shape,
     block: self.block,
     graph: Graph::Sub(self, other),
