@@ -406,6 +406,10 @@ pub fn Tensor::dot(self : Tensor, other : Tensor) -> Tensor {
   Tensor::sum(self * other)
 }
 
+pub fn Tensor::mean(self : Tensor) -> Tensor {
+  self.sum() / tensor(self.value.length().to_double())
+}
+
 pub trait TensorValue: Show {
   to_tensor(Self, ~requires_grad : Bool) -> Tensor
 }
