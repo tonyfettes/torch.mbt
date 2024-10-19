@@ -80,3 +80,11 @@ test "TensorView::to_json" {
   let view = tensor[1][:][2]
   @json.inspect!(view, content=[8, 11])
 }
+
+test "MSELoss" {
+  let input = @torch.tensor([[1.0, 2.0, 3.0]])
+  let target = @torch.tensor([[4.0, 5.0, 6.0]])
+  let criterion = @torch.MSELoss::new()
+  inspect!(criterion.forward(input, input), content="0")
+  inspect!(criterion.forward(input, target), content="9")
+}
