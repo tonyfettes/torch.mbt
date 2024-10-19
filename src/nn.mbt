@@ -170,8 +170,10 @@ pub fn CrossEntropyLoss::forward(
   input : Tensor,
   target : Tensor
 ) -> Tensor {
-  let diff = -target * input.log()
-  diff.sum() / tensor(input.length().to_double())
+  let max = input.max()
+  let log = input - max
+  let nl = -target * log
+  nl.sum()
 }
 
 struct Sigmoid {} derive(Show, ToJson, FromJson)
