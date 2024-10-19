@@ -80,8 +80,5 @@ test "CrossEntropyLoss/Batch" {
   )
   let criterion = @torch.CrossEntropyLoss::new()
   let output = criterion.forward(input, target)
-  @json.inspect!(
-    output,
-    content=6.018485334290704,
-  )
+  @json.inspect!(output, content=6.018485334290704)
 }

@@ -532,11 +532,11 @@ test "MNIST" {
   @json.inspect!(output[0][label], content=-0.3365644644720264)
   let target = FixedArray::make(10, 0.0)
   target[label] = 1.0
-  let loss = criterion.forward(output, @torch.tensor(target))
-  @json.inspect!(loss, content=0.7805945528623369)
+  let loss = criterion.forward(output, @torch.tensor([target]))
+  @json.inspect!(loss, content=2.675598250228825)
   optimizer.zero_grad()
   loss.backward()
   optimizer.step()
   let output = model.forward(image)
-  @json.inspect!(output[0][label], content=1.9621323785131335)
+  @json.inspect!(output[0][label], content=1.8093816993511227)
 }
