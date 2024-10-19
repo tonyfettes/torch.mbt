@@ -152,57 +152,6 @@ pub fn MSELoss::forward(
   diff.pow(2).sum() / tensor(diff.value.length().to_double())
 }
 
-pub struct CrossEntropyLoss {}
-
-pub fn CrossEntropyLoss::new() -> CrossEntropyLoss {
-  CrossEntropyLoss::{  }
-}
-
-pub fn CrossEntropyLoss::output(
-  _self : CrossEntropyLoss,
-  logger : Logger
-) -> Unit {
-  logger.write_string("CrossEntropyLoss()")
-}
-
-pub fn CrossEntropyLoss::forward(
-  _self : CrossEntropyLoss,
-  input : Tensor,
-  target : Tensor
-) -> Tensor {
-  let max = input.max()
-  let sub_max = input - max
-  let log_soft_max = sub_max - sub_max.exp().sum().log()
-  let nl = -target * log_soft_max
-  nl.sum()
-}
-
-test "CrossEntropyLoss" {
-  let input = tensor([0.0, 1.0e3, 0.0])
-  let target = tensor([0.3, 0.3, 0.4])
-  let loss = CrossEntropyLoss::new()
-  let output = loss.forward(input, target)
-  inspect!(output, content="700")
-}
-
-test "CrossEntropyLoss/Random" {
-  let input = tensor(
-    [
-      -0.14630347333285626, -0.11041421512364283, -0.12559252186003866, -0.13513121430614242,
-      -0.1788202792999719, -0.1412897765465771, -0.12746655654191671, -0.12665480060556913,
-      -0.14233145825454024, -0.1360269781704941,
-    ],
-  )
-  let target = {
-    let target = FixedArray::make(10, 0.0)
-    target[6] = 1.0
-    tensor(target)
-  }
-  let criterion = CrossEntropyLoss::new()
-  let output = criterion.forward(input, target)
-  inspect!(output, content="2.293193741636991")
-}
-
 struct Sigmoid {} derive(Show, ToJson, FromJson)
 
 pub fn Sigmoid::new() -> Sigmoid {
