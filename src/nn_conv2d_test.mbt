@@ -226,7 +226,7 @@ test "Conv2d - Backward" {
       [28, 29, 30, 31],
     ],
   )
-  let layer = @torch.Conv2d::new(2, 2, kernel_size=(2, 2))
+  let layer = @torch.Conv2d::new(2, 2, kernel_size=2, padding=2)
   @torch.with_no_grad(
     fn() {
       // 0 1
@@ -260,28 +260,38 @@ test "Conv2d - Backward" {
   let output = layer.forward(image)
   @json.inspect!(
     output[0][0],
-    content=[[47, 51, 55], [63, 67, 71], [79, 83, 87]],
+    content=[
+      [0, 0, 0, 0, 0, 0, 0],
+      [0, 16, 34, 37, 40, 19, 0],
+      [0, 24, 47, 51, 55, 23, 0],
+      [0, 36, 63, 67, 71, 27, 0],
+      [0, 48, 79, 83, 87, 31, 0],
+      [0, 12, 13, 14, 15, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0],
+    ],
   )
   @json.inspect!(
     output[0][1],
-    content=[[37, 41, 45], [53, 57, 61], [69, 73, 77]],
+    content=[
+      [0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 1, 2, 3, 0],
+      [0, 16, 37, 41, 45, 29, 0],
+      [0, 20, 53, 57, 61, 41, 0],
+      [0, 24, 69, 73, 77, 53, 0],
+      [0, 28, 69, 72, 75, 46, 0],
+      [0, 0, 0, 0, 0, 0, 0],
+    ],
   )
   let loss = output.sum()
   let optimizer = @torch.SGD::new(layer.parameters(), learning_rate=0.1)
-  @json.inspect!(loss, content=1116)
+  @json.inspect!(loss, content=1984)
   optimizer.zero_grad()
   loss.backward()
   optimizer.step()
-  inspect!(layer.weight[0][0], content="[[-4.5, -4.4], [-8.1, -8]]")
-  @json.inspect!(
-    layer.weight[0][1],
-    content=[[-18.900000000000002, -19.8], [-21.5, -22.400000000000002]],
-  )
-  inspect!(layer.weight[1][0], content="[[-3.5, -5.4], [-7.1, -9]]")
-  @json.inspect!(
-    layer.weight[1][1],
-    content=[[-17.900000000000002, -18.8], [-22.5, -23.400000000000002]],
-  )
+  @json.inspect!(layer.weight[0][0], content=[[-12, -11], [-12, -11]])
+  @json.inspect!(layer.weight[0][1], content=[[-37.6, -37.6], [-36.6, -36.6]])
+  @json.inspect!(layer.weight[1][0], content=[[-11, -12], [-11, -12]])
+  @json.inspect!(layer.weight[1][1], content=[[-36.6, -36.6], [-37.6, -37.6]])
 }
 
 test "Conv2d - train average kernel" {
