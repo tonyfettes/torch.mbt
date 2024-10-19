@@ -374,42 +374,97 @@ test "Conv2d - train random kernel" {
 
 test "Conv2d - Sigmoid - AvgPool2d" {
   @torch.seed(b"12345678223456783234567842345678")
-  let image = @torch.tensor(
-    FixedArray::makei(1 * 4 * 4, fn(i) { i.to_double() }),
-  ).reshape([1, 1, 4, 4])
-  let model = @torch.Sequential::new(
-    [
-      @torch.Conv2d::new(1, 2, kernel_size=(2, 2), padding=(1, 1)),
-      @torch.AvgPool2d::new(2, stride=2),
-      @torch.Conv2d::new(2, 4, kernel_size=(2, 2), padding=(1, 1)),
-      @torch.AvgPool2d::new(2, stride=2),
-      @torch.Flatten::new(),
-    ],
-  )
-  let optimizer = @torch.SGD::new(model.parameters(), learning_rate=0.1)
-  let output = model.forward(image)
-  let output = output[0].to_tensor()
-  @json.inspect!(output.shape(), content=[4])
+  let image = @torch.Uniform::new(-1, 1).sample([1, 1, 4, 4])
   @json.inspect!(
-    output,
-    content=[
-      0.24703008886185587, -0.21500467743215967, 0.5635915491413397, 1.1507770555671106,
-    ],
-  )
-  let target = @torch.tensor([0.0, 1.0, 0.0, 0.0])
-  let loss = @torch.MSELoss::new()
-  let loss = loss.forward(output, target)
-  @json.inspect!(loss, content=0.7947958742170917)
-  loss.backward()
-  optimizer.step()
-  let output = model.forward(image)
-  @json.inspect!(
-    output,
+    image[0][0],
     content=[
       [
-        -0.2003092825370439, 1.16722331247751, -0.22011918067464994, -0.7783120995274583,
+        -0.29557028390369, -0.8177422144361883, -0.8997844018869048, -0.1545487762608706,
+      ],
+      [
+        -0.5520054503667071, -0.09482517741472507, 0.6609056774831252, 0.21990249887250046,
+      ],
+      [
+        0.4313355035432884, 0.9582411244732583, 0.7228865545307872, -0.5188244284458443,
+      ],
+      [
+        0.2701149512079253, -0.21887879807607646, 0.9439179395000068, -0.4507487893925779,
       ],
     ],
+  )
+  let model = (
+    @torch.Conv2d::new(1, 2, kernel_size=2, padding=1),
+    @torch.Sigmoid::new(),
+    @torch.AvgPool2d::new(2, stride=2),
+  )
+  @json.inspect!(
+    model.0.weight,
+    content=[
+      [
+        [
+          [-0.27374372773124167, 0.20872805188361476],
+          [0.1974688954407423, 0.49873644685786933],
+        ],
+      ],
+      [
+        [
+          [-0.4501954011239082, 0.0932438253080703],
+          [-0.35850578001958444, -0.14072045572696013],
+        ],
+      ],
+    ],
+  )
+  @json.inspect!(
+    model.0.bias,
+    content=[-0.012118885501261834, 0.1191592062303477],
+  )
+  let optimizer = @torch.SGD::new(
+    @torch.Module::parameters(model),
+    learning_rate=0.1,
+  )
+  let output = @torch.Module::forward(model, image)
+  @json.inspect!(output.shape(), content=[1, 2, 2, 2])
+  @json.inspect!(
+    output[0],
+    content=[
+      [
+        [0.42306371266340065, 0.49365342570168114],
+        [0.560659050739706, 0.522574086097089],
+      ],
+      [
+        [0.5655426357800895, 0.5977144269072799],
+        [0.509114214887437, 0.41399279658010235],
+      ],
+    ],
+  )
+  let target = @torch.tensor([0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0]).reshape(
+    [1, 2, 2, 2],
+  )
+  let criterion = @torch.CrossEntropyLoss::new()
+  let loss = criterion.forward(output, target)
+  @json.inspect!(loss, content=0.18322279098221156)
+  loss.backward()
+  optimizer.step()
+  @json.inspect!(
+    model.0.weight,
+    content=[
+      [
+        [
+          [-0.274398280939688, 0.2080077914728873],
+          [0.19675859698058834, 0.4981537785986445],
+        ],
+      ],
+      [
+        [
+          [-0.44955294619094094, 0.09396218030855882],
+          [-0.3577914617572429, -0.14009231886256904],
+        ],
+      ],
+    ],
+  )
+  @json.inspect!(
+    model.0.bias,
+    content=[-0.012118885501261834, 0.1191592062303477],
   )
 }
 
