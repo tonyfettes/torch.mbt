@@ -35,7 +35,8 @@ fn eval(model : @torch.Module, dataset : Array[Data]) -> Double {
     let target = Array::make(10, 0.0)
     target[datum.label] = 1.0
     let target = @torch.tensor(target)
-    let output = model.forward(@torch.stack([[input]]))
+    let softmax = @torch.Softmax::new()
+    let output = softmax.forward(model.forward(@torch.stack([[input]])))
     let value = (output * target).sum().to_double()
     accuracy += value
   }
