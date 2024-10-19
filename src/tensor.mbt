@@ -1419,7 +1419,7 @@ pub fn Tensor::to_double(self : Tensor) -> Double {
   self.value[0]
 }
 
-pub fn cross_correlation(
+pub fn correlate2d(
   image : Tensor,
   kernel : Tensor,
   ~stride : Int = 1,
@@ -1485,7 +1485,7 @@ test "cross_correlation" {
     ],
   )
   let kernel = tensor([[0.0, 1.0, -1.0], [1.0, -1.0, 0.0], [1.0, 1.0, 0.0]])
-  inspect!(cross_correlation(image, kernel), content="[[15, 17], [23, 25]]")
+  inspect!(correlate2d(image, kernel), content="[[15, 17], [23, 25]]")
 }
 
 pub fn Tensor::permute(self : Tensor, permutation : Array[Int]) -> Tensor {

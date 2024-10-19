@@ -65,7 +65,7 @@ pub fn Conv2d::forward(self : Conv2d, input : Tensor) -> Tensor {
       for ic = 0; ic < in_channels; ic = ic + 1 {
         let input = input[n][ic].to_tensor()
         let weight = self.weight[oc][ic]
-        correlations[ic] = cross_correlation(
+        correlations[ic] = correlate2d(
           input,
           weight,
           padding=self.padding.0,
