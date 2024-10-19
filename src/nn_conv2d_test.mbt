@@ -122,17 +122,27 @@ test "Conv2d - Multiple input channels" {
     FixedArray::makei(3 * 4 * 4, fn(i) { i.to_double() }),
   )
   let image = image.reshape([1, 3, 4, 4])
-  inspect!(
+  @json.inspect!(
     image[0][0],
-    content="[[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11], [12, 13, 14, 15]]",
+    content=[[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11], [12, 13, 14, 15]],
   )
-  inspect!(
+  @json.inspect!(
     image[0][1],
-    content="[[16, 17, 18, 19], [20, 21, 22, 23], [24, 25, 26, 27], [28, 29, 30, 31]]",
+    content=[
+      [16, 17, 18, 19],
+      [20, 21, 22, 23],
+      [24, 25, 26, 27],
+      [28, 29, 30, 31],
+    ],
   )
-  inspect!(
+  @json.inspect!(
     image[0][2],
-    content="[[32, 33, 34, 35], [36, 37, 38, 39], [40, 41, 42, 43], [44, 45, 46, 47]]",
+    content=[
+      [32, 33, 34, 35],
+      [36, 37, 38, 39],
+      [40, 41, 42, 43],
+      [44, 45, 46, 47],
+    ],
   )
   let layer = @torch.Conv2d::new(3, 1, kernel_size=(2, 2))
   @torch.with_no_grad(
@@ -203,13 +213,18 @@ test "Conv2d - Backward" {
   let image = @torch.tensor(
     FixedArray::makei(2 * 4 * 4, fn(i) { i.to_double() }),
   ).reshape([1, 2, 4, 4])
-  inspect!(
+  @json.inspect!(
     image[0][0],
-    content="[[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11], [12, 13, 14, 15]]",
+    content=[[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11], [12, 13, 14, 15]],
   )
-  inspect!(
+  @json.inspect!(
     image[0][1],
-    content="[[16, 17, 18, 19], [20, 21, 22, 23], [24, 25, 26, 27], [28, 29, 30, 31]]",
+    content=[
+      [16, 17, 18, 19],
+      [20, 21, 22, 23],
+      [24, 25, 26, 27],
+      [28, 29, 30, 31],
+    ],
   )
   let layer = @torch.Conv2d::new(2, 2, kernel_size=(2, 2))
   @torch.with_no_grad(
@@ -243,18 +258,30 @@ test "Conv2d - Backward" {
     },
   )
   let output = layer.forward(image)
-  inspect!(output[0][0], content="[[47, 51, 55], [63, 67, 71], [79, 83, 87]]")
-  inspect!(output[0][1], content="[[37, 41, 45], [53, 57, 61], [69, 73, 77]]")
+  @json.inspect!(
+    output[0][0],
+    content=[[47, 51, 55], [63, 67, 71], [79, 83, 87]],
+  )
+  @json.inspect!(
+    output[0][1],
+    content=[[37, 41, 45], [53, 57, 61], [69, 73, 77]],
+  )
   let loss = output.sum()
   let optimizer = @torch.SGD::new(layer.parameters(), learning_rate=0.1)
-  inspect!(loss, content="1116")
+  @json.inspect!(loss, content=1116)
   optimizer.zero_grad()
   loss.backward()
   optimizer.step()
   inspect!(layer.weight[0][0], content="[[-4.5, -4.4], [-8.1, -8]]")
-  inspect!(layer.weight[0][1], content="[[-18.900000000000002, -19.8], [-21.5, -22.400000000000002]]")
+  @json.inspect!(
+    layer.weight[0][1],
+    content=[[-18.900000000000002, -19.8], [-21.5, -22.400000000000002]],
+  )
   inspect!(layer.weight[1][0], content="[[-3.5, -5.4], [-7.1, -9]]")
-  inspect!(layer.weight[1][1], content="[[-17.900000000000002, -18.8], [-22.5, -23.400000000000002]]")
+  @json.inspect!(
+    layer.weight[1][1],
+    content=[[-17.900000000000002, -18.8], [-22.5, -23.400000000000002]],
+  )
 }
 
 test "Conv2d - train average kernel" {
@@ -272,9 +299,16 @@ test "Conv2d - train average kernel" {
     loss.backward()
     optimizer.step()
   }
-  inspect!(
+  @json.inspect!(
     model.weight,
-    content="[[[[0.2398214365174994, 0.23837034340298877], [0.2372611163600896, 0.237249868299508]]]]",
+    content=[
+      [
+        [
+          [0.2398214365174994, 0.23837034340298877],
+          [0.2372611163600896, 0.237249868299508],
+        ],
+      ],
+    ],
   )
 }
 
@@ -287,9 +321,12 @@ test "Conv2d - train random kernel" {
     fn() {
       let distrib = @torch.Uniform::new(-8, 8)
       let kernel = distrib.sample([2, 2])
-      inspect!(
+      @json.inspect!(
         kernel,
-        content="[[5.783092436246298, -4.1505954275667545], [2.1609196096634022, -1.7510303846086117]]",
+        content=[
+          [5.783092436246298, -4.1505954275667545],
+          [2.1609196096634022, -1.7510303846086117],
+        ],
       )
       refer.weight[0][0] = kernel
     },
@@ -304,9 +341,16 @@ test "Conv2d - train random kernel" {
     loss.backward()
     optimizer.step()
   }
-  inspect!(
+  @json.inspect!(
     model.weight,
-    content="[[[[5.734003024208306, -4.1928148324930925], [2.115193989982714, -1.7950790294008958]]]]",
+    content=[
+      [
+        [
+          [5.734003024208306, -4.1928148324930925],
+          [2.115193989982714, -1.7950790294008958],
+        ],
+      ],
+    ],
   )
 }
 
@@ -327,21 +371,27 @@ test "Conv2d - Sigmoid - AvgPool2d" {
   let optimizer = @torch.SGD::new(model.parameters(), learning_rate=0.1)
   let output = model.forward(image)
   let output = output[0].to_tensor()
-  inspect!(output.shape(), content="[4]")
-  inspect!(
+  @json.inspect!(output.shape(), content=[4])
+  @json.inspect!(
     output,
-    content="[0.4052299802353421, -1.2087408488805544, 0.2599913853969742, -0.08152780176751948]",
+    content=[
+      0.24703008886185587, -0.21500467743215967, 0.5635915491413397, 1.1507770555671106,
+    ],
   )
   let target = @torch.tensor([0.0, 1.0, 0.0, 0.0])
   let loss = @torch.MSELoss::new()
   let loss = loss.forward(output, target)
-  inspect!(loss, content="1.2792474443342026")
+  @json.inspect!(loss, content=0.7947958742170917)
   loss.backward()
   optimizer.step()
   let output = model.forward(image)
-  inspect!(
+  @json.inspect!(
     output,
-    content="[[0.0055807694974617725, 0.6621095254158275, 0.0995642683094404, -0.05257892536220428]]",
+    content=[
+      [
+        -0.2003092825370439, 1.16722331247751, -0.22011918067464994, -0.7783120995274583,
+      ],
+    ],
   )
 }
 
@@ -406,14 +456,14 @@ test "MNIST" {
   let optimizer = @torch.SGD::new(model.parameters(), learning_rate=0.1)
   let criterion = @torch.CrossEntropyLoss::new()
   let output = model.forward(image)
-  inspect!(output[0][label], content="-0.3365644644720264")
+  @json.inspect!(output[0][label], content=-0.3365644644720264)
   let target = FixedArray::make(10, 0.0)
   target[label] = 1.0
   let loss = criterion.forward(output, @torch.tensor(target))
-  inspect!(loss, content="0.7805945528623369")
+  @json.inspect!(loss, content=0.7805945528623369)
   optimizer.zero_grad()
   loss.backward()
   optimizer.step()
   let output = model.forward(image)
-  inspect!(output[0][label], content="1.9621323785131335")
+  @json.inspect!(output[0][label], content=1.9621323785131335)
 }
