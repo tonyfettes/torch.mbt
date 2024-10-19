@@ -287,14 +287,22 @@ test "Conv2d - Backward" {
 test "Conv2d - train average kernel" {
   @torch.seed(b"12345678223456783234567842345678")
   let model = @torch.Conv2d::new(1, 1, kernel_size=(2, 2))
+  @json.inspect!(
+    model.weight[0][0],
+    content=[
+      [-0.147785141951845, -0.40887110721809417],
+      [-0.4498922009434524, -0.0772743881304353],
+    ],
+  )
+  @json.inspect!(model.bias[0], content=-0.27600272518335356)
   let refer = @torch.AvgPool2d::new(2, stride=1)
   let optimizer = @torch.SGD::new(model.parameters(), learning_rate=0.001)
+  let criterion = @torch.MSELoss::new()
   for i = 0; i < 10; i = i + 1 {
     let input = @torch.Uniform::new(-1, 1).sample([1, 1, 28, 28])
     let output = model.forward(input)
     let target = refer.forward(input)
-    let loss = @torch.MSELoss::new()
-    let loss = loss.forward(output, target)
+    let loss = criterion.forward(output, target)
     optimizer.zero_grad()
     loss.backward()
     optimizer.step()
@@ -304,8 +312,8 @@ test "Conv2d - train average kernel" {
     content=[
       [
         [
-          [0.2398214365174994, 0.23837034340298877],
-          [0.2372611163600896, 0.237249868299508],
+          [-0.1450861159407917, -0.40445321042353977],
+          [-0.4451870982662845, -0.07506427810887198],
         ],
       ],
     ],
@@ -346,8 +354,8 @@ test "Conv2d - train random kernel" {
     content=[
       [
         [
-          [5.734003024208306, -4.1928148324930925],
-          [2.115193989982714, -1.7950790294008958],
+          [-0.10729496084550386, -0.43479597964267996],
+          [-0.431368564979322, -0.08917967937604632],
         ],
       ],
     ],
