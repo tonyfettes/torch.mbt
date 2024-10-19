@@ -149,7 +149,7 @@ pub fn MSELoss::forward(
     abort("Input and target tensors should have the same length")
   }
   let diff = input - target
-  diff.pow(2).sum() / tensor(diff.length().to_double())
+  diff.pow(2).sum() / tensor(diff.value.length().to_double())
 }
 
 pub struct CrossEntropyLoss {}
