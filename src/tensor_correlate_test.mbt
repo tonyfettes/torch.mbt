@@ -1,4 +1,4 @@
-test "cross_correlation" {
+test "Tensor::correlate2d" {
   let image = @torch.tensor(
     [
       [0.0, 1.0, 2.0, 3.0],
