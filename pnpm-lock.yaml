@@ -9,15 +9,15 @@ importers:
   .:
     devDependencies:
       '@moonbit/moonbit-lsp':
-        specifier: ^0.1.202409240
-        version: 0.1.202409240
+        specifier: ^0.1.202410171
+        version: 0.1.202410171
 
 packages:
 
-  '@moonbit/moonbit-lsp@0.1.202409240':
-    resolution: {integrity: sha512-cBxcMhlSoypb7U4znYCBZITCEiCHzcxYsK5jN3swzNTM08uN+K8Hdz8iSPHvu+k3GXnvmVJ9+FINtXgUehM6Bw==}
+  '@moonbit/moonbit-lsp@0.1.202410171':
+    resolution: {integrity: sha512-0H1XQ3O9ei7kEOZ5PyxTTcJVLsC/mjibdWTe/890QaU75J3iVui2HLf245d8y/28sFeIisvw+O8QR/uwNlq6Dw==}
     hasBin: true
 
 snapshots:
 
-  '@moonbit/moonbit-lsp@0.1.202409240': {}
+  '@moonbit/moonbit-lsp@0.1.202410171': {}
