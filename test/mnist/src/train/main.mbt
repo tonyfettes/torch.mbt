@@ -44,7 +44,7 @@ fn eval(model : @torch.Module, dataset : Array[Data]) -> Double {
 }
 
 fn train(model : @mnist.Model, dataset : Array[Data]) -> Unit {
-  let loss = @torch.CrossEntropyLoss::new()
+  let criterion = @torch.CrossEntropyLoss::new()
   let optimizer = @torch.SGD::new(model.parameters(), learning_rate=0.01)
   let mut step = 0
   let batch = 10
@@ -68,7 +68,7 @@ fn train(model : @mnist.Model, dataset : Array[Data]) -> Unit {
       let target = @torch.tensor(target)
       let output = model.forward(input)
       optimizer.zero_grad()
-      let loss = loss.forward(output, target)
+      let loss = criterion.forward(output, target)
       println("step: \{step}, loss: \{loss}")
       loss.backward()
       optimizer.step()

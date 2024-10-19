@@ -3,7 +3,7 @@ pub struct Data {
   label : Int
 }
 
-let loss : @torch.CrossEntropyLoss = @torch.CrossEntropyLoss::new()
+let criterion : @torch.CrossEntropyLoss = @torch.CrossEntropyLoss::new()
 
 pub fn train[Model : @torch.Module](
   model : Model,
@@ -28,7 +28,7 @@ pub fn train[Model : @torch.Module](
     |> @torch.tensor()
   let output = model.forward(input)
   optimizer.zero_grad()
-  let loss = loss.forward(output, target)
+  let loss = criterion.forward(output, target)
   loss.backward()
   optimizer.step()
   loss.to_double()

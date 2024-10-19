@@ -145,12 +145,12 @@ test "MNIST" {
     ],
   )
   let optimizer = @torch.SGD::new(model.parameters(), learning_rate=0.1)
-  let loss = @torch.CrossEntropyLoss::new()
+  let criterion = @torch.CrossEntropyLoss::new()
   let output = model.forward(image)
   inspect!(output[0][label], content="-0.3365644644720264")
   let target = FixedArray::make(10, 0.0)
   target[label] = 1.0
-  let loss = loss.forward(output, @torch.tensor(target))
+  let loss = criterion.forward(output, @torch.tensor(target))
   inspect!(loss, content="0.7805945528623369")
   optimizer.zero_grad()
   loss.backward()
