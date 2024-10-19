@@ -1419,46 +1419,6 @@ pub fn Tensor::to_double(self : Tensor) -> Double {
   self.value[0]
 }
 
-pub fn correlate2d(
-  image : Tensor,
-  kernel : Tensor,
-  ~stride : Int = 1,
-  ~padding : Int = 0
-) -> Tensor {
-  let image_height = image.shape[0]
-  let image_width = image.shape[1]
-  let kernel_height = kernel.shape[0]
-  let kernel_width = kernel.shape[1]
-  let output_height = (image_height + 2 * padding - kernel_height + stride) /
-    stride
-  let output_width = (image_width + 2 * padding - kernel_width + stride) /
-    stride
-  FixedArray::makei(
-    output_height,
-    fn(i) {
-      FixedArray::makei(
-        output_width,
-        fn(j) {
-          let i_start = @math.maximum(0, i * stride - padding)
-          let i_end = @math.minimum(
-            i * stride + kernel_height - padding,
-            image_height,
-          )
-          let j_start = @math.maximum(0, j * stride - padding)
-          let j_end = @math.minimum(
-            j * stride + kernel_width - padding,
-            image_width,
-          )
-          let patch = image[i_start:i_end][j_start:j_end].to_tensor()
-          (patch * kernel).sum()
-        },
-      )
-      |> Tensor::stack()
-    },
-  )
-  |> Tensor::stack()
-}
-
 test "Tensor::op_as_view" {
   let image = tensor(
     [
@@ -1473,19 +1433,6 @@ test "Tensor::op_as_view" {
     image[0:3][0:3].to_tensor(),
     content="[[0, 1, 2], [4, 5, 6], [8, 9, 10]]",
   )
-}
-
-test "cross_correlation" {
-  let image = tensor(
-    [
-      [0.0, 1.0, 2.0, 3.0],
-      [4.0, 5.0, 6.0, 7.0],
-      [8.0, 9.0, 10.0, 11.0],
-      [12.0, 13.0, 14.0, 15.0],
-    ],
-  )
-  let kernel = tensor([[0.0, 1.0, -1.0], [1.0, -1.0, 0.0], [1.0, 1.0, 0.0]])
-  inspect!(correlate2d(image, kernel), content="[[15, 17], [23, 25]]")
 }
 
 pub fn Tensor::permute(self : Tensor, permutation : Array[Int]) -> Tensor {
