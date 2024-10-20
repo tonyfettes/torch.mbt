@@ -1,6 +1,18 @@
 {
   "is-main": true,
   "import": [
-    "tonyfettes/torch"
+    "tonyfettes/torch",
+    {
+      "path": "tonyfettes/torch/tensor",
+      "alias": "torch/tensor"
+    },
+    {
+      "path": "tonyfettes/torch/nn",
+      "alias": "torch/nn"
+    },
+    {
+      "path": "tonyfettes/torch/optim",
+      "alias": "torch/optim"
+    }
   ]
 }

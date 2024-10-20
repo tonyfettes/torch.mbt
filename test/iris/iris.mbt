@@ -1065,7 +1065,7 @@ let dataset : Array[Data] = [
   },
 ]
 
-fn evaluate[Model : @torch.Module](
+fn evaluate[Model : @torch/nn.Module](
   model : Model,
   dataset : ArrayView[Data]
 ) -> Double {
@@ -1093,21 +1093,21 @@ fn evaluate[Model : @torch.Module](
 fn main {
   let rand = @random.Rand::new()
   let model = [
-      @torch.Linear::new(4, 4),
-      @torch.ReLU::new(),
-      @torch.Linear::new(4, 5),
-      @torch.ReLU::new(),
-      @torch.Linear::new(5, 3),
-      @torch.Softmax::new(),
+      @torch/nn.Linear::new(4, 4) as @torch/nn.Module,
+      @torch/nn.ReLU::new(),
+      @torch/nn.Linear::new(4, 5),
+      @torch/nn.ReLU::new(),
+      @torch/nn.Linear::new(5, 3),
+      @torch/nn.Softmax::new(),
     ]
-    |> @torch.Sequential::new
+    |> @torch/nn.Sequential::new
   let dataset = dataset.shuffle(rand=fn(upper) { rand.int(limit=upper) })
   let split = (dataset.length().to_double() * 0.8).floor().to_int()
   let train = dataset[:split]
   let validate = dataset[split:]
   let accuracy = evaluate(model, validate)
   println(accuracy)
-  let loss = @torch.CrossEntropyLoss::new()
+  let loss = @torch/nn.CrossEntropyLoss::new()
   let total_epoch = 128
   let total_step = total_epoch * train.length()
   let mut step = 0
@@ -1129,7 +1129,7 @@ fn main {
       let output = model.forward(input)
       let lr = 0.01 *
         (@math.cos(step.to_double() / total_step.to_double() * @math.pi) + 1.0)
-      let optimizer = @torch.SGD::new(model.parameters(), learning_rate=lr)
+      let optimizer = @torch/optim.SGD::new(model.parameters(), learning_rate=lr)
       optimizer.zero_grad()
       loss.forward(output, target).backward()
       optimizer.step()
