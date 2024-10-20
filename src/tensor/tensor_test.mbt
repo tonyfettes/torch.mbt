@@ -1,23 +1,23 @@
 test "Tensor::new - Scalar" {
   let value = 1.0
-  let tensor = @torch.Tensor::new(value)
+  let tensor = @tensor.Tensor::new(value)
   inspect!(tensor, content="1")
 }
 
 test "Tensor::new - Vector" {
   let value = [0.0, 1.0, 2.0, 3.0]
-  let tensor = @torch.Tensor::new(value)
+  let tensor = @tensor.Tensor::new(value)
   inspect!(tensor, content="[0, 1, 2, 3]")
 }
 
 test "Tensor::new - Matrix" {
   let value = [[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]]
-  let tensor = @torch.Tensor::new(value)
+  let tensor = @tensor.Tensor::new(value)
   inspect!(tensor, content="[[0, 1, 2], [3, 4, 5]]")
 }
 
 test "Tensor::new - Tensor" {
-  let tensor = @torch.Tensor::new(
+  let tensor = @tensor.Tensor::new(
     [
       [[0.0, 1.0, 2.0, 3.0], [4.0, 5.0, 6.0, 7.0], [8.0, 9.0, 10.0, 11.0]],
       [
@@ -34,24 +34,24 @@ test "Tensor::new - Tensor" {
 }
 
 test "panic Tensor::op_get - Scalar" {
-  let tensor = @torch.Tensor::new(1.0)
+  let tensor = @tensor.Tensor::new(1.0)
   tensor[0] |> ignore
 }
 
 test "Tensor::op_get - Vector" {
-  let tensor = @torch.Tensor::new([0.0, 1.0, 2.0, 3.0])
+  let tensor = @tensor.Tensor::new([0.0, 1.0, 2.0, 3.0])
   let slice = tensor[1]
   inspect!(slice, content="1")
 }
 
 test "Tensor::op_get - Matrix" {
-  let tensor = @torch.Tensor::new([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]])
+  let tensor = @tensor.Tensor::new([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]])
   let view = tensor[1]
   inspect!(view, content="[3, 4, 5]")
 }
 
 test "TensorView::to_tensor" {
-  let tensor = @torch.tensor(
+  let tensor = @tensor.tensor(
     [
       [[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]],
       [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]],
@@ -69,22 +69,14 @@ test "TensorView::to_tensor" {
 }
 
 test "Tensor::permute" {
-  let tensor = @torch.tensor([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]])
+  let tensor = @tensor.tensor([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]])
   inspect!(tensor.permute([1, 0]), content="[[0, 3], [1, 4], [2, 5]]")
 }
 
 test "TensorView::to_json" {
-  let tensor = @torch.Tensor::new(
+  let tensor = @tensor.Tensor::new(
     [[[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]], [[6.0, 7.0, 8.0], [9.0, 10.0, 11.0]]],
   )
   let view = tensor[1][:][2]
   @json.inspect!(view, content=[8, 11])
-}
-
-test "MSELoss" {
-  let input = @torch.tensor([[1.0, 2.0, 3.0]])
-  let target = @torch.tensor([[4.0, 5.0, 6.0]])
-  let criterion = @torch.MSELoss::new()
-  inspect!(criterion.forward(input, input), content="0")
-  inspect!(criterion.forward(input, target), content="9")
 }

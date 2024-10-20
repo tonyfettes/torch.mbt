@@ -1,15 +1,12 @@
 {
-  "pre-build": [
+  "import": [
     {
-      "input": "../bin/generate_tuple/main.mbt",
-      "output": "nn_tuple.mbt",
-      "command": "cd bin && moon run generate_tuple"
+      "path": "tonyfettes/torch/tensor",
+      "alias": "tensor"
     }
   ],
-  "targets": {
-    "tensor_add.wasm.mbt": ["wasm"],
-    "tensor_add.mbt": ["not", "wasm"],
-    "tensor_mul.wasm.mbt": ["wasm"],
-    "tensor_mul.mbt": ["not", "wasm"]
-  }
+  "test-import": [
+    "tonyfettes/torch/distributions",
+    "tonyfettes/torch/nn"
+  ]
 }

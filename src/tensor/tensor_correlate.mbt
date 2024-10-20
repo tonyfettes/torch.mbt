@@ -2,7 +2,7 @@ pub fn correlate2d(
   image : Tensor,
   kernel : Tensor,
   ~stride : Int = 1,
-  ~padding : Shape2d = 0
+  ~padding : @shape.Shape2d = 0
 ) -> Tensor {
   let image_height = image.shape[0]
   let image_width = image.shape[1]

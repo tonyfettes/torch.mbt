@@ -21,7 +21,7 @@ fn build_forward(length : Int) -> String {
   fn build_body(length : Int) {
     let lines = ["input"]
     for i in 0..<length {
-      lines.push("|> forward(self.\{i})")
+      lines.push("|> forward_(self.\{i})")
     }
     return lines
   }
@@ -31,8 +31,8 @@ fn build_forward(length : Int) -> String {
   let body = String::concat(build_body(length), separator="\n  ")
   $|pub impl[\{type_parameters}] Module for \{tuple_type} with forward(
   $|  self : \{tuple_type},
-  $|  input : Tensor
-  $|) -> Tensor {
+  $|  input : @tensor.Tensor
+  $|) -> @tensor.Tensor {
   $|  \{body}
   $|}
 }
@@ -51,7 +51,7 @@ fn build_parameters(length : Int) -> String {
   let body = String::concat(build_body(length), separator="\n  ")
   $|pub impl[\{type_parameters}] Module for \{tuple_type} with parameters(
   $|  self : \{tuple_type}
-  $|) -> Iter[Tensor] {
+  $|) -> Iter[@tensor.Tensor] {
   $|  \{body}
   $|}
 }
@@ -92,5 +92,5 @@ fn main {
     functions.push(build_pytorch_transpile(i))
   }
   let content = String::concat(functions, separator="\n\n")
-  @fs.write_string_to_file(path="../src/nn_tuple.mbt", ~content)
+  @fs.write_string_to_file(path="../src/nn/nn_tuple.mbt", ~content)
 }

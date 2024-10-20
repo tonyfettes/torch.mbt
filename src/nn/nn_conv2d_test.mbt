@@ -1,13 +1,13 @@
 test "Conv2d" {
-  @torch.seed(b"12345678223456783234567842345678")
-  let image = @torch.tensor(FixedArray::makei(4 * 4, fn(i) { i.to_double() }))
+  @distributions.seed(b"12345678223456783234567842345678")
+  let image = @tensor.tensor(FixedArray::makei(4 * 4, fn(i) { i.to_double() }))
   @json.inspect!(
     image.reshape([4, 4]),
     content=[[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11], [12, 13, 14, 15]],
   )
   let image = image.reshape([1, 1, 4, 4])
-  let layer = @torch.Conv2d::new(1, 1, kernel_size=(2, 2))
-  @torch.with_no_grad(
+  let layer = @nn.Conv2d::new(1, 1, kernel_size=(2, 2))
+  @tensor.with_no_grad(
     fn() {
       // kernel[0]:
       // 0 1
@@ -16,7 +16,7 @@ test "Conv2d" {
       layer.weight[0][0][0][1] = 1.0
       layer.weight[0][0][1][0] = 0.0
       layer.weight[0][0][1][1] = 1.0
-      layer.bias[0] = @torch.tensor(0.0)
+      layer.bias[0] = @tensor.tensor(0.0)
     },
   )
   @json.inspect!(layer.weight[0][0], content=[[0, 1], [0, 1]])
@@ -25,8 +25,8 @@ test "Conv2d" {
 }
 
 test "Conv2d - Random" {
-  @torch.seed(b"12345678223456783234567842345678")
-  let image = @torch.Uniform::new(-1.0, 1.0).sample([1, 1, 4, 4])
+  @distributions.seed(b"12345678223456783234567842345678")
+  let image = @distributions.Uniform::new(-1.0, 1.0).sample([1, 1, 4, 4])
   @json.inspect!(
     image[0][0],
     content=[
@@ -44,7 +44,7 @@ test "Conv2d - Random" {
       ],
     ],
   )
-  let layer = @torch.Conv2d::new(1, 1, kernel_size=(2, 2))
+  let layer = @nn.Conv2d::new(1, 1, kernel_size=(2, 2))
   @json.inspect!(
     layer.weight,
     content=[
@@ -69,16 +69,16 @@ test "Conv2d - Random" {
 }
 
 test "Conv2d - Multiple output channels" {
-  @torch.seed(b"12345678223456783234567842345678")
-  let image = @torch.tensor(FixedArray::makei(4 * 4, fn(i) { i.to_double() }))
+  @distributions.seed(b"12345678223456783234567842345678")
+  let image = @tensor.tensor(FixedArray::makei(4 * 4, fn(i) { i.to_double() }))
   inspect!(
     image.reshape([4, 4]),
     content="[[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11], [12, 13, 14, 15]]",
   )
   let image = image.reshape([1, 1, 4, 4])
   inspect!(image.shape(), content="[1, 1, 4, 4]")
-  let layer = @torch.Conv2d::new(1, 3, kernel_size=(2, 2))
-  @torch.with_no_grad(
+  let layer = @nn.Conv2d::new(1, 3, kernel_size=(2, 2))
+  @tensor.with_no_grad(
     fn() {
       // kernel[0]:
       // 0 1
@@ -101,9 +101,9 @@ test "Conv2d - Multiple output channels" {
       layer.weight[2][0][0][1] = 0.0
       layer.weight[2][0][1][0] = 0.0
       layer.weight[2][0][1][1] = 1.0
-      layer.bias[0] = @torch.tensor(0.0)
-      layer.bias[1] = @torch.tensor(0.0)
-      layer.bias[2] = @torch.tensor(0.0)
+      layer.bias[0] = @tensor.tensor(0.0)
+      layer.bias[1] = @tensor.tensor(0.0)
+      layer.bias[2] = @tensor.tensor(0.0)
     },
   )
   inspect!(layer.weight[0][0], content="[[0, 1], [0, 1]]")
@@ -117,8 +117,8 @@ test "Conv2d - Multiple output channels" {
 }
 
 test "Conv2d - Multiple input channels" {
-  @torch.seed(b"12345678223456783234567842345678")
-  let image = @torch.tensor(
+  @distributions.seed(b"12345678223456783234567842345678")
+  let image = @tensor.tensor(
     FixedArray::makei(3 * 4 * 4, fn(i) { i.to_double() }),
   )
   let image = image.reshape([1, 3, 4, 4])
@@ -144,8 +144,8 @@ test "Conv2d - Multiple input channels" {
       [44, 45, 46, 47],
     ],
   )
-  let layer = @torch.Conv2d::new(3, 1, kernel_size=(2, 2))
-  @torch.with_no_grad(
+  let layer = @nn.Conv2d::new(3, 1, kernel_size=(2, 2))
+  @tensor.with_no_grad(
     fn() {
       // kernel[0]:
       // 0 1
@@ -168,7 +168,7 @@ test "Conv2d - Multiple input channels" {
       layer.weight[0][2][0][1] = 0.0
       layer.weight[0][2][1][0] = 0.0
       layer.weight[0][2][1][1] = 1.0
-      layer.bias[0] = @torch.tensor(0.0)
+      layer.bias[0] = @tensor.tensor(0.0)
     },
   )
   let output = layer.forward(image)
@@ -179,11 +179,11 @@ test "Conv2d - Multiple input channels" {
 }
 
 test "Conv2d - Padding" {
-  let image = @torch.tensor(FixedArray::makei(4 * 4, fn(i) { i.to_double() })).reshape(
+  let image = @tensor.tensor(FixedArray::makei(4 * 4, fn(i) { i.to_double() })).reshape(
     [1, 1, 4, 4],
   )
-  let layer = @torch.Conv2d::new(1, 1, kernel_size=(2, 2), padding=(1, 1))
-  @torch.with_no_grad(
+  let layer = @nn.Conv2d::new(1, 1, kernel_size=(2, 2), padding=(1, 1))
+  @tensor.with_no_grad(
     fn() {
       // kernel:
       // 0 1
@@ -192,7 +192,7 @@ test "Conv2d - Padding" {
       layer.weight[0][0][0][1] = 1.0
       layer.weight[0][0][1][0] = 0.0
       layer.weight[0][0][1][1] = 1.0
-      layer.bias[0] = @torch.tensor(0.0)
+      layer.bias[0] = @tensor.tensor(0.0)
     },
   )
   let output = layer.forward(image)
@@ -209,8 +209,8 @@ test "Conv2d - Padding" {
 }
 
 test "Conv2d - Backward" {
-  @torch.seed(b"12345678223456783234567842345678")
-  let image = @torch.tensor(
+  @distributions.seed(b"12345678223456783234567842345678")
+  let image = @tensor.tensor(
     FixedArray::makei(2 * 4 * 4, fn(i) { i.to_double() }),
   ).reshape([1, 2, 4, 4])
   @json.inspect!(
@@ -226,8 +226,8 @@ test "Conv2d - Backward" {
       [28, 29, 30, 31],
     ],
   )
-  let layer = @torch.Conv2d::new(2, 2, kernel_size=2, padding=2)
-  @torch.with_no_grad(
+  let layer = @nn.Conv2d::new(2, 2, kernel_size=2, padding=2)
+  @tensor.with_no_grad(
     fn() {
       // 0 1
       // 0 1
@@ -253,8 +253,8 @@ test "Conv2d - Backward" {
       layer.weight[1][1][0][1] = 1.0
       layer.weight[1][1][1][0] = 0.0
       layer.weight[1][1][1][1] = 0.0
-      layer.bias[0] = @torch.tensor(0.0)
-      layer.bias[1] = @torch.tensor(0.0)
+      layer.bias[0] = @tensor.tensor(0.0)
+      layer.bias[1] = @tensor.tensor(0.0)
     },
   )
   let output = layer.forward(image)
@@ -283,7 +283,7 @@ test "Conv2d - Backward" {
     ],
   )
   let loss = output.sum()
-  let optimizer = @torch.SGD::new(layer.parameters(), learning_rate=0.1)
+  let optimizer = @optim.SGD::new(layer.parameters(), learning_rate=0.1)
   @json.inspect!(loss, content=1984)
   optimizer.zero_grad()
   loss.backward()
@@ -295,8 +295,8 @@ test "Conv2d - Backward" {
 }
 
 test "Conv2d - train average kernel" {
-  @torch.seed(b"12345678223456783234567842345678")
-  let model = @torch.Conv2d::new(1, 1, kernel_size=(2, 2))
+  @distributions.seed(b"12345678223456783234567842345678")
+  let model = @nn.Conv2d::new(1, 1, kernel_size=(2, 2))
   @json.inspect!(
     model.weight[0][0],
     content=[
@@ -305,11 +305,11 @@ test "Conv2d - train average kernel" {
     ],
   )
   @json.inspect!(model.bias[0], content=-0.27600272518335356)
-  let refer = @torch.AvgPool2d::new(2, stride=1)
-  let optimizer = @torch.SGD::new(model.parameters(), learning_rate=0.001)
-  let criterion = @torch.MSELoss::new()
+  let refer = @nn.AvgPool2d::new(2, stride=1)
+  let optimizer = @optim.SGD::new(model.parameters(), learning_rate=0.001)
+  let criterion = @nn.MSELoss::new()
   for i = 0; i < 10; i = i + 1 {
-    let input = @torch.Uniform::new(-1, 1).sample([1, 1, 28, 28])
+    let input = @distributions.Uniform::new(-1, 1).sample([1, 1, 28, 28])
     let output = model.forward(input)
     let target = refer.forward(input)
     let loss = criterion.forward(output, target)
@@ -331,13 +331,13 @@ test "Conv2d - train average kernel" {
 }
 
 test "Conv2d - train random kernel" {
-  @torch.seed(b"12345678223456783234567842345678")
-  let model = @torch.Conv2d::new(1, 1, kernel_size=2)
-  let refer = @torch.Conv2d::new(1, 1, kernel_size=2)
-  let optimizer = @torch.SGD::new(model.parameters(), learning_rate=0.001)
-  @torch.with_no_grad_error!(
+  @distributions.seed(b"12345678223456783234567842345678")
+  let model = @nn.Conv2d::new(1, 1, kernel_size=2)
+  let refer = @nn.Conv2d::new(1, 1, kernel_size=2)
+  let optimizer = @optim.SGD::new(model.parameters(), learning_rate=0.001)
+  @tensor.with_no_grad_error!(
     fn() {
-      let distrib = @torch.Uniform::new(-8, 8)
+      let distrib = @distributions.Uniform::new(-8, 8)
       let kernel = distrib.sample([2, 2])
       @json.inspect!(
         kernel,
@@ -349,9 +349,9 @@ test "Conv2d - train random kernel" {
       refer.weight[0][0] = kernel
     },
   )
-  let loss = @torch.MSELoss::new()
+  let loss = @nn.MSELoss::new()
   for i = 0; i < 10; i = i + 1 {
-    let input = @torch.Uniform::new(-1, 1).sample([1, 1, 28, 28])
+    let input = @distributions.Uniform::new(-1, 1).sample([1, 1, 28, 28])
     let output = model.forward(input)
     let target = refer.forward(input)
     let loss = loss.forward(output, target)
@@ -373,8 +373,8 @@ test "Conv2d - train random kernel" {
 }
 
 test "Conv2d - Sigmoid - AvgPool2d" {
-  @torch.seed(b"12345678223456783234567842345678")
-  let image = @torch.Uniform::new(-1, 1).sample([1, 1, 4, 4])
+  @distributions.seed(b"12345678223456783234567842345678")
+  let image = @distributions.Uniform::new(-1, 1).sample([1, 1, 4, 4])
   @json.inspect!(
     image[0][0],
     content=[
@@ -393,9 +393,9 @@ test "Conv2d - Sigmoid - AvgPool2d" {
     ],
   )
   let model = (
-    @torch.Conv2d::new(1, 2, kernel_size=2, padding=1),
-    @torch.Sigmoid::new(),
-    @torch.AvgPool2d::new(2, stride=2),
+    @nn.Conv2d::new(1, 2, kernel_size=2, padding=1),
+    @nn.Sigmoid::new(),
+    @nn.AvgPool2d::new(2, stride=2),
   )
   @json.inspect!(
     model.0.weight,
@@ -418,11 +418,11 @@ test "Conv2d - Sigmoid - AvgPool2d" {
     model.0.bias,
     content=[-0.012118885501261834, 0.1191592062303477],
   )
-  let optimizer = @torch.SGD::new(
-    @torch.Module::parameters(model),
+  let optimizer = @optim.SGD::new(
+    @nn.Module::parameters(model),
     learning_rate=0.1,
   )
-  let output = @torch.Module::forward(model, image)
+  let output = @nn.Module::forward(model, image)
   @json.inspect!(output.shape(), content=[1, 2, 2, 2])
   @json.inspect!(
     output[0],
@@ -437,10 +437,10 @@ test "Conv2d - Sigmoid - AvgPool2d" {
       ],
     ],
   )
-  let target = @torch.tensor([0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0]).reshape(
+  let target = @tensor.tensor([0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0]).reshape(
     [1, 2, 2, 2],
   )
-  let criterion = @torch.CrossEntropyLoss::new()
+  let criterion = @nn.CrossEntropyLoss::new()
   let loss = criterion.forward(output, target)
   @json.inspect!(loss, content=0.18322279098221156)
   loss.backward()
@@ -469,9 +469,9 @@ test "Conv2d - Sigmoid - AvgPool2d" {
 }
 
 test "MNIST" {
-  @torch.seed(b"12345678223456783234567842345678")
+  @distributions.seed(b"12345678223456783234567842345678")
   let label = 5
-  let image = @torch.tensor(
+  let image = @tensor.tensor(
     [
       0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -510,29 +510,29 @@ test "MNIST" {
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     ],
   ).reshape([1, 1, 28, 28])
-  let model = @torch.Sequential::new(
+  let model = @nn.Sequential::new(
     [
-      @torch.Conv2d::new(1, 6, kernel_size=5, padding=2),
-      @torch.Sigmoid::new(),
-      @torch.AvgPool2d::new(2, stride=2),
-      @torch.Conv2d::new(6, 16, kernel_size=5),
-      @torch.Sigmoid::new(),
-      @torch.AvgPool2d::new(2, stride=2),
-      @torch.Flatten::new(),
-      @torch.Linear::new(400, 120),
-      @torch.Sigmoid::new(),
-      @torch.Linear::new(120, 84),
-      @torch.Sigmoid::new(),
-      @torch.Linear::new(84, 10),
+      @nn.Conv2d::new(1, 6, kernel_size=5, padding=2),
+      @nn.Sigmoid::new(),
+      @nn.AvgPool2d::new(2, stride=2),
+      @nn.Conv2d::new(6, 16, kernel_size=5),
+      @nn.Sigmoid::new(),
+      @nn.AvgPool2d::new(2, stride=2),
+      @nn.Flatten::new(),
+      @nn.Linear::new(400, 120),
+      @nn.Sigmoid::new(),
+      @nn.Linear::new(120, 84),
+      @nn.Sigmoid::new(),
+      @nn.Linear::new(84, 10),
     ],
   )
-  let optimizer = @torch.SGD::new(model.parameters(), learning_rate=0.1)
-  let criterion = @torch.CrossEntropyLoss::new()
+  let optimizer = @optim.SGD::new(model.parameters(), learning_rate=0.1)
+  let criterion = @nn.CrossEntropyLoss::new()
   let output = model.forward(image)
   @json.inspect!(output[0][label], content=-0.3365644644720264)
   let target = FixedArray::make(10, 0.0)
   target[label] = 1.0
-  let loss = criterion.forward(output, @torch.tensor([target]))
+  let loss = criterion.forward(output, @tensor.tensor([target]))
   @json.inspect!(loss, content=2.675598250228825)
   optimizer.zero_grad()
   loss.backward()

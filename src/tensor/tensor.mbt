@@ -1,4 +1,4 @@
-struct Tensor {
+pub struct Tensor {
   value : FixedArray[Double]
   shape : FixedArray[Int]
   block : FixedArray[Int]
@@ -11,7 +11,16 @@ pub fn Tensor::shape(self : Tensor) -> FixedArray[Int] {
   self.shape
 }
 
-let nan : Tensor = tensor(@double.not_a_number, requires_grad=false)
+pub let empty : Tensor = {
+  Tensor::{
+    value: [],
+    shape: [],
+    block: [],
+    graph: Graph::Val,
+    ref: 0,
+    grad: [],
+  }
+}
 
 pub fn Tensor::to_json(self : Tensor) -> Json {
   fn build(dimension : Int, offset : Int) -> Json {
@@ -56,7 +65,7 @@ test "Tensor::from_json" {
   inspect!(tensor, content="[[0, 1, 2], [3, 4, 5]]")
 }
 
-enum Graph {
+pub enum Graph {
   Val
   Var
   Add(Tensor, Tensor)
@@ -310,7 +319,7 @@ pub fn Tensor::log(self : Tensor) -> Tensor {
   }
 }
 
-pub fn Tensor::sum(self : Tensor, ~dim : Shape = ()) -> Tensor {
+pub fn Tensor::sum(self : Tensor, ~dim : @shape.Shape = ()) -> Tensor {
   let dim = dim.to_fixed_array()
   let dim = if dim.length() == 0 {
     FixedArray::makei(self.shape.length(), fn(i) { i })
@@ -1482,7 +1491,7 @@ test "Tensor::permute" {
   inspect!(permuted, content="[[0, 3], [1, 4], [2, 5]]")
 }
 
-pub fn Tensor::moveaxis[Shape : Shape](
+pub fn Tensor::moveaxis[Shape : @shape.Shape](
   self : Tensor,
   source : Shape,
   destination : Shape
@@ -1544,10 +1553,6 @@ test "Tensor::moveaxis" {
     moved,
     content="[[[0, 0], [0, 0], [0, 0], [0, 0]], [[1, 1], [1, 1], [1, 1], [1, 1]], [[2, 2], [2, 2], [2, 2], [2, 2]]]",
   )
-}
-
-pub fn forward(self : Tensor, module : Module) -> Tensor {
-  module.forward(self)
 }
 
 pub fn Tensor::avg_pool2d(
@@ -1618,7 +1623,7 @@ test "avg_pool2d" {
   )
 }
 
-pub fn Tensor::zeros[Shape : Shape](
+pub fn Tensor::zeros[Shape : @shape.Shape](
   shape : Shape,
   ~requires_grad : Bool = false
 ) -> Tensor {
@@ -1640,7 +1645,7 @@ pub fn Tensor::zeros[Shape : Shape](
   }
 }
 
-fn Tensor::ones[Shape : Shape](
+fn Tensor::ones[Shape : @shape.Shape](
   shape : Shape,
   ~requires_grad : Bool = false
 ) -> Tensor {

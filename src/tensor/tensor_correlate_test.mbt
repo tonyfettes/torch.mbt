@@ -1,5 +1,5 @@
 test "Tensor::correlate2d" {
-  let image = @torch.tensor(
+  let image = @tensor.tensor(
     [
       [0.0, 1.0, 2.0, 3.0],
       [4.0, 5.0, 6.0, 7.0],
@@ -7,15 +7,15 @@ test "Tensor::correlate2d" {
       [12.0, 13.0, 14.0, 15.0],
     ],
   )
-  let kernel = @torch.tensor(
+  let kernel = @tensor.tensor(
     [[0.0, 1.0, -1.0], [1.0, -1.0, 0.0], [1.0, 1.0, 0.0]],
   )
-  inspect!(@torch.correlate2d(image, kernel), content="[[15, 17], [23, 25]]")
+  inspect!(@tensor.correlate2d(image, kernel), content="[[15, 17], [23, 25]]")
 }
 
 test "Tensor::correlate2d - random" {
-  @torch.seed(b"12345678223456783234567842345678")
-  let image = @torch.Uniform::new(-1.0, 1.0).sample([4, 4])
+  @distributions.seed(b"12345678223456783234567842345678")
+  let image = @distributions.Uniform::new(-1.0, 1.0).sample([4, 4])
   @json.inspect!(
     image,
     content=[
@@ -33,7 +33,7 @@ test "Tensor::correlate2d - random" {
       ],
     ],
   )
-  let kernel = @torch.Uniform::new(-1.0, 1.0).sample([2, 2])
+  let kernel = @distributions.Uniform::new(-1.0, 1.0).sample([2, 2])
   @json.inspect!(
     kernel,
     content=[
@@ -42,7 +42,7 @@ test "Tensor::correlate2d - random" {
     ],
   )
   @json.inspect!(
-    @torch.correlate2d(image, kernel),
+    @tensor.correlate2d(image, kernel),
     content=[
       [-0.49214381331510293, 0.6938685660678281, 0.908466752805929],
       [1.3888009485240067, 1.4273200803835957, -0.5020560123459269],
@@ -52,7 +52,7 @@ test "Tensor::correlate2d - random" {
 }
 
 test "Tensor::correlate2d - Padding" {
-  let image = @torch.tensor(
+  let image = @tensor.tensor(
     [
       [0.0, 1.0, 2.0, 3.0],
       [4.0, 5.0, 6.0, 7.0],
@@ -60,11 +60,11 @@ test "Tensor::correlate2d - Padding" {
       [12.0, 13.0, 14.0, 15.0],
     ],
   )
-  let kernel = @torch.tensor(
+  let kernel = @tensor.tensor(
     [[0.0, 1.0, -1.0], [1.0, -1.0, 0.0], [1.0, 1.0, 0.0]],
   )
   @json.inspect!(
-    @torch.correlate2d(image, kernel, padding=(2, 2)),
+    @tensor.correlate2d(image, kernel, padding=(2, 2)),
     content=[
       [0, 0, 1, 3, 5, 3],
       [0, 4, 8, 10, 12, 10],

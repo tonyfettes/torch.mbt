@@ -1,12 +1,12 @@
 pub struct SGD {
-  parameters : Array[Tensor]
+  parameters : Array[@tensor.Tensor]
   learning_rate : Double
 }
 
-pub fn SGD::new(parameters : Iter[Tensor], ~learning_rate : Double) -> SGD {
+pub fn SGD::new(parameters : Iter[@tensor.Tensor], ~learning_rate : Double) -> SGD {
   let vars = []
   for parameter in parameters {
-    parameter.graph = Var
+    parameter.graph = @tensor.Var
     vars.push(parameter)
   }
   SGD::{ parameters: parameters.to_array(), learning_rate }

@@ -1,0 +1,8 @@
+{
+  "import": [
+    "tonyfettes/torch/shape"
+  ],
+  "test-import": [
+    "tonyfettes/torch/distributions"
+  ]
+}

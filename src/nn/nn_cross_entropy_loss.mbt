@@ -21,9 +21,9 @@ pub fn CrossEntropyLoss::output(
 
 pub fn CrossEntropyLoss::forward(
   self : CrossEntropyLoss,
-  input : Tensor,
-  target : Tensor
-) -> Tensor {
+  input : @tensor.Tensor,
+  target : @tensor.Tensor
+) -> @tensor.Tensor {
   let input_shape = input.shape()
   if input_shape != target.shape() {
     abort(
@@ -31,7 +31,7 @@ pub fn CrossEntropyLoss::forward(
     )
   }
   let dimension = input_shape.length()
-  fn compute1d(input : Tensor, target : Tensor) -> Tensor {
+  fn compute1d(input : @tensor.Tensor, target : @tensor.Tensor) -> @tensor.Tensor {
     let max = input.max()
     let sub_max = input - max
     let log_soft_max = sub_max - sub_max.exp().sum().log()
@@ -46,7 +46,7 @@ pub fn CrossEntropyLoss::forward(
         input_shape[0],
         fn(i) { compute1d(input[i][:].to_tensor(), target[i][:].to_tensor()) },
       )
-      |> stack()
+      |> @tensor.stack()
     dimension =>
       if dimension <= 0 {
         abort(
@@ -67,10 +67,10 @@ pub fn CrossEntropyLoss::forward(
                   )
                 },
               )
-              |> stack()
+              |> @tensor.stack()
             },
           )
-          |> stack()
+          |> @tensor.stack()
         let output_shape = FixedArray::make(dimension - 1, input_shape[0])
         for i in 1..<(dimension - 1) {
           output_shape[i] = input_shape[i + 1]

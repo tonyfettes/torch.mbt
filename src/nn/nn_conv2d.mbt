@@ -1,14 +1,14 @@
 pub struct Conv2d {
-  weight : Array[Array[Tensor]]
-  bias : Array[Tensor]
+  weight : Array[Array[@tensor.Tensor]]
+  bias : Array[@tensor.Tensor]
   padding : (Int, Int)
 } derive(Show, ToJson, FromJson)
 
-pub fn Conv2d::new[KernelSize : Shape2d](
+pub fn Conv2d::new[KernelSize : @shape.Shape2d](
   in_channels : Int,
   out_channels : Int,
   ~kernel_size : KernelSize,
-  ~padding : Shape2d = 0
+  ~padding : @shape.Shape2d = 0
 ) -> Conv2d {
   if in_channels == 0 {
     abort("Input channels has zero width")
@@ -17,13 +17,13 @@ pub fn Conv2d::new[KernelSize : Shape2d](
     abort("Output channels has zero width")
   }
   let kernel_size = kernel_size.to_fixed_array()
-  let weight_distribution : Continuous = {
+  let weight_distribution : @distributions.Continuous = {
     let mut n = in_channels
     for k in kernel_size {
       n *= k
     }
     let stdv = 1.0 / n.to_double().sqrt()
-    Uniform::new(-stdv, stdv)
+    @distributions.Uniform::new(-stdv, stdv)
   }
   let weight = Array::makei(
     out_channels,
@@ -45,7 +45,7 @@ pub fn Conv2d::output(self : Conv2d, logger : Logger) -> Unit {
   Show::output(self.weight, logger)
 }
 
-pub fn Conv2d::forward(self : Conv2d, input : Tensor) -> Tensor {
+pub fn Conv2d::forward(self : Conv2d, input : @tensor.Tensor) -> @tensor.Tensor {
   if input.shape.length() != 4 {
     abort("Input tensor should be of shape (N, C, H, W)")
   }
@@ -57,24 +57,24 @@ pub fn Conv2d::forward(self : Conv2d, input : Tensor) -> Tensor {
     )
   }
   let batch_size = input.shape[0]
-  let batch = FixedArray::make(batch_size, nan)
+  let batch = FixedArray::make(batch_size, @tensor.empty)
   for n = 0; n < batch_size; n = n + 1 {
-    let channels = FixedArray::make(out_channels, nan)
+    let channels = FixedArray::make(out_channels, @tensor.empty)
     for oc = 0; oc < out_channels; oc = oc + 1 {
-      let correlations = FixedArray::make(in_channels, nan)
+      let correlations = FixedArray::make(in_channels, @tensor.empty)
       for ic = 0; ic < in_channels; ic = ic + 1 {
         let input = input[n][ic].to_tensor()
         let weight = self.weight[oc][ic]
-        correlations[ic] = correlate2d(input, weight, padding=self.padding.0)
+        correlations[ic] = @tensor.correlate2d(input, weight, padding=self.padding.0)
       }
-      channels[oc] = Tensor::stack(correlations).sum(dim=0) + self.bias[oc]
+      channels[oc] = @tensor.Tensor::stack(correlations).sum(dim=0) + self.bias[oc]
     }
-    batch[n] = Tensor::stack(channels)
+    batch[n] = @tensor.Tensor::stack(channels)
   }
-  Tensor::stack(batch)
+  @tensor.Tensor::stack(batch)
 }
 
-pub fn Conv2d::parameters(self : Conv2d) -> Iter[Tensor] {
+pub fn Conv2d::parameters(self : Conv2d) -> Iter[@tensor.Tensor] {
   self.weight.iter().flat_map(fn { channel => channel.iter() })
 }
 

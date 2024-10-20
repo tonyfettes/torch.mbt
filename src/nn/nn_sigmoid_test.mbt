@@ -1,6 +1,6 @@
 test "Sigmoid" {
-  @torch.seed(b"12345678223456783234567842345678")
-  let input = @torch.Uniform::new(-1, 1).sample([3, 3])
+  @distributions.seed(b"12345678223456783234567842345678")
+  let input = @distributions.Uniform::new(-1, 1).sample([3, 3])
   @json.inspect!(
     input,
     content=[
@@ -20,8 +20,8 @@ test "Sigmoid" {
 }
 
 test "Sigmoid/Backward" {
-  @torch.seed(b"12345678223456783234567842345678")
-  let input = @torch.Uniform::new(-1, 1).sample([3, 3])
+  @distributions.seed(b"12345678223456783234567842345678")
+  let input = @distributions.Uniform::new(-1, 1).sample([3, 3])
   @json.inspect!(
     input,
     content=[
@@ -39,7 +39,7 @@ test "Sigmoid/Backward" {
       [0.6594638069803208, 0.5547551522746634, 0.6061925292136984],
     ],
   )
-  let optimizer = @torch.SGD::new(Iter::singleton(input), learning_rate=0.1)
+  let optimizer = @optim.SGD::new(Iter::singleton(input), learning_rate=0.1)
   optimizer.zero_grad()
   sigmoid.sum().backward()
   optimizer.step()

@@ -1,0 +1,27 @@
+{
+  "pre-build": [
+    {
+      "input": "../../bin/generate_tuple/main.mbt",
+      "output": "nn_tuple.mbt",
+      "command": "cd bin && moon run generate_tuple"
+    }
+  ],
+  "targets": {
+    "tensor_add.wasm.mbt": ["wasm"],
+    "tensor_add.mbt": ["not", "wasm"],
+    "tensor_mul.wasm.mbt": ["wasm"],
+    "tensor_mul.mbt": ["not", "wasm"]
+  },
+  "import": [
+    "tonyfettes/torch/tensor",
+    "tonyfettes/torch/shape",
+    "tonyfettes/torch/distributions",
+    "tonyfettes/torch/optim"
+  ],
+  "test-import": [
+    {
+      "path": "tonyfettes/torch/tensor",
+      "alias": "tensor"
+    }
+  ]
+}

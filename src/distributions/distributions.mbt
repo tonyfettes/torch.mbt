@@ -3,10 +3,10 @@ pub trait IContinuous {
 }
 
 pub trait Continuous: IContinuous {
-  sample(Self, FixedArray[Int]) -> Tensor
+  sample(Self, FixedArray[Int]) -> @tensor.Tensor
 }
 
-impl Continuous with sample(self : Self, shape : FixedArray[Int]) -> Tensor {
+impl Continuous with sample(self : Self, shape : FixedArray[Int]) -> @tensor.Tensor {
   let mut size = 1
   for s in shape {
     size *= s
@@ -15,14 +15,14 @@ impl Continuous with sample(self : Self, shape : FixedArray[Int]) -> Tensor {
   for i = 0; i < size; i = i + 1 {
     sample.push(IContinuous::_sample(self))
   }
-  Tensor::new(sample).reshape(shape)
+  @tensor.Tensor::new(sample).reshape(shape)
 }
 
 pub trait Discrete {
   sample(Self) -> Int
 }
 
-impl IContinuous for Double with _sample(self : Double) -> Double { self }
+pub impl IContinuous for Double with _sample(self : Double) -> Double { self }
 
 struct Uniform {
   lower : Double
@@ -33,11 +33,14 @@ pub fn Uniform::new(lower : Double, upper : Double) -> Uniform {
   Uniform::{ lower, upper }
 }
 
-impl IContinuous for Uniform with _sample(self : Uniform) -> Double {
+pub impl IContinuous for Uniform with _sample(self : Uniform) -> Double {
   rand.val.double() * (self.upper - self.lower) + self.lower
 }
 
-pub fn Uniform::sample(self : Uniform, shape : FixedArray[Int]) -> Tensor {
+pub fn Uniform::sample(
+  self : Uniform,
+  shape : FixedArray[Int]
+) -> @tensor.Tensor {
   Continuous::sample(self, shape)
 }
 
@@ -73,11 +76,11 @@ fn Normal::_sample(self : Normal) -> Double {
 }
 
 pub struct Categorical {
-  logits : Tensor
-  probs : Tensor
+  logits : @tensor.Tensor
+  probs : @tensor.Tensor
 } derive(Show)
 
-pub fn Categorical::new(probs : Tensor) -> Categorical {
+pub fn Categorical::new(probs : @tensor.Tensor) -> Categorical {
   let logits = probs.log()
   Categorical::{ logits, probs }
 }
@@ -96,6 +99,15 @@ pub fn Categorical::sample(self : Categorical) -> Int {
   rand.val.int(limit=self.probs.length())
 }
 
-pub fn Categorical::log_prob(self : Categorical, sample : Int) -> Tensor {
+pub fn Categorical::log_prob(
+  self : Categorical,
+  sample : Int
+) -> @tensor.Tensor {
   self.logits[sample].to_tensor()
+}
+
+let rand : Ref[@random.Rand] = @ref.new(@random.Rand::new())
+
+pub fn seed(seed : Bytes) -> Unit {
+  rand.val = @random.Rand::new(~seed)
 }
