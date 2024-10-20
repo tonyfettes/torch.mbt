@@ -17,7 +17,8 @@ pub fn Linear::new(
   let weight_distribution = match weight_distribution {
     None => {
       let in_features_sqrt_inv = 1.0 / in_features_sqrt
-      @distributions.Uniform::new(-in_features_sqrt_inv, in_features_sqrt_inv) as @distributions.Continuous
+      @distributions.Uniform::new(-in_features_sqrt_inv, in_features_sqrt_inv)
+      as @distributions.Continuous
     }
     Some(distrib) => distrib
   }

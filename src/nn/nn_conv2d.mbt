@@ -65,9 +65,14 @@ pub fn Conv2d::forward(self : Conv2d, input : @tensor.Tensor) -> @tensor.Tensor 
       for ic = 0; ic < in_channels; ic = ic + 1 {
         let input = input[n][ic].to_tensor()
         let weight = self.weight[oc][ic]
-        correlations[ic] = @tensor.correlate2d(input, weight, padding=self.padding.0)
+        correlations[ic] = @tensor.correlate2d(
+          input,
+          weight,
+          padding=self.padding.0,
+        )
       }
-      channels[oc] = @tensor.Tensor::stack(correlations).sum(dim=0) + self.bias[oc]
+      channels[oc] = @tensor.Tensor::stack(correlations).sum(dim=0) +
+        self.bias[oc]
     }
     batch[n] = @tensor.Tensor::stack(channels)
   }

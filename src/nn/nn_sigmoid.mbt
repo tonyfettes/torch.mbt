@@ -4,7 +4,10 @@ pub fn Sigmoid::new() -> Sigmoid {
   Sigmoid::{  }
 }
 
-pub fn Sigmoid::forward(_self : Sigmoid, input : @tensor.Tensor) -> @tensor.Tensor {
+pub fn Sigmoid::forward(
+  _self : Sigmoid,
+  input : @tensor.Tensor
+) -> @tensor.Tensor {
   input.sigmoid()
 }
 

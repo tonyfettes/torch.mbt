@@ -11,15 +11,13 @@ pub fn Tensor::shape(self : Tensor) -> FixedArray[Int] {
   self.shape
 }
 
-pub let empty : Tensor = {
-  Tensor::{
-    value: [],
-    shape: [],
-    block: [],
-    graph: Graph::Val,
-    ref: 0,
-    grad: [],
-  }
+pub let empty : Tensor = Tensor::{
+  value: [],
+  shape: [],
+  block: [],
+  graph: Graph::Val,
+  ref: 0,
+  grad: [],
 }
 
 pub fn Tensor::to_json(self : Tensor) -> Json {

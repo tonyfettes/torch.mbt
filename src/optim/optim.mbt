@@ -3,7 +3,10 @@ pub struct SGD {
   learning_rate : Double
 }
 
-pub fn SGD::new(parameters : Iter[@tensor.Tensor], ~learning_rate : Double) -> SGD {
+pub fn SGD::new(
+  parameters : Iter[@tensor.Tensor],
+  ~learning_rate : Double
+) -> SGD {
   let vars = []
   for parameter in parameters {
     parameter.graph = @tensor.Var

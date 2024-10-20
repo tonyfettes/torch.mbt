@@ -31,7 +31,10 @@ pub fn CrossEntropyLoss::forward(
     )
   }
   let dimension = input_shape.length()
-  fn compute1d(input : @tensor.Tensor, target : @tensor.Tensor) -> @tensor.Tensor {
+  fn compute1d(
+    input : @tensor.Tensor,
+    target : @tensor.Tensor
+  ) -> @tensor.Tensor {
     let max = input.max()
     let sub_max = input - max
     let log_soft_max = sub_max - sub_max.exp().sum().log()

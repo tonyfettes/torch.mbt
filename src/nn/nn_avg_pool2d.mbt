@@ -15,7 +15,10 @@ pub fn AvgPool2d::new[KernelSize : @shape.Shape2d](
   AvgPool2d::{ kernel_size, stride }
 }
 
-pub fn AvgPool2d::forward(self : AvgPool2d, input : @tensor.Tensor) -> @tensor.Tensor {
+pub fn AvgPool2d::forward(
+  self : AvgPool2d,
+  input : @tensor.Tensor
+) -> @tensor.Tensor {
   @tensor.avg_pool2d(input, kernel_size=self.kernel_size, stride=self.stride)
 }
 
