@@ -76,9 +76,9 @@ pub fn Linear::output(self : Linear, logger : Logger) -> Unit {
   logger.write_string(")")
 }
 
-pub impl ToPyTorchSource for Linear with transpile(
+pub impl @transpile.ToPyTorchSource for Linear with transpile(
   self : Linear,
-  transpiler : PyTorchTranspiler
+  transpiler : @transpile.PyTorchTranspiler
 ) -> String {
   let variable = transpiler.allocate()
   transpiler.push_model(

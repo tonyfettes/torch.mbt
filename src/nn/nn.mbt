@@ -1,4 +1,4 @@
-pub trait Module: Show + ToPyTorchSource {
+pub trait Module: Show + @transpile.ToPyTorchSource {
   forward(Self, @tensor.Tensor) -> @tensor.Tensor
   parameters(Self) -> Iter[@tensor.Tensor]
 }
@@ -11,7 +11,10 @@ pub fn Sequential::new(modules : Array[Module]) -> Sequential {
   Sequential::{ modules, }
 }
 
-pub fn Sequential::forward(self : Sequential, input : @tensor.Tensor) -> @tensor.Tensor {
+pub fn Sequential::forward(
+  self : Sequential,
+  input : @tensor.Tensor
+) -> @tensor.Tensor {
   loop input, self.modules[:] {
     input, [module, .. as modules] => continue module.forward(input), modules
     input, [] => input
@@ -35,13 +38,15 @@ pub fn Sequential::to_string(self : Sequential) -> String {
   logger.to_string()
 }
 
-pub impl ToPyTorchSource for Sequential with transpile(
+pub impl @transpile.ToPyTorchSource for Sequential with transpile(
   self : Sequential,
-  transpiler : PyTorchTranspiler
+  transpiler : @transpile.PyTorchTranspiler
 ) -> String {
   let module_variables = []
   for module in self.modules {
-    module_variables.push(ToPyTorchSource::transpile(module, transpiler))
+    module_variables.push(
+      @transpile.ToPyTorchSource::transpile(module, transpiler),
+    )
   }
   let variable = transpiler.allocate()
   transpiler.push_model("\{variable} = torch.nn.Sequential(")
@@ -72,9 +77,9 @@ pub fn ReLU::parameters(_self : ReLU) -> Iter[@tensor.Tensor] {
   Iter::empty()
 }
 
-pub impl ToPyTorchSource for ReLU with transpile(
+pub impl @transpile.ToPyTorchSource for ReLU with transpile(
   _self : ReLU,
-  transpiler : PyTorchTranspiler
+  transpiler : @transpile.PyTorchTranspiler
 ) -> String {
   let variable = transpiler.allocate()
   transpiler.push_model("\{variable} = torch.nn.ReLU()")
@@ -93,7 +98,10 @@ pub fn Softmax::output(_self : Softmax, logger : Logger) -> Unit {
   logger.write_string("Softmax()")
 }
 
-pub fn Softmax::forward(_self : Softmax, input : @tensor.Tensor) -> @tensor.Tensor {
+pub fn Softmax::forward(
+  _self : Softmax,
+  input : @tensor.Tensor
+) -> @tensor.Tensor {
   let exp = input.exp()
   let sum = exp.sum()
   exp / sum
@@ -103,9 +111,9 @@ pub fn Softmax::parameters(_self : Softmax) -> Iter[@tensor.Tensor] {
   Iter::empty()
 }
 
-pub impl ToPyTorchSource for Softmax with transpile(
+pub impl @transpile.ToPyTorchSource for Softmax with transpile(
   _self : Softmax,
-  transpiler : PyTorchTranspiler
+  transpiler : @transpile.PyTorchTranspiler
 ) -> String {
   let variable = transpiler.allocate()
   transpiler.push_model("\{variable} = torch.nn.Softmax(dim=-1)")
@@ -206,7 +214,10 @@ pub fn Flatten::new(~start : Int = 1, ~end? : Int) -> Flatten {
   Flatten::{ start, end }
 }
 
-pub fn Flatten::forward(self : Flatten, input : @tensor.Tensor) -> @tensor.Tensor {
+pub fn Flatten::forward(
+  self : Flatten,
+  input : @tensor.Tensor
+) -> @tensor.Tensor {
   input.flatten(start=self.start, end?=self.end)
 }
 
@@ -214,15 +225,28 @@ pub fn Flatten::parameters(_self : Flatten) -> Iter[@tensor.Tensor] {
   Iter::empty()
 }
 
-pub impl ToPyTorchSource for Flatten with transpile(
+pub impl @transpile.ToPyTorchSource for Flatten with transpile(
   _self : Flatten,
-  transpiler : PyTorchTranspiler
+  transpiler : @transpile.PyTorchTranspiler
 ) -> String {
   let variable = transpiler.allocate()
   transpiler.push_model("\{variable} = torch.nn.Flatten()")
   variable
 }
 
-fn forward_[Module : Module](tensor : @tensor.Tensor, module : Module) -> @tensor.Tensor {
+fn forward_[Module : Module](
+  tensor : @tensor.Tensor,
+  module : Module
+) -> @tensor.Tensor {
   module.forward(tensor)
 }
+
+// pub fn transpile[Module : Module](
+//   module : Module,
+//   export : String
+// ) -> String {
+//   let transpiler = @transpile.PyTorchTranspiler::new()
+//   let variable = @transpile.ToPyTorchSource::transpile(module, transpiler)
+//   transpiler.export(variable, export)
+//   transpiler.to_string()
+// }

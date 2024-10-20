@@ -10,7 +10,7 @@ test (it : @test.T) {
       @nn.Softmax::new(),
     ],
   )
-  it.write(@nn.transpile(model, "model"))
+  it.write(@transpile.transpile(model, "model"))
   it.snapshot!(filename="ToPyTorchSource/Linear.py")
 }
 
@@ -32,7 +32,7 @@ test (it : @test.T) {
       @nn.Linear::new(84, 10),
     ],
   )
-  it.write(@nn.transpile(model, "model"))
+  it.write(@transpile.transpile(model, "model"))
   it.snapshot!(filename="ToPyTorchSource/MNIST/Sequential.py")
 }
 
@@ -52,6 +52,6 @@ test (it : @test.T) {
     @nn.Sigmoid::new(),
     @nn.Linear::new(84, 10),
   )
-  it.write(@nn.transpile(model, "model"))
+  it.write(@transpile.transpile(model, "model"))
   it.snapshot!(filename="ToPyTorchSource/MNIST/Tuple.py")
 }

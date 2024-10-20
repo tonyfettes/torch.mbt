@@ -3,10 +3,10 @@ let type_names = [
   "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
 ]
 
-fn build_type_parameters(length : Int) -> String {
+fn build_type_parameters(length : Int, ~constraint : String = "Module") -> String {
   let type_parameters = []
   for i in 0..<length {
-    type_parameters.push("\{type_names[i]} : Module")
+    type_parameters.push("\{type_names[i]} : \{constraint}")
   }
   String::concat(type_parameters, separator=", ")
 }
@@ -57,7 +57,7 @@ fn build_parameters(length : Int) -> String {
 }
 
 fn build_pytorch_transpile(length : Int) -> String {
-  let type_parameters = build_type_parameters(length)
+  let type_parameters = build_type_parameters(length, constraint="ToPyTorchSource")
   let tuple_type = build_tuple_type(length)
   let push_children = []
   for i in 0..<length {
@@ -89,8 +89,13 @@ fn main {
   for i in 2..=16 {
     functions.push(build_forward(i))
     functions.push(build_parameters(i))
-    functions.push(build_pytorch_transpile(i))
   }
   let content = String::concat(functions, separator="\n\n")
   @fs.write_string_to_file(path="../src/nn/nn_tuple.mbt", ~content)
+  let functions = []
+  for i in 2..=16 {
+    functions.push(build_pytorch_transpile(i))
+  }
+  let content = String::concat(functions, separator="\n\n")
+  @fs.write_string_to_file(path="../src/nn/internal/transpile/tuple.mbt", ~content)
 }

@@ -1,4 +1,4 @@
-struct PyTorchTranspiler {
+pub struct PyTorchTranspiler {
   mut ident : Int
   mut level : Int
   model : Array[(Int, String)]
@@ -10,13 +10,13 @@ pub fn PyTorchTranspiler::new() -> PyTorchTranspiler {
   PyTorchTranspiler::{ ident: 0, level: 0, model: [], after: [], exports: [] }
 }
 
-fn PyTorchTranspiler::allocate(self : PyTorchTranspiler) -> String {
+pub fn PyTorchTranspiler::allocate(self : PyTorchTranspiler) -> String {
   let ident = self.ident
   self.ident = ident + 1
   "_layer\{ident}"
 }
 
-fn PyTorchTranspiler::push_model(
+pub fn PyTorchTranspiler::push_model(
   self : PyTorchTranspiler,
   model : String
 ) -> Unit {
@@ -24,19 +24,12 @@ fn PyTorchTranspiler::push_model(
   self.model.push((ident, model))
 }
 
-fn PyTorchTranspiler::push_after(
+pub fn PyTorchTranspiler::push_after(
   self : PyTorchTranspiler,
   after : String
 ) -> Unit {
   let ident = self.level
   self.after.push((ident, after))
-}
-
-pub fn PyTorchTranspiler::module[Module : Module](
-  self : PyTorchTranspiler,
-  module : Module
-) -> String {
-  ToPyTorchSource::transpile(module, self)
 }
 
 pub fn PyTorchTranspiler::export(
@@ -85,12 +78,12 @@ pub trait ToPyTorchSource {
   transpile(Self, PyTorchTranspiler) -> String
 }
 
-pub fn transpile[Module : Module](
+pub fn transpile[Module : ToPyTorchSource](
   module : Module,
   export : String
 ) -> String {
   let transpiler = PyTorchTranspiler::new()
-  let variable = transpiler.module(module)
+  let variable = ToPyTorchSource::transpile(module, transpiler)
   transpiler.export(variable, export)
   transpiler.to_string()
 }

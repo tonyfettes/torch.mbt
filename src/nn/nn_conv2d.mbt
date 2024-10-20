@@ -78,9 +78,9 @@ pub fn Conv2d::parameters(self : Conv2d) -> Iter[@tensor.Tensor] {
   self.weight.iter().flat_map(fn { channel => channel.iter() })
 }
 
-pub impl ToPyTorchSource for Conv2d with transpile(
+pub impl @transpile.ToPyTorchSource for Conv2d with transpile(
   self : Conv2d,
-  transpiler : PyTorchTranspiler
+  transpiler : @transpile.PyTorchTranspiler
 ) -> String {
   let variable = transpiler.allocate()
   let kernel_size = self.weight[0][0].shape

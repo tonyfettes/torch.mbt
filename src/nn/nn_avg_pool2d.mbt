@@ -23,9 +23,9 @@ pub fn AvgPool2d::parameters(_self : AvgPool2d) -> Iter[@tensor.Tensor] {
   Iter::empty()
 }
 
-pub impl ToPyTorchSource for AvgPool2d with transpile(
+pub impl @transpile.ToPyTorchSource for AvgPool2d with transpile(
   self : AvgPool2d,
-  transpiler : PyTorchTranspiler
+  transpiler : @transpile.PyTorchTranspiler
 ) -> String {
   let variable = transpiler.allocate()
   transpiler.push_model(
