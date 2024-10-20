@@ -46,6 +46,7 @@ PyTorch-like tensor operations implemented in MoonBit.
 - [ ] PyTorch module
   - [x] `Sigmoid`
   - [x] `AvgPool2d`
+  - [ ] [`torch.nn.LogSoftmax`](https://pytorch.org/docs/stable/generated/torch.nn.LogSoftmax.html)
 - [ ] PyTorch functional module
 - [ ] Module/model saving and loading
   - [x] Static JSON format.
@@ -57,9 +58,10 @@ PyTorch-like tensor operations implemented in MoonBit.
   - [ ] Eliminate `Cat(Get(...))`
 - [ ] Loss
   - [ ] KL-divergence
+  - [ ] [`torch.nn.NLLLoss`](https://pytorch.org/docs/stable/generated/torch.nn.NLLLoss.html)
 - [ ] Distributions re-parametrization trick
 - [ ] `Adam*` optimizers
 - [ ] WASM-SIMD `v128`
   - [x] `add`
-  - [ ] `mul`
-  - [ ] `matmul`
+  - [x] `mul`
+  - [ ] ~~`matmul`~~ [General Matrix Multiply](https://en.wikipedia.org/wiki/Basic_Linear_Algebra_Subprograms#Level_3)
