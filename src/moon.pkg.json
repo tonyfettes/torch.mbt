@@ -1,4 +1,11 @@
 {
+  "pre-build": [
+    {
+      "input": "../bin/generate_tuple/main.mbt",
+      "output": "nn_tuple.mbt",
+      "command": "cd bin && moon run generate_tuple"
+    }
+  ],
   "targets": {
     "tensor_add.wasm.mbt": ["wasm"],
     "tensor_add.mbt": ["not", "wasm"],
