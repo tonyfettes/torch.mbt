@@ -81,11 +81,19 @@ pub impl ToPyTorchSource for Linear with transpile(
   transpiler : PyTorchTranspiler
 ) -> String {
   let variable = transpiler.allocate()
+  let weight_shape = self.weight.shape.copy()
+  let dimension = weight_shape.length()
+  let width = weight_shape[dimension - 1]
+  let height = weight_shape[dimension - 2]
+  weight_shape[dimension - 1] = height
+  weight_shape[dimension - 2] = width
+  let weight_shape = Array::makei(dimension, fn(i) { weight_shape[i].to_string() })
+  let weight_shape = String::concat(weight_shape, separator=", ")
   transpiler.push_model(
     "\{variable} = torch.nn.Linear(\{self.weight.shape[0]}, \{self.weight.shape[1]})",
   )
   transpiler.push_after(
-    "\{variable}.weight = torch.nn.Parameter(torch.tensor(\{self.weight.to_json().stringify()}))",
+    "\{variable}.weight = torch.nn.Parameter(torch.tensor(\{self.weight.to_json().stringify()}).reshape(\{weight_shape}))",
   )
   transpiler.push_after(
     "\{variable}.bias = torch.nn.Parameter(torch.tensor(\{self.bias.to_json().stringify()}))",

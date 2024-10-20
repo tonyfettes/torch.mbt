@@ -86,7 +86,7 @@ pub impl ToPyTorchSource for Conv2d with transpile(
   let kernel_size = self.weight[0][0].shape
   let kernel_size = (kernel_size[0], kernel_size[1])
   transpiler.push_model(
-    "\{variable} = torch.nn.Conv2d(\{self.weight.length()}, \{self.weight[0].length()}, kernel_size=\{kernel_size}, padding=\{self.padding})",
+    "\{variable} = torch.nn.Conv2d(\{self.weight[1].length()}, \{self.weight.length()}, kernel_size=\{kernel_size}, padding=\{self.padding})",
   )
   transpiler.push_after(
     "\{variable}.weight = torch.nn.Parameter(torch.tensor(\{self.weight.to_json().stringify()}))",
