@@ -5,7 +5,7 @@ struct PyTorchTranspiler {
   after : Array[(Int, String)]
 }
 
-fn PyTorchTranspiler::new() -> PyTorchTranspiler {
+pub fn PyTorchTranspiler::new() -> PyTorchTranspiler {
   PyTorchTranspiler::{ ident: 0, level: 0, model: [], after: [] }
 }
 
@@ -31,22 +31,19 @@ fn PyTorchTranspiler::push_after(
   self.after.push((ident, after))
 }
 
-pub trait ToPyTorchSource {
-  transpile(Self, PyTorchTranspiler) -> String
-  to_string(Self) -> String
+pub fn PyTorchTranspiler::transpile[Module: Module](self : PyTorchTranspiler, module : Module) -> String {
+  module.transpile(self)
 }
 
-impl ToPyTorchSource with to_string(self : Self) -> String {
-  let transpiler = PyTorchTranspiler::new()
-  ToPyTorchSource::transpile(self, transpiler) |> ignore
+pub fn PyTorchTranspiler::to_string(self : PyTorchTranspiler) -> String {
   let model = []
-  for line in transpiler.model {
+  for line in self.model {
     let (level, line) = line
     model.push(String::make(level * 4, ' ') + line)
   }
   let model = String::concat(model, separator="\n")
   let after = []
-  for line in transpiler.after {
+  for line in self.after {
     let (level, line) = line
     after.push(String::make(level * 4, ' ') + line)
   }
@@ -57,4 +54,8 @@ impl ToPyTorchSource with to_string(self : Self) -> String {
   $|
   $|with torch.no_grad():
   $|    \{after}
+}
+
+pub trait ToPyTorchSource {
+  transpile(Self, PyTorchTranspiler) -> String
 }
