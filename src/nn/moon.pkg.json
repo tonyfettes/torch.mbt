@@ -1,9 +1,9 @@
 {
   "pre-build": [
     {
-      "input": "../../bin/generate_tuple/main.mbt",
+      "input": "../../bin/generate/nn/tuple/main.mbt",
       "output": "nn_tuple.mbt",
-      "command": "cd bin && moon run generate_tuple && moon fmt"
+      "command": "cd bin && moon run generate/nn/tuple && moon fmt"
     }
   ],
   "targets": {

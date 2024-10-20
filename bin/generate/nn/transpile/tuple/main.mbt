@@ -1,9 +1,9 @@
 fn build_pytorch_transpile(length : Int) -> String {
-  let type_parameters = @generate_tuple.build_type_parameters(
+  let type_parameters = @generate/nn/tuple.build_type_parameters(
     length,
     constraint="ToPyTorchSource",
   )
-  let tuple_type = @generate_tuple.build_tuple_type(length)
+  let tuple_type = @generate/nn/tuple.build_tuple_type(length)
   let push_children = []
   for i in 0..<length {
     push_children.push(

@@ -1,9 +1,9 @@
 {
   "pre-build": [
     {
-      "input": "../../../../bin/generate_transpile_tuple/main.mbt",
+      "input": "../../../../bin/generate/nn/transpile/tuple/main.mbt",
       "output": "nn_tuple.mbt",
-      "command": "cd bin && moon run generate_transpile_tuple && moon fmt"
+      "command": "cd bin && moon run generate/nn/transpile/tuple && moon fmt"
     }
   ],
   "test-import": [
