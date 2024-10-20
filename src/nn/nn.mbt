@@ -7,7 +7,9 @@ struct Sequential[Module] {
   modules : Array[Module]
 }
 
-pub fn Sequential::new[Module: Module](modules : Array[Module]) -> Sequential[Module] {
+pub fn Sequential::new[Module : Module](
+  modules : Array[Module]
+) -> Sequential[Module] {
   Sequential::{ modules, }
 }
 
