@@ -1,6 +1,5 @@
 {
   "name": "tonyfettes/torch/mnist",
-  "version": "0.2.1",
   "deps": {
     "tonyfettes/torch": {
       "path": "../.."
@@ -8,9 +7,5 @@
     "moonbitlang/x": "0.4.9"
   },
   "readme": "README.md",
-  "repository": "",
-  "license": "Apache-2.0",
-  "keywords": [],
-  "description": "",
   "source": "src"
 }

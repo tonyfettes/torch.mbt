@@ -8,5 +8,6 @@
     "tonyfettes/torch": {
       "path": "../../.."
     }
-  }
+  },
+  "readme": "README.md"
 }
