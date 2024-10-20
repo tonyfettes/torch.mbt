@@ -510,7 +510,7 @@ test "MNIST" {
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     ],
   ).reshape([1, 1, 28, 28])
-  let model = @nn.Sequential::new(
+  let model : @nn.Sequential[@nn.Module] = @nn.Sequential::new(
     [
       @nn.Conv2d::new(1, 6, kernel_size=5, padding=2),
       @nn.Sigmoid::new(),

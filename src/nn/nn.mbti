@@ -99,11 +99,11 @@ pub enum Reduction {
 
 type Sequential
 impl Sequential {
-  forward(Self, @tensor.Tensor) -> @tensor.Tensor
-  new(Array[Module]) -> Self
-  output(Self, Logger) -> Unit
-  parameters(Self) -> Iter[@tensor.Tensor]
-  to_string(Self) -> String
+  forward(Self[Module], @tensor.Tensor) -> @tensor.Tensor
+  new[Module : Module + Show](Array[Module]) -> Self[Module]
+  output(Self[Module], Logger) -> Unit
+  parameters(Self[Module]) -> Iter[@tensor.Tensor]
+  to_string(Self[Module]) -> String
 }
 
 type Sigmoid
@@ -134,7 +134,7 @@ pub trait Loss {
   forward(Self, @tensor.Tensor, @tensor.Tensor) -> @tensor.TensorValue
 }
 
-pub trait Module : Show + @transpile.ToPyTorchSource {
+pub trait Module : Show {
   forward(Self, @tensor.Tensor) -> @tensor.Tensor
   parameters(Self) -> Iter[@tensor.Tensor]
 }

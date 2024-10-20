@@ -41,7 +41,9 @@ test "Linear with ReLU" {
       linear.bias[1] = 6.0
     },
   )
-  let layers = @nn.Sequential::new([linear, @nn.ReLU::new()])
+  let layers : @nn.Sequential[@nn.Module] = @nn.Sequential::new(
+    [linear, @nn.ReLU::new()],
+  )
   let optimizer = @optim.SGD::new(linear.parameters(), learning_rate=1)
   let input = @tensor.tensor([2.0, 2.0])
   let output = layers.forward(input)
@@ -75,7 +77,9 @@ test "Linear with Softmax" {
       linear.bias[1] = 2.0
     },
   )
-  let layers = @nn.Sequential::new([linear, @nn.Softmax::new()])
+  let layers : @nn.Sequential[@nn.Module] = @nn.Sequential::new(
+    [linear, @nn.Softmax::new()],
+  )
   let optimizer = @optim.SGD::new(linear.parameters(), learning_rate=1)
   let input = @tensor.tensor([2.0, 2.0])
   let output = layers.forward(input)

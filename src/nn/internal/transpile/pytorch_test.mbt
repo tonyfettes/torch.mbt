@@ -1,6 +1,8 @@
+trait Module: @nn.Module + @transpile.ToPyTorchSource {}
+
 test (it : @test.T) {
   @distributions.seed(b"12345678223456783234567842345678")
-  let model = @nn.Sequential::new(
+  let model : @nn.Sequential[Module] = @nn.Sequential::new(
     [
       @nn.Linear::new(1, 2),
       @nn.ReLU::new(),
@@ -16,7 +18,7 @@ test (it : @test.T) {
 
 test (it : @test.T) {
   @distributions.seed(b"12345678223456783234567842345678")
-  let model = @nn.Sequential::new(
+  let model : @nn.Sequential[Module] = @nn.Sequential::new(
     [
       @nn.Conv2d::new(1, 6, kernel_size=5, padding=2),
       @nn.Sigmoid::new(),

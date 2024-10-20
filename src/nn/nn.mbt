@@ -1,18 +1,18 @@
-pub trait Module: Show + @transpile.ToPyTorchSource {
+pub trait Module: Show {
   forward(Self, @tensor.Tensor) -> @tensor.Tensor
   parameters(Self) -> Iter[@tensor.Tensor]
 }
 
-struct Sequential {
+struct Sequential[Module] {
   modules : Array[Module]
 }
 
-pub fn Sequential::new(modules : Array[Module]) -> Sequential {
+pub fn Sequential::new[Module: Module](modules : Array[Module]) -> Sequential[Module] {
   Sequential::{ modules, }
 }
 
 pub fn Sequential::forward(
-  self : Sequential,
+  self : Sequential[Module],
   input : @tensor.Tensor
 ) -> @tensor.Tensor {
   loop input, self.modules[:] {
@@ -21,25 +21,29 @@ pub fn Sequential::forward(
   }
 }
 
-pub fn Sequential::parameters(self : Sequential) -> Iter[@tensor.Tensor] {
+pub fn Sequential::parameters(
+  self : Sequential[Module]
+) -> Iter[@tensor.Tensor] {
   self.modules.iter().flat_map(fn { module => module.parameters() })
 }
 
-pub fn Sequential::output(self : Sequential, logger : Logger) -> Unit {
+pub fn Sequential::output(self : Sequential[Module], logger : Logger) -> Unit {
   for module in self.modules {
     Show::output(module, logger)
     logger.write_string(",\n")
   }
 }
 
-pub fn Sequential::to_string(self : Sequential) -> String {
+pub fn Sequential::to_string(self : Sequential[Module]) -> String {
   let logger = StringBuilder::new()
   self.output(logger)
   logger.to_string()
 }
 
-pub impl @transpile.ToPyTorchSource for Sequential with transpile(
-  self : Sequential,
+pub impl[Module : Module + @transpile.ToPyTorchSource] @transpile.ToPyTorchSource for Sequential[
+  Module,
+] with transpile(
+  self : Sequential[Module],
   transpiler : @transpile.PyTorchTranspiler
 ) -> String {
   let module_variables = []
@@ -138,7 +142,7 @@ test "Softmax" {
 
 test "MLP" {
   @distributions.seed(b"12345678223456783234567842345678")
-  let layers = Sequential::new(
+  let layers : Sequential[Module] = Sequential::new(
     [
       Linear::new(4, 8),
       ReLU::new(),
