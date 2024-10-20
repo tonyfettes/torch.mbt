@@ -1,4 +1,11 @@
 {
+  "pre-build": [
+    {
+      "input": "../../../../bin/generate_transpile_tuple/main.mbt",
+      "output": "nn_tuple.mbt",
+      "command": "cd bin && moon run generate_transpile_tuple && moon fmt"
+    }
+  ],
   "test-import": [
     "tonyfettes/torch/shape",
     "tonyfettes/torch/distributions",
