@@ -3,7 +3,7 @@
     {
       "input": "../../bin/generate_tuple/main.mbt",
       "output": "nn_tuple.mbt",
-      "command": "cd bin && moon run generate_tuple"
+      "command": "cd bin && moon run generate_tuple && moon fmt"
     }
   ],
   "targets": {
