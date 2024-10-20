@@ -1,4 +1,4 @@
-pub fn infer[Model : @torch.Module](
+pub fn infer[Model : @torch/nn.Module](
   model : Model,
   input : FixedArray[Int]
 ) -> FixedArray[Double] {

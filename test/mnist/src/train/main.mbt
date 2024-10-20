@@ -26,7 +26,7 @@ fn Dataset::load(path : String) -> Dataset! {
   Dataset::{ train, eval }
 }
 
-fn eval(model : @torch.Module, dataset : Array[Data]) -> Double {
+fn eval(model : @torch/nn.Module, dataset : Array[Data]) -> Double {
   let mut accuracy = 0.0
   for datum in dataset {
     let input = @torch.tensor(datum.image.map(fn(x) { x.to_double() / 255.0 })).reshape(
@@ -35,7 +35,7 @@ fn eval(model : @torch.Module, dataset : Array[Data]) -> Double {
     let target = Array::make(10, 0.0)
     target[datum.label] = 1.0
     let target = @torch.tensor(target)
-    let softmax = @torch.Softmax::new()
+    let softmax = @torch/nn.Softmax::new()
     let output = softmax.forward(model.forward(@torch.stack([[input]])))
     let value = (output * target).sum().to_double()
     accuracy += value
@@ -44,9 +44,9 @@ fn eval(model : @torch.Module, dataset : Array[Data]) -> Double {
   accuracy
 }
 
-fn train(model : @mnist.Model, dataset : Array[Data]) -> Unit {
-  let criterion = @torch.CrossEntropyLoss::new()
-  let optimizer = @torch.SGD::new(model.parameters(), learning_rate=0.01)
+fn train[Module : @torch/nn.Module](model : Module, dataset : Array[Data]) -> Unit {
+  let criterion = @torch/nn.CrossEntropyLoss::new()
+  let optimizer = @torch/optim.SGD::new(model.parameters(), learning_rate=0.01)
   let mut step = 0
   let batch = 10
   for epoch = 0; epoch < 3; epoch = epoch + 1 {

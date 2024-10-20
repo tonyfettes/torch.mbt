@@ -3,11 +3,11 @@ pub struct Data {
   label : Int
 }
 
-let criterion : @torch.CrossEntropyLoss = @torch.CrossEntropyLoss::new()
+let criterion : @torch/nn.CrossEntropyLoss = @torch/nn.CrossEntropyLoss::new()
 
-pub fn train[Model : @torch.Module](
+pub fn train[Model : @torch/nn.Module](
   model : Model,
-  optimizer : @torch.SGD,
+  optimizer : @torch/optim.SGD,
   batch : FixedArray[Data]
 ) -> Double {
   let input = batch.map(
@@ -17,7 +17,7 @@ pub fn train[Model : @torch.Module](
       )
     },
   )
-  let input = @torch.stack(input)
+  let input = @torch/tensor.stack(input)
   let target = batch.map(
       fn(data) {
         let target = FixedArray::make(10, 0.0)

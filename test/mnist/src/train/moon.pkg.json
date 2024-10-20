@@ -1,8 +1,20 @@
 {
   "is-main": true,
   "import": [
-    "tonyfettes/torch",
+    {
+      "path": "tonyfettes/torch/nn",
+      "alias": "torch/nn"
+    },
+    {
+      "path": "tonyfettes/torch/tensor",
+      "alias": "torch/tensor"
+    },
+    {
+      "path": "tonyfettes/torch/optim",
+      "alias": "torch/optim"
+    },
     "tonyfettes/torch/mnist",
-    "moonbitlang/x/fs"
+    "moonbitlang/x/fs",
+    "tonyfettes/torch"
   ]
 }
