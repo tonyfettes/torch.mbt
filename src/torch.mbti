@@ -1,10 +1,16 @@
 package tonyfettes/torch
 
+alias @tonyfettes/torch/tensor as @tensor
+
 // Values
+fn stack[X : @tensor.TensorLike](FixedArray[X]) -> @tensor.Tensor
+
+fn tensor[X : @tensor.TensorValue + Show](X, ~requires_grad : Bool = ..) -> @tensor.Tensor
 
 // Types and methods
 
 // Type aliases
+pub typealias Tensor = @tensor.Tensor
 
 // Traits
 

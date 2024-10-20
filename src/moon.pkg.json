@@ -1,4 +1,3 @@
 {
-  "import": ["tonyfettes/torch/tensor"],
-  "test-import": ["tonyfettes/torch/distributions", "tonyfettes/torch/nn"]
+  "import": ["tonyfettes/torch/tensor"]
 }
