@@ -9,7 +9,7 @@ test (it : @test.T) {
       @torch.Softmax::new(),
     ],
   )
-  it.write(@torch.ToPyTorchSource::to_string(model))
+  it.write(@torch.transpile(model, "model"))
   it.snapshot!(filename="ToPyTorchSource/Linear.py")
 }
 
@@ -30,7 +30,7 @@ test (it : @test.T) {
       @torch.Linear::new(84, 10),
     ],
   )
-  it.write(@torch.ToPyTorchSource::to_string(model))
+  it.write(@torch.transpile(model, "model"))
   it.snapshot!(filename="ToPyTorchSource/MNIST/Sequential.py")
 }
 
@@ -49,6 +49,6 @@ test (it : @test.T) {
     @torch.Sigmoid::new(),
     @torch.Linear::new(84, 10),
   )
-  it.write(@torch.ToPyTorchSource::to_string(model))
+  it.write(@torch.transpile(model, "model"))
   it.snapshot!(filename="ToPyTorchSource/MNIST/Tuple.py")
 }

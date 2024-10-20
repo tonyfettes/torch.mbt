@@ -3,16 +3,17 @@ struct PyTorchTranspiler {
   mut level : Int
   model : Array[(Int, String)]
   after : Array[(Int, String)]
+  exports : Array[(String, String)]
 }
 
 pub fn PyTorchTranspiler::new() -> PyTorchTranspiler {
-  PyTorchTranspiler::{ ident: 0, level: 0, model: [], after: [] }
+  PyTorchTranspiler::{ ident: 0, level: 0, model: [], after: [], exports: [] }
 }
 
 fn PyTorchTranspiler::allocate(self : PyTorchTranspiler) -> String {
   let ident = self.ident
   self.ident = ident + 1
-  "layer\{ident}"
+  "_layer\{ident}"
 }
 
 fn PyTorchTranspiler::push_model(
@@ -31,8 +32,19 @@ fn PyTorchTranspiler::push_after(
   self.after.push((ident, after))
 }
 
-pub fn PyTorchTranspiler::transpile[Module: Module](self : PyTorchTranspiler, module : Module) -> String {
-  module.transpile(self)
+pub fn PyTorchTranspiler::module[Module : Module](
+  self : PyTorchTranspiler,
+  module : Module
+) -> String {
+  ToPyTorchSource::transpile(module, self)
+}
+
+pub fn PyTorchTranspiler::export(
+  self : PyTorchTranspiler,
+  variable : String,
+  identifier : String
+) -> Unit {
+  self.exports.push((variable, identifier))
 }
 
 pub fn PyTorchTranspiler::to_string(self : PyTorchTranspiler) -> String {
@@ -48,14 +60,37 @@ pub fn PyTorchTranspiler::to_string(self : PyTorchTranspiler) -> String {
     after.push(String::make(level * 4, ' ') + line)
   }
   let after = String::concat(after, separator="\n    ")
+  let exports = []
+  let __all__ = []
+  for export in self.exports {
+    let (variable, identifier) = export
+    exports.push("\{identifier} = \{variable}")
+    __all__.push("\"\{identifier}\"")
+  }
+  let exports = String::concat(exports, separator="\n")
+  let __all__ = String::concat(__all__, separator=", ")
   $|import torch
   $|
   $|\{model}
   $|
   $|with torch.no_grad():
   $|    \{after}
+  $|
+  $|\{exports}
+  $|
+  $|__all__ = [\{__all__}]
 }
 
 pub trait ToPyTorchSource {
   transpile(Self, PyTorchTranspiler) -> String
+}
+
+pub fn transpile[Module : Module](
+  module : Module,
+  export : String
+) -> String {
+  let transpiler = PyTorchTranspiler::new()
+  let variable = transpiler.module(module)
+  transpiler.export(variable, export)
+  transpiler.to_string()
 }
