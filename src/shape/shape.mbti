@@ -1,0 +1,35 @@
+package tonyfettes/torch/shape
+
+// Values
+
+// Types and methods
+
+// Type aliases
+
+// Traits
+pub trait Shape {
+  to_fixed_array(Self) -> FixedArray[Int]
+}
+
+pub trait Shape2d {
+  to_fixed_array(Self) -> FixedArray[Int]
+  to_tuple(Self) -> (Int, Int)
+}
+
+// Extension Methods
+impl Shape for Unit
+
+impl Shape for Int
+
+impl Shape for FixedArray
+
+impl Shape for Array
+
+impl Shape2d for Unit
+
+impl Shape2d for Int
+
+impl Shape2d::to_fixed_array
+
+impl Shape2d for Tuple(2)
+

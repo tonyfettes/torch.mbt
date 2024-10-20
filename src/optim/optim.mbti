@@ -1,0 +1,23 @@
+package tonyfettes/torch/optim
+
+alias @tonyfettes/torch/tensor as @tensor
+
+// Values
+
+// Types and methods
+pub struct SGD {
+  pub parameters : Array[@tensor.Tensor]
+  pub learning_rate : Double
+}
+impl SGD {
+  new(Iter[@tensor.Tensor], ~learning_rate : Double) -> Self
+  step(Self) -> Unit
+  zero_grad(Self) -> Unit
+}
+
+// Type aliases
+
+// Traits
+
+// Extension Methods
+

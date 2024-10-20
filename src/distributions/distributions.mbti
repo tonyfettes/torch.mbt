@@ -1,0 +1,59 @@
+package tonyfettes/torch/distributions
+
+alias @tonyfettes/torch/tensor as @tensor
+
+// Values
+fn normal(~mean : Double = .., ~std : Double = ..) -> Double
+
+fn seed(Bytes) -> Unit
+
+// Types and methods
+pub struct Categorical {
+  pub logits : @tensor.Tensor
+  pub probs : @tensor.Tensor
+}
+impl Categorical {
+  log_prob(Self, Int) -> @tensor.Tensor
+  new(@tensor.Tensor) -> Self
+  sample(Self) -> Int
+  to_string(Self) -> String
+}
+
+pub struct Normal {
+  pub mean : Double
+  pub std : Double
+}
+impl Normal {
+  new(~mean : Double = .., ~std : Double = ..) -> Self
+}
+
+type Uniform
+impl Uniform {
+  new(Double, Double) -> Self
+  sample(Self, FixedArray[Int]) -> @tensor.Tensor
+}
+
+// Type aliases
+
+// Traits
+pub trait Continuous : IContinuous {
+  sample(Self, FixedArray[Int]) -> @tensor.Tensor
+}
+
+pub trait Discrete {
+  sample(Self) -> Int
+}
+
+pub trait IContinuous {
+  _sample(Self) -> Double
+}
+
+// Extension Methods
+impl Show for Categorical
+
+impl Continuous::sample
+
+impl IContinuous for Double
+
+impl IContinuous for Uniform
+

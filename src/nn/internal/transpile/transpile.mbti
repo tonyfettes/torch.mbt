@@ -1,0 +1,60 @@
+package tonyfettes/torch/nn/internal/transpile
+
+// Values
+fn transpile[Module : ToPyTorchSource](Module, String) -> String
+
+// Types and methods
+pub struct PyTorchTranspiler {
+  pub ident : Int
+  pub level : Int
+  pub model : Array[(Int, String)]
+  pub after : Array[(Int, String)]
+  pub exports : Array[(String, String)]
+}
+impl PyTorchTranspiler {
+  allocate(Self) -> String
+  export(Self, String, String) -> Unit
+  new() -> Self
+  push_after(Self, String) -> Unit
+  push_model(Self, String) -> Unit
+  to_string(Self) -> String
+}
+
+// Type aliases
+
+// Traits
+pub trait ToPyTorchSource {
+  transpile(Self, PyTorchTranspiler) -> String
+}
+
+// Extension Methods
+impl ToPyTorchSource for Tuple(2)
+
+impl ToPyTorchSource for Tuple(3)
+
+impl ToPyTorchSource for Tuple(4)
+
+impl ToPyTorchSource for Tuple(5)
+
+impl ToPyTorchSource for Tuple(6)
+
+impl ToPyTorchSource for Tuple(7)
+
+impl ToPyTorchSource for Tuple(8)
+
+impl ToPyTorchSource for Tuple(9)
+
+impl ToPyTorchSource for Tuple(10)
+
+impl ToPyTorchSource for Tuple(11)
+
+impl ToPyTorchSource for Tuple(12)
+
+impl ToPyTorchSource for Tuple(13)
+
+impl ToPyTorchSource for Tuple(14)
+
+impl ToPyTorchSource for Tuple(15)
+
+impl ToPyTorchSource for Tuple(16)
+
