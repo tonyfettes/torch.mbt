@@ -1,4 +1,5 @@
 test (it : @test.T) {
+  @torch.seed(b"12345678223456783234567842345678")
   let model = @torch.Sequential::new(
     [
       @torch.Linear::new(1, 2),
@@ -14,6 +15,7 @@ test (it : @test.T) {
 }
 
 test (it : @test.T) {
+  @torch.seed(b"12345678223456783234567842345678")
   let model = @torch.Sequential::new(
     [
       @torch.Conv2d::new(1, 6, kernel_size=5, padding=2),
@@ -35,6 +37,7 @@ test (it : @test.T) {
 }
 
 test (it : @test.T) {
+  @torch.seed(b"12345678223456783234567842345678")
   let model = (
     @torch.Conv2d::new(1, 6, kernel_size=5, padding=2),
     @torch.Sigmoid::new(),
