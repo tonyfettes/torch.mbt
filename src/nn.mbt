@@ -1,4 +1,4 @@
-pub trait Module: Show {
+pub trait Module: Show + ToPyTorchSource {
   forward(Self, Tensor) -> Tensor
   parameters(Self) -> Iter[Tensor]
 }
@@ -35,6 +35,25 @@ pub fn Sequential::to_string(self : Sequential) -> String {
   logger.to_string()
 }
 
+pub impl ToPyTorchSource for Sequential with transpile(
+  self : Sequential,
+  transpiler : PyTorchTranspiler
+) -> String {
+  let module_variables = []
+  for module in self.modules {
+    module_variables.push(ToPyTorchSource::transpile(module, transpiler))
+  }
+  let variable = transpiler.allocate()
+  transpiler.push_model("\{variable} = torch.nn.Sequential(")
+  transpiler.level = transpiler.level + 1
+  for module_variable in module_variables {
+    transpiler.push_model("\{module_variable},")
+  }
+  transpiler.level = transpiler.level - 1
+  transpiler.push_model(")")
+  variable
+}
+
 pub struct ReLU {} derive(Show, ToJson, FromJson)
 
 pub fn ReLU::new() -> ReLU {
@@ -51,6 +70,15 @@ pub fn ReLU::forward(_self : ReLU, input : Tensor) -> Tensor {
 
 pub fn ReLU::parameters(_self : ReLU) -> Iter[Tensor] {
   Iter::empty()
+}
+
+pub impl ToPyTorchSource for ReLU with transpile(
+  _self : ReLU,
+  transpiler : PyTorchTranspiler
+) -> String {
+  let variable = transpiler.allocate()
+  transpiler.push_model("\{variable} = torch.nn.ReLU()")
+  variable
 }
 
 pub struct ReLU6 {}
@@ -73,6 +101,15 @@ pub fn Softmax::forward(_self : Softmax, input : Tensor) -> Tensor {
 
 pub fn Softmax::parameters(_self : Softmax) -> Iter[Tensor] {
   Iter::empty()
+}
+
+pub impl ToPyTorchSource for Softmax with transpile(
+  _self : Softmax,
+  transpiler : PyTorchTranspiler
+) -> String {
+  let variable = transpiler.allocate()
+  transpiler.push_model("\{variable} = torch.nn.Softmax(dim=-1)")
+  variable
 }
 
 test "Softmax" {
@@ -167,4 +204,13 @@ pub fn Flatten::forward(self : Flatten, input : Tensor) -> Tensor {
 
 pub fn Flatten::parameters(_self : Flatten) -> Iter[Tensor] {
   Iter::empty()
+}
+
+pub impl ToPyTorchSource for Flatten with transpile(
+  _self : Flatten,
+  transpiler : PyTorchTranspiler
+) -> String {
+  let variable = transpiler.allocate()
+  transpiler.push_model("\{variable} = torch.nn.Flatten()")
+  variable
 }

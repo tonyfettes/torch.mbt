@@ -77,3 +77,22 @@ pub fn Conv2d::forward(self : Conv2d, input : Tensor) -> Tensor {
 pub fn Conv2d::parameters(self : Conv2d) -> Iter[Tensor] {
   self.weight.iter().flat_map(fn { channel => channel.iter() })
 }
+
+pub impl ToPyTorchSource for Conv2d with transpile(
+  self : Conv2d,
+  transpiler : PyTorchTranspiler
+) -> String {
+  let variable = transpiler.allocate()
+  let kernel_size = self.weight[0][0].shape
+  let kernel_size = (kernel_size[0], kernel_size[1])
+  transpiler.push_model(
+    "\{variable} = torch.nn.Conv2d(\{self.weight.length()}, \{self.weight[0].length()}, kernel_size=\{kernel_size}, padding=\{self.padding})",
+  )
+  transpiler.push_after(
+    "\{variable}.weight = torch.nn.Parameter(torch.tensor(\{self.weight.to_json().stringify()}))",
+  )
+  transpiler.push_after(
+    "\{variable}.bias = torch.nn.Parameter(torch.tensor(\{self.bias.to_json().stringify()}))",
+  )
+  variable
+}
