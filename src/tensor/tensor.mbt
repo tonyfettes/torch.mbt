@@ -1127,49 +1127,6 @@ test "Tensor::op_as_view" {
   )
 }
 
-pub fn Tensor::permute(self : Tensor, permutation : Array[Int]) -> Tensor {
-  if permutation.length() != self.shape.length() {
-    abort("Permutation length does not match tensor rank")
-  }
-  let shape = FixedArray::makei(
-    self.shape.length(),
-    fn(i) { self.shape[permutation[i]] },
-  )
-  let value = Array::new(capacity=self.value.length())
-  let index = Array::new(capacity=self.value.length())
-  fn build(dimension : Int, offset : Int) -> Unit {
-    if dimension == self.shape.length() {
-      value.push(self.value[offset])
-      index.push(offset)
-      return
-    }
-    for i = 0; i < self.shape[permutation[dimension]]; i = i + 1 {
-      build(dimension + 1, offset + i * self.block[permutation[dimension]])
-    }
-  }
-
-  build(0, 0)
-  Tensor::{
-    value: FixedArray::from_array(value),
-    shape,
-    block: compute_block_size(shape),
-    graph: Graph::Get(self, FixedArray::from_array(index)),
-    ref: 0,
-    grad: FixedArray::make(value.length(), 0.0),
-  }
-}
-
-test "Tensor::permute" {
-  let tensor = tensor([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]])
-  inspect!(tensor.shape, content="[2, 3]")
-  inspect!(tensor.value, content="[0, 1, 2, 3, 4, 5]")
-  inspect!(tensor, content="[[0, 1, 2], [3, 4, 5]]")
-  let permuted = tensor.permute([1, 0])
-  inspect!(permuted.shape, content="[3, 2]")
-  inspect!(permuted.value, content="[0, 3, 1, 4, 2, 5]")
-  inspect!(permuted, content="[[0, 3], [1, 4], [2, 5]]")
-}
-
 pub fn Tensor::zeros[Shape : @shape.Shape](
   shape : Shape,
   ~requires_grad : Bool = false
