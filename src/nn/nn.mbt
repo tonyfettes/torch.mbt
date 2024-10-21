@@ -94,54 +94,6 @@ pub impl @transpile.ToPyTorchSource for ReLU with transpile(
 
 pub struct ReLU6 {}
 
-pub struct Softmax {} derive(Show, ToJson, FromJson)
-
-pub fn Softmax::new() -> Softmax {
-  Softmax::{  }
-}
-
-pub fn Softmax::output(_self : Softmax, logger : Logger) -> Unit {
-  logger.write_string("Softmax()")
-}
-
-pub fn Softmax::forward(
-  _self : Softmax,
-  input : @tensor.Tensor
-) -> @tensor.Tensor {
-  let exp = input.exp()
-  let sum = exp.sum()
-  exp / sum
-}
-
-pub fn Softmax::parameters(_self : Softmax) -> Iter[@tensor.Tensor] {
-  Iter::empty()
-}
-
-pub impl @transpile.ToPyTorchSource for Softmax with transpile(
-  _self : Softmax,
-  transpiler : @transpile.PyTorchTranspiler
-) -> String {
-  let variable = transpiler.allocate()
-  transpiler.push_model("\{variable} = torch.nn.Softmax(dim=-1)")
-  variable
-}
-
-test "Softmax" {
-  let input = @tensor.tensor([1.0, 2.0, 3.0])
-  let softmax = Softmax::new()
-  let output = softmax.forward(input)
-  inspect!(
-    output,
-    content="[0.09003057317038046, 0.24472847105479767, 0.6652409557748219]",
-  )
-  let target = @tensor.tensor([1.0, 0.0, 0.0])
-  let mut loss = @tensor.tensor(0.0)
-  for i = 0; i < output.length(); i = i + 1 {
-    loss = loss + target[i] * output[i]
-  }
-  inspect!(loss, content="0.09003057317038046")
-}
-
 test "MLP" {
   @distributions.seed(b"12345678223456783234567842345678")
   let layers : Sequential[Module] = Sequential::new(
