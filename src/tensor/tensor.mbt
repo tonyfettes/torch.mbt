@@ -1159,7 +1159,9 @@ pub fn Tensor::backward(self : Tensor) -> Unit {
     self.grad[i] += 1.0
   }
   self.propagate()
-  self.check()
+  if @debug.debug {
+    self.check()
+  }
 }
 
 test "Tensor::backward - Add" {

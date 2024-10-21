@@ -6,7 +6,8 @@
     "tensor_mul.wasm.mbt": ["wasm"]
   },
   "import": [
-    "tonyfettes/torch/shape"
+    "tonyfettes/torch/shape",
+    "tonyfettes/torch/internal/debug"
   ],
   "test-import": [
     "tonyfettes/torch/distributions"
