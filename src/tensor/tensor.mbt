@@ -613,7 +613,6 @@ pub fn with_no_grad_error[X](f : () -> X!) -> X! {
   r
 }
 
-
 fn compute_block_size(shape : FixedArray[Int]) -> FixedArray[Int] {
   let mut dimension = shape.length()
   let block = FixedArray::make(dimension, 1)
@@ -628,6 +627,7 @@ fn compute_block_size(shape : FixedArray[Int]) -> FixedArray[Int] {
 test "compute_block_size" {
   inspect!(compute_block_size([2, 3, 4]), content="[12, 4, 1]")
 }
+
 fn Tensor::ref(self : Tensor) -> Unit {
   if self.ref == -1 {
     self.ref = 0
