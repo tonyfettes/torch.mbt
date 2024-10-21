@@ -970,66 +970,6 @@ test "Tensor::bacward - MatMul" {
   inspect!(y.grad, content="[5, 5, 7, 7, 9, 9]")
 }
 
-pub fn Tensor::reshape(self : Tensor, shape : FixedArray[Int]) -> Tensor {
-  let block = compute_block_size(shape)
-  Tensor::{
-    value: self.value,
-    shape,
-    block,
-    ref: 0,
-    graph: Nop(self),
-    grad: self.grad,
-  }
-}
-
-test "Tensor::reshape" {
-  let tensor = Tensor::new([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]])
-  let reshaped = tensor.reshape([3, 2])
-  inspect!(reshaped, content="[[0, 1], [2, 3], [4, 5]]")
-  inspect!(reshaped.graph, content="Nop([[0, 1, 2], [3, 4, 5]])")
-  reshaped.ref()
-  inspect!(tensor.ref, content="1")
-}
-
-test "Tensor::reshape - backward" {
-  let tensor = Tensor::new([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]])
-  inspect!(tensor.sum(dim=0), content="[3, 5, 7]")
-  let reshaped = tensor.reshape([3, 2])
-  inspect!(reshaped, content="[[0, 1], [2, 3], [4, 5]]")
-  let sum = reshaped.sum(dim=0)
-  inspect!(sum, content="[6, 9]")
-  let sum_sum = sum.sum(dim=0)
-  inspect!(sum_sum, content="15")
-  sum_sum.backward()
-  inspect!(sum_sum.grad, content="[1]")
-  inspect!(sum.grad, content="[1, 1]")
-  inspect!(reshaped.grad, content="[1, 1, 1, 1, 1, 1]")
-  inspect!(tensor.grad, content="[1, 1, 1, 1, 1, 1]")
-}
-
-test "Tensor::reshape - backward with matrix multiplication" {
-  let x = Tensor::new([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]])
-  let w = Tensor::new([[6.0, 7.0], [8.0, 9.0], [10.0, 11.0]])
-  let y = x.matmul(w)
-  inspect!(y, content="[[28, 31], [100, 112]]")
-  y.sum(dim=0).sum(dim=0).backward()
-  inspect!(y.grad, content="[1, 1, 1, 1]")
-  inspect!(x.grad, content="[13, 17, 21, 13, 17, 21]")
-  inspect!(w.grad, content="[3, 3, 5, 5, 7, 7]")
-  let xs = x.reshape([3, 2])
-  let ws = w.reshape([2, 3])
-  inspect!(xs, content="[[0, 1], [2, 3], [4, 5]]")
-  inspect!(ws, content="[[6, 7, 8], [9, 10, 11]]")
-  let ys = xs.matmul(ws)
-  inspect!(ys, content="[[9, 10, 11], [39, 44, 49], [69, 78, 87]]")
-  ys.sum(dim=0).sum(dim=0).backward()
-  inspect!(ys.grad, content="[1, 1, 1, 1, 1, 1, 1, 1, 1]")
-  inspect!(xs.grad, content="[34, 47, 42, 43, 38, 51]")
-  inspect!(ws.grad, content="[9, 9, 11, 14, 16, 16]")
-  inspect!(x.grad, content="[34, 47, 42, 43, 38, 51]")
-  inspect!(w.grad, content="[9, 9, 11, 14, 16, 16]")
-}
-
 pub impl[X : TensorLike] TensorLike for Array[X] with to_tensor(self : Array[X]) -> Tensor {
   let tensors = FixedArray::from_array(self)
   TensorLike::to_tensor(tensors)
