@@ -1361,36 +1361,6 @@ test "sigmoid" {
   )
 }
 
-pub fn Tensor::flatten(self : Tensor, ~start : Int = 0, ~end? : Int) -> Tensor {
-  let end = match end {
-    Some(end) => end
-    None => self.shape.length()
-  }
-  let shape = []
-  for i = 0; i < start; i = i + 1 {
-    shape.push(self.shape[i])
-  }
-  if start < end {
-    let mut flat_size = 1
-    for i = start; i < end; i = i + 1 {
-      flat_size *= self.shape[i]
-    }
-    shape.push(flat_size)
-  }
-  for i = end; i < self.shape.length(); i = i + 1 {
-    shape.push(self.shape[i])
-  }
-  let shape = FixedArray::from_array(shape)
-  let block = compute_block_size(shape)
-  Tensor::{ ..self, block, shape }
-}
-
-test "flatten" {
-  let input = tensor([[[1.0, 2.0], [3.0, 4.0]], [[5.0, 6.0], [7.0, 8.0]]])
-  inspect!(input.flatten(), content="[1, 2, 3, 4, 5, 6, 7, 8]")
-  inspect!(input.flatten(start=1), content="[[1, 2, 3, 4], [5, 6, 7, 8]]")
-}
-
 pub fn Tensor::upgrade(self : Tensor, ~dim : Int = 1) -> Tensor {
   let old_dim = self.shape.length()
   let shape = FixedArray::make(old_dim + dim, 1)
