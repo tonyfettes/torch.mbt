@@ -39,8 +39,3 @@ pub impl Shape2d for (Int, Int) with to_tuple(self : (Int, Int)) -> (Int, Int) {
 pub impl Shape2d for Int with to_tuple(self : Int) -> (Int, Int) {
   (self, self)
 }
-
-pub impl Shape2d for Unit with to_tuple(self : Unit) -> (Int, Int) {
-  self |> ignore
-  abort("Coerce Unit to Shape2d")
-}
