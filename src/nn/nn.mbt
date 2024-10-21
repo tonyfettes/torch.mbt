@@ -71,36 +71,6 @@ pub trait Loss {
   forward(Self, @tensor.Tensor, @tensor.Tensor) -> @tensor.TensorValue
 }
 
-pub struct MSELoss {}
-
-pub fn MSELoss::new() -> MSELoss {
-  MSELoss::{  }
-}
-
-pub fn MSELoss::output(_self : MSELoss, logger : Logger) -> Unit {
-  logger.write_string("MSELoss()")
-}
-
-pub fn MSELoss::forward(
-  _self : MSELoss,
-  input : @tensor.Tensor,
-  target : @tensor.Tensor
-) -> @tensor.Tensor {
-  if input.length() != target.length() {
-    abort("Input and target tensors should have the same length")
-  }
-  let diff = input - target
-  diff.pow(2).mean()
-}
-
-test "MSELoss" {
-  let input = @tensor.tensor([[1.0, 2.0, 3.0]])
-  let target = @tensor.tensor([[4.0, 5.0, 6.0]])
-  let criterion = MSELoss::new()
-  inspect!(criterion.forward(input, input), content="0")
-  inspect!(criterion.forward(input, target), content="9")
-}
-
 fn forward_[Module : Module](
   tensor : @tensor.Tensor,
   module : Module
