@@ -11,7 +11,7 @@ pub fn Tensor::matmul(self : Tensor, other : Tensor) -> Tensor {
       "Matrix dimensions do not match: \{self_shape[0]}x\{self_shape[1]} * \{other_shape[0]}x\{other_shape[1]}",
     )
   }
-  let output : FixedArray[Double] = FixedArray::make(
+  let output : FixedArray[Float] = FixedArray::make(
     self_shape[0] * other_shape[1],
     0.0,
   )

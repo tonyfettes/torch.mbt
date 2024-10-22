@@ -19,14 +19,14 @@ test "MLP" {
   let output = layers.forward(input)
   inspect!(
     output,
-    content="[0.20922499162142535, 0.25805928787959304, 0.2551680112861502, 0.27754770921283145]",
+    content="[0.20922499895095825, 0.2580592930316925, 0.25516802072525024, 0.2775477170944214]",
   )
   let target = @tensor.tensor([1.0, 0.0, 0.0, 0.0])
   let mut loss = @tensor.tensor(0.0)
   for i = 0; i < output.length(); i = i + 1 {
     loss = loss - target[i].to_tensor() * output[i].log()
   }
-  inspect!(loss, content="1.5643450911089625")
+  inspect!(loss, content="1.5643450021743774")
   let optimizer = @optim.SGD::new(layers.parameters(), learning_rate=0.1)
   optimizer.zero_grad()
   loss.backward()
@@ -34,7 +34,7 @@ test "MLP" {
   let output = layers.forward(input)
   inspect!(
     output,
-    content="[0.24395465491177973, 0.24583749392308907, 0.24326207530914587, 0.2669457758559854]",
+    content="[0.24395465850830078, 0.2458374947309494, 0.24326206743717194, 0.2669457793235779]",
   )
 }
 

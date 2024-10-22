@@ -1,10 +1,10 @@
 pub struct Tensor {
-  value : FixedArray[Double]
+  value : FixedArray[Float]
   shape : FixedArray[Int]
   block : FixedArray[Int]
   mut graph : Graph
   mut ref : Int
-  grad : FixedArray[Double]
+  grad : FixedArray[Float]
 }
 
 pub fn Tensor::shape(self : Tensor) -> FixedArray[Int] {
@@ -23,7 +23,7 @@ pub let empty : Tensor = Tensor::{
 pub fn Tensor::to_json(self : Tensor) -> Json {
   fn build(dimension : Int, offset : Int) -> Json {
     if dimension >= self.shape.length() {
-      return Json::Number(self.value[offset])
+      return Json::Number(self.value[offset].to_double())
     }
     let elements = Array::new(capacity=self.shape[dimension])
     for i = 0; i < self.shape[dimension]; i = i + 1 {
@@ -82,7 +82,7 @@ pub enum Graph {
   ReLU(Tensor)
 } derive(Show)
 
-pub fn Tensor::get(self : Tensor, index : Array[Int]) -> Double {
+pub fn Tensor::get(self : Tensor, index : Array[Int]) -> Float {
   if index.length() != self.shape.length() {
     abort("Index length does not match tensor shape")
   }
@@ -96,7 +96,7 @@ pub fn Tensor::get(self : Tensor, index : Array[Int]) -> Double {
   self.value[offset]
 }
 
-pub fn Tensor::set(self : Tensor, index : Array[Int], value : Double) -> Unit {
+pub fn Tensor::set(self : Tensor, index : Array[Int], value : Float) -> Unit {
   if index.length() != self.shape.length() {
     abort("Index length does not match tensor shape")
   }
@@ -238,7 +238,7 @@ fn Tensor::default() -> Tensor {
 pub fn Tensor::op_sub(self : Tensor, other : Tensor) -> Tensor {
   let (self, other) = Tensor::broadcast(self, other)
   let length = self.value.length()
-  let value : FixedArray[Double] = FixedArray::make(length, 0.0)
+  let value : FixedArray[Float] = FixedArray::make(length, 0.0)
   for i = 0; i < self.value.length(); i = i + 1 {
     value[i] = self.value[i] - other.value[i]
   }
@@ -254,7 +254,7 @@ pub fn Tensor::op_sub(self : Tensor, other : Tensor) -> Tensor {
 
 pub fn Tensor::op_neg(self : Tensor) -> Tensor {
   let length = self.value.length()
-  let output : FixedArray[Double] = FixedArray::make(length, 0.0)
+  let output : FixedArray[Float] = FixedArray::make(length, 0.0)
   for i = 0; i < self.value.length(); i = i + 1 {
     output[i] = -self.value[i]
   }
@@ -271,7 +271,7 @@ pub fn Tensor::op_neg(self : Tensor) -> Tensor {
 pub fn Tensor::op_div(self : Tensor, other : Tensor) -> Tensor {
   let (self, other) = Tensor::broadcast(self, other)
   let length = self.value.length()
-  let output : FixedArray[Double] = FixedArray::make(length, 0.0)
+  let output : FixedArray[Float] = FixedArray::make(length, 0.0)
   for i = 0; i < self.value.length(); i = i + 1 {
     output[i] = self.value[i] / other.value[i]
   }
@@ -287,7 +287,7 @@ pub fn Tensor::op_div(self : Tensor, other : Tensor) -> Tensor {
 
 pub fn Tensor::exp(self : Tensor) -> Tensor {
   let length = self.value.length()
-  let output : FixedArray[Double] = FixedArray::make(length, 0.0)
+  let output : FixedArray[Float] = FixedArray::make(length, 0.0)
   for i = 0; i < self.value.length(); i = i + 1 {
     output[i] = self.value[i].exp()
   }
@@ -303,7 +303,7 @@ pub fn Tensor::exp(self : Tensor) -> Tensor {
 
 pub fn Tensor::log(self : Tensor) -> Tensor {
   let length = self.value.length()
-  let output : FixedArray[Double] = FixedArray::make(length, 0.0)
+  let output : FixedArray[Float] = FixedArray::make(length, 0.0)
   for i = 0; i < self.value.length(); i = i + 1 {
     output[i] = self.value[i].ln()
   }
@@ -340,12 +340,32 @@ pub trait Default {
   default() -> Self
 }
 
+pub impl TensorValue for Float with to_tensor(
+  self : Float,
+  ~requires_grad : Bool
+) -> Tensor {
+  Tensor::{
+    value: [self],
+    shape: [],
+    block: [],
+    graph: if requires_grad {
+      Graph::Var
+    } else {
+      Graph::Val
+    },
+    ref: 0,
+    grad: [0.0],
+  }
+}
+
+pub impl Default for Float with default() -> Float { 0.0 }
+
 pub impl TensorValue for Double with to_tensor(
   self : Double,
   ~requires_grad : Bool
 ) -> Tensor {
   Tensor::{
-    value: [self],
+    value: [self.to_float()],
     shape: [],
     block: [],
     graph: if requires_grad {
@@ -387,7 +407,7 @@ pub impl[X : TensorValue + Default] TensorValue for FixedArray[X] with to_tensor
     shape[i + 1] = s
   }
   let block = compute_block_size(shape)
-  let value = FixedArray::make(shape[0] * block[0], 0.0)
+  let value : FixedArray[Float] = FixedArray::make(shape[0] * block[0], 0.0)
   for i = 0; i < tensors.length(); i = i + 1 {
     for j = 0; j < tensors[i].value.length(); j = j + 1 {
       value[i * block[0] + j] = tensors[i].value[j]
@@ -423,7 +443,7 @@ pub impl[X : TensorValue + Default] TensorValue for Array[X] with to_tensor(
     shape[i + 1] = s
   }
   let block = compute_block_size(shape)
-  let value = FixedArray::make(shape[0] * block[0], 0.0)
+  let value : FixedArray[Float] = FixedArray::make(shape[0] * block[0], 0.0)
   for i = 0; i < tensors.length(); i = i + 1 {
     for j = 0; j < tensors[i].value.length(); j = j + 1 {
       value[i * block[0] + j] = tensors[i].value[j]
@@ -585,14 +605,14 @@ fn Tensor::ref(self : Tensor) -> Unit {
   }
 }
 
-fn power(base : Double, exponent : Int) -> Double {
+fn power(base : Float, exponent : Int) -> Float {
   if exponent == 0 {
     return 1.0
   }
   if exponent == 1 {
     return base
   }
-  let mut result = 1.0
+  let mut result : Float = 1.0
   let mut base = base
   let mut exponent = exponent
   while exponent > 0 {
@@ -621,7 +641,7 @@ test "power" {
 
 pub fn Tensor::pow(self : Tensor, exponent : Int) -> Tensor {
   let length = self.value.length()
-  let output : FixedArray[Double] = FixedArray::make(length, 0.0)
+  let output : FixedArray[Float] = FixedArray::make(length, 0.0)
   for i = 0; i < self.value.length(); i = i + 1 {
     output[i] = power(self.value[i], exponent)
   }
@@ -713,7 +733,7 @@ fn Tensor::propagate(self : Tensor) -> Unit {
     }
     Pow(a, b) => {
       for i = 0; i < self.grad.length(); i = i + 1 {
-        a.grad[i] = self.grad[i] * b.to_double() * power(a.value[i], b - 1)
+        a.grad[i] = self.grad[i] * b.to_float() * power(a.value[i], b - 1)
       }
       a.propagate()
     }
@@ -909,7 +929,7 @@ pub impl[X : TensorLike] TensorLike for FixedArray[X] with to_tensor(
     shape[i + 1] = s
   }
   let block = compute_block_size(shape)
-  let value = FixedArray::make(shape[0] * block[0], 0.0)
+  let value : FixedArray[Float] = FixedArray::make(shape[0] * block[0], 0.0)
   let index = FixedArray::make(shape[0] * block[0], (-1, -1))
   for i = 0; i < tensors.length(); i = i + 1 {
     for j = 0; j < tensors[i].value.length(); j = j + 1 {
@@ -1019,7 +1039,7 @@ pub fn Tensor::to_double(self : Tensor) -> Double {
   if self.shape.length() != 0 {
     abort("Tensor is not a scalar")
   }
-  self.value[0]
+  self.value[0].to_double()
 }
 
 test "Tensor::op_as_view" {
@@ -1045,7 +1065,7 @@ pub fn Tensor::zeros[Shape : @shape.Shape](
   let shape = shape.to_fixed_array()
   let block = compute_block_size(shape)
   let total = if shape.length() == 0 { 1 } else { shape[0] * block[0] }
-  let value = FixedArray::make(total, 0.0)
+  let value : FixedArray[Float] = FixedArray::make(total, 0.0)
   Tensor::{
     shape,
     block,
@@ -1067,7 +1087,7 @@ fn Tensor::ones[Shape : @shape.Shape](
   let shape = shape.to_fixed_array()
   let block = compute_block_size(shape)
   let total = if shape.length() == 0 { 1 } else { shape[0] * block[0] }
-  let value = FixedArray::make(total, 1.0)
+  let value : FixedArray[Float] = FixedArray::make(total, 1.0)
   Tensor::{
     shape,
     block,
@@ -1091,7 +1111,7 @@ pub fn Tensor::upgrade(self : Tensor, ~dim : Int = 1) -> Tensor {
   self.reshape(shape)
 }
 
-pub fn Tensor::value(self : Tensor) -> FixedArray[Double] {
+pub fn Tensor::value(self : Tensor) -> FixedArray[Float] {
   self.value
 }
 

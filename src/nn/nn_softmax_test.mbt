@@ -4,12 +4,12 @@ test "Softmax" {
   let output = softmax.forward(input)
   inspect!(
     output,
-    content="[0.09003057317038046, 0.24472847105479767, 0.6652409557748219]",
+    content="[0.09003057330846786, 0.2447284758090973, 0.6652409434318542]",
   )
   let target = @tensor.tensor([1.0, 0.0, 0.0])
   let mut loss = @tensor.tensor(0.0)
   for i = 0; i < output.length(); i = i + 1 {
     loss = loss + target[i] * output[i]
   }
-  inspect!(loss, content="0.09003057317038046")
+  inspect!(loss, content="0.09003057330846786")
 }

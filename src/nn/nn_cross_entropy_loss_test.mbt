@@ -21,7 +21,7 @@ test "CrossEntropyLoss/Random" {
   }
   let criterion = @nn.CrossEntropyLoss::new()
   let output = criterion.forward(input, target)
-  inspect!(output, content="2.293193741636991")
+  inspect!(output, content="2.293193817138672")
 }
 
 test "CrossEntropyLoss/Backward" {
@@ -46,9 +46,9 @@ test "CrossEntropyLoss/Backward" {
   @json.inspect!(
     input,
     content=[
-      -0.15620946237082442, -0.12068217941940952, -0.13570581265456363, -0.14514849615800837,
-      -0.18840933792174988, -0.15124555592247957, -0.03756091242662528, -0.13675735397031713,
-      -0.15227687227681524, -0.14603529092095632,
+      -0.15620946884155273, -0.12068218737840652, -0.13570579886436462, -0.14514848589897156,
+      -0.18840934336185455, -0.15124554932117462, -0.03756091743707657, -0.13675735890865326,
+      -0.15227685868740082, -0.14603528380393982,
     ],
   )
 }
@@ -80,5 +80,5 @@ test "CrossEntropyLoss/Batch" {
   )
   let criterion = @nn.CrossEntropyLoss::new()
   let output = criterion.forward(input, target)
-  @json.inspect!(output, content=6.018485334290704)
+  @json.inspect!(output, content=6.0184855461120605)
 }

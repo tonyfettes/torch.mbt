@@ -52,7 +52,7 @@ pub fn TensorView::to_json(self : TensorView) -> Json {
   let value = self.tensor.value
   fn build(d : Int, p : Int) {
     if d == dimension {
-      return Json::Number(value[p])
+      return Json::Number(value[p].to_double())
     }
     let (start, end) = if d < self.index.length() {
       match self.index[d] {
@@ -187,7 +187,7 @@ pub fn TensorView::to_tensor(self : TensorView) -> Tensor {
   let shape = FixedArray::from_array(shape)
   let block = compute_block_size(shape)
   let total = if shape.length() == 0 { 1 } else { shape[0] * block[0] }
-  let value = FixedArray::make(total, 0.0)
+  let value : FixedArray[Float] = FixedArray::make(total, 0.0)
   let mut value_length = 0
   let index = FixedArray::make(total, 0)
   let mut index_length = 0

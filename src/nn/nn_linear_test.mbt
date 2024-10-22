@@ -23,10 +23,13 @@ test "Linear" {
   optimizer.zero_grad()
   loss.backward()
   optimizer.step()
-  inspect!(linear.weight, content="[[0.9, 2.9], [1.8, 3.8]]")
-  inspect!(linear.bias, content="[4.9, 5.9]")
+  inspect!(
+    linear.weight,
+    content="[[0.8999999761581421, 2.9000000953674316], [1.7999999523162842, 3.799999952316284]]",
+  )
+  inspect!(linear.bias, content="[4.900000095367432, 5.900000095367432]")
   let output = linear.forward(input)
-  inspect!(output, content="[9.4, 16.4]")
+  inspect!(output, content="[9.399999618530273, 16.399999618530273]")
 }
 
 test "Linear with ReLU" {
@@ -53,16 +56,16 @@ test "Linear with ReLU" {
   for i = 0; i < output.length(); i = i + 1 {
     loss = loss - target[i].to_tensor() * output[i].log()
   }
-  inspect!(loss, content="-2.3978952727983707")
+  inspect!(loss, content="-2.397895336151123")
   optimizer.zero_grad()
   loss.backward()
   optimizer.step()
   inspect!(
     linear.weight,
-    content="[[1.1818181818181819, 3], [2.1818181818181817, 4]]",
+    content="[[1.1818182468414307, 3], [2.1818182468414307, 4]]",
   )
   let output = layers.forward(input)
-  inspect!(output, content="[11.818181818181817, 20]")
+  inspect!(output, content="[11.818181991577148, 20]")
 }
 
 test "Linear with Softmax" {
@@ -83,18 +86,18 @@ test "Linear with Softmax" {
   let optimizer = @optim.SGD::new(linear.parameters(), learning_rate=1)
   let input = @tensor.tensor([2.0, 2.0])
   let output = layers.forward(input)
-  inspect!(output, content="[0.2689414213699951, 0.7310585786300049]")
+  inspect!(output, content="[0.2689414322376251, 0.7310585975646973]")
   let target = @tensor.tensor([1.0, 0.0])
   let mut loss = @tensor.tensor(0.0)
   for i = 0; i < output.length(); i = i + 1 {
     loss = loss - target[i].to_tensor() * output[i].log()
   }
-  inspect!(loss, content="1.3132616875182228")
+  inspect!(loss, content="1.31326162815094")
   optimizer.zero_grad()
   loss.backward()
   optimizer.step()
   let output = layers.forward(input)
-  inspect!(output, content="[0.9999947593218812, 0.00000524067811873532]")
+  inspect!(output, content="[0.9999947547912598, 0.0000052406817303563]")
 }
 
 test "Linear Regression" {
@@ -133,6 +136,6 @@ test "Linear Regression" {
     loss.backward()
     optimizer.step()
   }
-  inspect!(model.weight[0][0], content="1.981059015531822")
-  inspect!(model.bias[0], content="3.01049253711016")
+  inspect!(model.weight[0][0], content="1.9810588359832764")
+  inspect!(model.bias[0], content="3.0104925632476807")
 }

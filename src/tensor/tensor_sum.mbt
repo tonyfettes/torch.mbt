@@ -1,4 +1,3 @@
-
 pub fn Tensor::sum(self : Tensor, ~dim : @shape.Shape = ()) -> Tensor {
   let dim = dim.to_fixed_array()
   let dim = if dim.length() == 0 {
@@ -19,7 +18,7 @@ pub fn Tensor::sum(self : Tensor, ~dim : @shape.Shape = ()) -> Tensor {
   let shape = FixedArray::from_array(shape)
   let block = compute_block_size(shape)
   let total = if shape.length() == 0 { 1 } else { shape[0] * block[0] }
-  let value : FixedArray[Double] = FixedArray::make(total, 0.0)
+  let value : FixedArray[Float] = FixedArray::make(total, 0.0)
   let index : FixedArray[Array[Int]] = FixedArray::makei(total, fn(__) { [] })
   fn build(d : Int, sum_pos : Int, val_pos : Int) -> Unit {
     if d == self.shape.length() {
