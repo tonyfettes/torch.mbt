@@ -16,10 +16,11 @@ pub impl[A : ToPyTorchSource, B : ToPyTorchSource] ToPyTorchSource for (A, B) wi
   variable
 }
 
-pub impl[A : ToPyTorchSource, B : ToPyTorchSource, C : ToPyTorchSource] ToPyTorchSource for (A, B, C) with transpile(
-  self : (A, B, C),
-  transpiler : PyTorchTranspiler
-) -> String {
+pub impl[A : ToPyTorchSource, B : ToPyTorchSource, C : ToPyTorchSource] ToPyTorchSource for (
+  A,
+  B,
+  C,
+) with transpile(self : (A, B, C), transpiler : PyTorchTranspiler) -> String {
   let module_variables = []
   module_variables.push(ToPyTorchSource::transpile(self.0, transpiler))
   module_variables.push(ToPyTorchSource::transpile(self.1, transpiler))
@@ -35,10 +36,12 @@ pub impl[A : ToPyTorchSource, B : ToPyTorchSource, C : ToPyTorchSource] ToPyTorc
   variable
 }
 
-pub impl[A : ToPyTorchSource, B : ToPyTorchSource, C : ToPyTorchSource, D : ToPyTorchSource] ToPyTorchSource for (A, B, C, D) with transpile(
-  self : (A, B, C, D),
-  transpiler : PyTorchTranspiler
-) -> String {
+pub impl[A : ToPyTorchSource, B : ToPyTorchSource, C : ToPyTorchSource, D : ToPyTorchSource] ToPyTorchSource for (
+  A,
+  B,
+  C,
+  D,
+) with transpile(self : (A, B, C, D), transpiler : PyTorchTranspiler) -> String {
   let module_variables = []
   module_variables.push(ToPyTorchSource::transpile(self.0, transpiler))
   module_variables.push(ToPyTorchSource::transpile(self.1, transpiler))
@@ -55,10 +58,13 @@ pub impl[A : ToPyTorchSource, B : ToPyTorchSource, C : ToPyTorchSource, D : ToPy
   variable
 }
 
-pub impl[A : ToPyTorchSource, B : ToPyTorchSource, C : ToPyTorchSource, D : ToPyTorchSource, E : ToPyTorchSource] ToPyTorchSource for (A, B, C, D, E) with transpile(
-  self : (A, B, C, D, E),
-  transpiler : PyTorchTranspiler
-) -> String {
+pub impl[A : ToPyTorchSource, B : ToPyTorchSource, C : ToPyTorchSource, D : ToPyTorchSource, E : ToPyTorchSource] ToPyTorchSource for (
+  A,
+  B,
+  C,
+  D,
+  E,
+) with transpile(self : (A, B, C, D, E), transpiler : PyTorchTranspiler) -> String {
   let module_variables = []
   module_variables.push(ToPyTorchSource::transpile(self.0, transpiler))
   module_variables.push(ToPyTorchSource::transpile(self.1, transpiler))
@@ -76,10 +82,14 @@ pub impl[A : ToPyTorchSource, B : ToPyTorchSource, C : ToPyTorchSource, D : ToPy
   variable
 }
 
-pub impl[A : ToPyTorchSource, B : ToPyTorchSource, C : ToPyTorchSource, D : ToPyTorchSource, E : ToPyTorchSource, F : ToPyTorchSource] ToPyTorchSource for (A, B, C, D, E, F) with transpile(
-  self : (A, B, C, D, E, F),
-  transpiler : PyTorchTranspiler
-) -> String {
+pub impl[A : ToPyTorchSource, B : ToPyTorchSource, C : ToPyTorchSource, D : ToPyTorchSource, E : ToPyTorchSource, F : ToPyTorchSource] ToPyTorchSource for (
+  A,
+  B,
+  C,
+  D,
+  E,
+  F,
+) with transpile(self : (A, B, C, D, E, F), transpiler : PyTorchTranspiler) -> String {
   let module_variables = []
   module_variables.push(ToPyTorchSource::transpile(self.0, transpiler))
   module_variables.push(ToPyTorchSource::transpile(self.1, transpiler))
@@ -98,10 +108,15 @@ pub impl[A : ToPyTorchSource, B : ToPyTorchSource, C : ToPyTorchSource, D : ToPy
   variable
 }
 
-pub impl[A : ToPyTorchSource, B : ToPyTorchSource, C : ToPyTorchSource, D : ToPyTorchSource, E : ToPyTorchSource, F : ToPyTorchSource, G : ToPyTorchSource] ToPyTorchSource for (A, B, C, D, E, F, G) with transpile(
-  self : (A, B, C, D, E, F, G),
-  transpiler : PyTorchTranspiler
-) -> String {
+pub impl[A : ToPyTorchSource, B : ToPyTorchSource, C : ToPyTorchSource, D : ToPyTorchSource, E : ToPyTorchSource, F : ToPyTorchSource, G : ToPyTorchSource] ToPyTorchSource for (
+  A,
+  B,
+  C,
+  D,
+  E,
+  F,
+  G,
+) with transpile(self : (A, B, C, D, E, F, G), transpiler : PyTorchTranspiler) -> String {
   let module_variables = []
   module_variables.push(ToPyTorchSource::transpile(self.0, transpiler))
   module_variables.push(ToPyTorchSource::transpile(self.1, transpiler))
@@ -121,7 +136,16 @@ pub impl[A : ToPyTorchSource, B : ToPyTorchSource, C : ToPyTorchSource, D : ToPy
   variable
 }
 
-pub impl[A : ToPyTorchSource, B : ToPyTorchSource, C : ToPyTorchSource, D : ToPyTorchSource, E : ToPyTorchSource, F : ToPyTorchSource, G : ToPyTorchSource, H : ToPyTorchSource] ToPyTorchSource for (A, B, C, D, E, F, G, H) with transpile(
+pub impl[A : ToPyTorchSource, B : ToPyTorchSource, C : ToPyTorchSource, D : ToPyTorchSource, E : ToPyTorchSource, F : ToPyTorchSource, G : ToPyTorchSource, H : ToPyTorchSource] ToPyTorchSource for (
+  A,
+  B,
+  C,
+  D,
+  E,
+  F,
+  G,
+  H,
+) with transpile(
   self : (A, B, C, D, E, F, G, H),
   transpiler : PyTorchTranspiler
 ) -> String {
@@ -145,7 +169,17 @@ pub impl[A : ToPyTorchSource, B : ToPyTorchSource, C : ToPyTorchSource, D : ToPy
   variable
 }
 
-pub impl[A : ToPyTorchSource, B : ToPyTorchSource, C : ToPyTorchSource, D : ToPyTorchSource, E : ToPyTorchSource, F : ToPyTorchSource, G : ToPyTorchSource, H : ToPyTorchSource, I : ToPyTorchSource] ToPyTorchSource for (A, B, C, D, E, F, G, H, I) with transpile(
+pub impl[A : ToPyTorchSource, B : ToPyTorchSource, C : ToPyTorchSource, D : ToPyTorchSource, E : ToPyTorchSource, F : ToPyTorchSource, G : ToPyTorchSource, H : ToPyTorchSource, I : ToPyTorchSource] ToPyTorchSource for (
+  A,
+  B,
+  C,
+  D,
+  E,
+  F,
+  G,
+  H,
+  I,
+) with transpile(
   self : (A, B, C, D, E, F, G, H, I),
   transpiler : PyTorchTranspiler
 ) -> String {
@@ -170,7 +204,18 @@ pub impl[A : ToPyTorchSource, B : ToPyTorchSource, C : ToPyTorchSource, D : ToPy
   variable
 }
 
-pub impl[A : ToPyTorchSource, B : ToPyTorchSource, C : ToPyTorchSource, D : ToPyTorchSource, E : ToPyTorchSource, F : ToPyTorchSource, G : ToPyTorchSource, H : ToPyTorchSource, I : ToPyTorchSource, J : ToPyTorchSource] ToPyTorchSource for (A, B, C, D, E, F, G, H, I, J) with transpile(
+pub impl[A : ToPyTorchSource, B : ToPyTorchSource, C : ToPyTorchSource, D : ToPyTorchSource, E : ToPyTorchSource, F : ToPyTorchSource, G : ToPyTorchSource, H : ToPyTorchSource, I : ToPyTorchSource, J : ToPyTorchSource] ToPyTorchSource for (
+  A,
+  B,
+  C,
+  D,
+  E,
+  F,
+  G,
+  H,
+  I,
+  J,
+) with transpile(
   self : (A, B, C, D, E, F, G, H, I, J),
   transpiler : PyTorchTranspiler
 ) -> String {
@@ -196,7 +241,19 @@ pub impl[A : ToPyTorchSource, B : ToPyTorchSource, C : ToPyTorchSource, D : ToPy
   variable
 }
 
-pub impl[A : ToPyTorchSource, B : ToPyTorchSource, C : ToPyTorchSource, D : ToPyTorchSource, E : ToPyTorchSource, F : ToPyTorchSource, G : ToPyTorchSource, H : ToPyTorchSource, I : ToPyTorchSource, J : ToPyTorchSource, K : ToPyTorchSource] ToPyTorchSource for (A, B, C, D, E, F, G, H, I, J, K) with transpile(
+pub impl[A : ToPyTorchSource, B : ToPyTorchSource, C : ToPyTorchSource, D : ToPyTorchSource, E : ToPyTorchSource, F : ToPyTorchSource, G : ToPyTorchSource, H : ToPyTorchSource, I : ToPyTorchSource, J : ToPyTorchSource, K : ToPyTorchSource] ToPyTorchSource for (
+  A,
+  B,
+  C,
+  D,
+  E,
+  F,
+  G,
+  H,
+  I,
+  J,
+  K,
+) with transpile(
   self : (A, B, C, D, E, F, G, H, I, J, K),
   transpiler : PyTorchTranspiler
 ) -> String {
@@ -223,7 +280,20 @@ pub impl[A : ToPyTorchSource, B : ToPyTorchSource, C : ToPyTorchSource, D : ToPy
   variable
 }
 
-pub impl[A : ToPyTorchSource, B : ToPyTorchSource, C : ToPyTorchSource, D : ToPyTorchSource, E : ToPyTorchSource, F : ToPyTorchSource, G : ToPyTorchSource, H : ToPyTorchSource, I : ToPyTorchSource, J : ToPyTorchSource, K : ToPyTorchSource, L : ToPyTorchSource] ToPyTorchSource for (A, B, C, D, E, F, G, H, I, J, K, L) with transpile(
+pub impl[A : ToPyTorchSource, B : ToPyTorchSource, C : ToPyTorchSource, D : ToPyTorchSource, E : ToPyTorchSource, F : ToPyTorchSource, G : ToPyTorchSource, H : ToPyTorchSource, I : ToPyTorchSource, J : ToPyTorchSource, K : ToPyTorchSource, L : ToPyTorchSource] ToPyTorchSource for (
+  A,
+  B,
+  C,
+  D,
+  E,
+  F,
+  G,
+  H,
+  I,
+  J,
+  K,
+  L,
+) with transpile(
   self : (A, B, C, D, E, F, G, H, I, J, K, L),
   transpiler : PyTorchTranspiler
 ) -> String {
@@ -251,7 +321,21 @@ pub impl[A : ToPyTorchSource, B : ToPyTorchSource, C : ToPyTorchSource, D : ToPy
   variable
 }
 
-pub impl[A : ToPyTorchSource, B : ToPyTorchSource, C : ToPyTorchSource, D : ToPyTorchSource, E : ToPyTorchSource, F : ToPyTorchSource, G : ToPyTorchSource, H : ToPyTorchSource, I : ToPyTorchSource, J : ToPyTorchSource, K : ToPyTorchSource, L : ToPyTorchSource, M : ToPyTorchSource] ToPyTorchSource for (A, B, C, D, E, F, G, H, I, J, K, L, M) with transpile(
+pub impl[A : ToPyTorchSource, B : ToPyTorchSource, C : ToPyTorchSource, D : ToPyTorchSource, E : ToPyTorchSource, F : ToPyTorchSource, G : ToPyTorchSource, H : ToPyTorchSource, I : ToPyTorchSource, J : ToPyTorchSource, K : ToPyTorchSource, L : ToPyTorchSource, M : ToPyTorchSource] ToPyTorchSource for (
+  A,
+  B,
+  C,
+  D,
+  E,
+  F,
+  G,
+  H,
+  I,
+  J,
+  K,
+  L,
+  M,
+) with transpile(
   self : (A, B, C, D, E, F, G, H, I, J, K, L, M),
   transpiler : PyTorchTranspiler
 ) -> String {
@@ -280,7 +364,22 @@ pub impl[A : ToPyTorchSource, B : ToPyTorchSource, C : ToPyTorchSource, D : ToPy
   variable
 }
 
-pub impl[A : ToPyTorchSource, B : ToPyTorchSource, C : ToPyTorchSource, D : ToPyTorchSource, E : ToPyTorchSource, F : ToPyTorchSource, G : ToPyTorchSource, H : ToPyTorchSource, I : ToPyTorchSource, J : ToPyTorchSource, K : ToPyTorchSource, L : ToPyTorchSource, M : ToPyTorchSource, N : ToPyTorchSource] ToPyTorchSource for (A, B, C, D, E, F, G, H, I, J, K, L, M, N) with transpile(
+pub impl[A : ToPyTorchSource, B : ToPyTorchSource, C : ToPyTorchSource, D : ToPyTorchSource, E : ToPyTorchSource, F : ToPyTorchSource, G : ToPyTorchSource, H : ToPyTorchSource, I : ToPyTorchSource, J : ToPyTorchSource, K : ToPyTorchSource, L : ToPyTorchSource, M : ToPyTorchSource, N : ToPyTorchSource] ToPyTorchSource for (
+  A,
+  B,
+  C,
+  D,
+  E,
+  F,
+  G,
+  H,
+  I,
+  J,
+  K,
+  L,
+  M,
+  N,
+) with transpile(
   self : (A, B, C, D, E, F, G, H, I, J, K, L, M, N),
   transpiler : PyTorchTranspiler
 ) -> String {
@@ -310,7 +409,23 @@ pub impl[A : ToPyTorchSource, B : ToPyTorchSource, C : ToPyTorchSource, D : ToPy
   variable
 }
 
-pub impl[A : ToPyTorchSource, B : ToPyTorchSource, C : ToPyTorchSource, D : ToPyTorchSource, E : ToPyTorchSource, F : ToPyTorchSource, G : ToPyTorchSource, H : ToPyTorchSource, I : ToPyTorchSource, J : ToPyTorchSource, K : ToPyTorchSource, L : ToPyTorchSource, M : ToPyTorchSource, N : ToPyTorchSource, O : ToPyTorchSource] ToPyTorchSource for (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O) with transpile(
+pub impl[A : ToPyTorchSource, B : ToPyTorchSource, C : ToPyTorchSource, D : ToPyTorchSource, E : ToPyTorchSource, F : ToPyTorchSource, G : ToPyTorchSource, H : ToPyTorchSource, I : ToPyTorchSource, J : ToPyTorchSource, K : ToPyTorchSource, L : ToPyTorchSource, M : ToPyTorchSource, N : ToPyTorchSource, O : ToPyTorchSource] ToPyTorchSource for (
+  A,
+  B,
+  C,
+  D,
+  E,
+  F,
+  G,
+  H,
+  I,
+  J,
+  K,
+  L,
+  M,
+  N,
+  O,
+) with transpile(
   self : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O),
   transpiler : PyTorchTranspiler
 ) -> String {
@@ -341,7 +456,24 @@ pub impl[A : ToPyTorchSource, B : ToPyTorchSource, C : ToPyTorchSource, D : ToPy
   variable
 }
 
-pub impl[A : ToPyTorchSource, B : ToPyTorchSource, C : ToPyTorchSource, D : ToPyTorchSource, E : ToPyTorchSource, F : ToPyTorchSource, G : ToPyTorchSource, H : ToPyTorchSource, I : ToPyTorchSource, J : ToPyTorchSource, K : ToPyTorchSource, L : ToPyTorchSource, M : ToPyTorchSource, N : ToPyTorchSource, O : ToPyTorchSource, P : ToPyTorchSource] ToPyTorchSource for (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P) with transpile(
+pub impl[A : ToPyTorchSource, B : ToPyTorchSource, C : ToPyTorchSource, D : ToPyTorchSource, E : ToPyTorchSource, F : ToPyTorchSource, G : ToPyTorchSource, H : ToPyTorchSource, I : ToPyTorchSource, J : ToPyTorchSource, K : ToPyTorchSource, L : ToPyTorchSource, M : ToPyTorchSource, N : ToPyTorchSource, O : ToPyTorchSource, P : ToPyTorchSource] ToPyTorchSource for (
+  A,
+  B,
+  C,
+  D,
+  E,
+  F,
+  G,
+  H,
+  I,
+  J,
+  K,
+  L,
+  M,
+  N,
+  O,
+  P,
+) with transpile(
   self : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P),
   transpiler : PyTorchTranspiler
 ) -> String {
