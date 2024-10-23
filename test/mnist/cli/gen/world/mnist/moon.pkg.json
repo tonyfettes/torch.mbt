@@ -1,0 +1,1 @@
+{ "import": [{ "path" : "tonyfettes/torch/mnist/cli/ffi", "alias" : "ffi" }, { "path" : "tonyfettes/torch/mnist/cli/world/mnist", "alias" : "mnist" }] }

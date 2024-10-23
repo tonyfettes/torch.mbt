@@ -1,0 +1,11 @@
+
+{
+      "link": {
+            "wasm": {
+                  "exports": ["cabi_realloc:cabi_realloc", "wasmExportInfer:infer", "wasmExportInferPostReturn:cabi_post_infer", "wasmExportLoad:load", "wasmExportSave:save", "wasmExportSavePostReturn:cabi_post_save", "wasmExportTrain:train"],
+                  "export-memory-name": "memory",
+                  "heap-start-address": 16
+            }
+      }
+      ,"import": [{ "path" : "tonyfettes/torch/mnist/cli/ffi", "alias" : "ffi" }, { "path" : "tonyfettes/torch/mnist/cli/gen/world/mnist", "alias" : "mnist" }, { "path" : "tonyfettes/torch/mnist/cli/world/mnist", "alias" : "mnist0" }]
+}
