@@ -1,6 +1,6 @@
 {
   "name": "tonyfettes/torch/mnist/web",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "deps": {
     "tonyfettes/torch/mnist": {
       "path": ".."
