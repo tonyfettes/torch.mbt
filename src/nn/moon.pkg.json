@@ -17,7 +17,7 @@
     "tonyfettes/torch/shape",
     "tonyfettes/torch/distributions",
     "tonyfettes/torch/optim",
-    "tonyfettes/torch/nn/internal/transpile"
+    "tonyfettes/torch/nn/transpile"
   ],
   "test-import": ["tonyfettes/torch/tensor"]
 }
