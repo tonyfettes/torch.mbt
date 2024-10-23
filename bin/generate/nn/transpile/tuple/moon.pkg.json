@@ -1,7 +1,6 @@
 {
   "is-main": true,
   "import": [
-    "moonbitlang/x/fs",
     {
       "path": "tonyfettes/torch/bin/generate/nn/tuple",
       "alias": "generate/nn/tuple"
