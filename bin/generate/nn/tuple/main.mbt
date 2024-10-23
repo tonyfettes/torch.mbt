@@ -66,5 +66,11 @@ fn main {
     functions.push(build_parameters(i))
   }
   let content = String::concat(functions, separator="\n\n")
-  @fs.write_string_to_file(path="../src/nn/nn_tuple.mbt", ~content)
+  try {
+    @generate.write_on_change!(path="../src/nn/nn_tuple.mbt", ~content)
+  } catch {
+    error =>
+      $|Failed to write on change: \{Show::to_string(error)}
+      |> println
+  }
 }

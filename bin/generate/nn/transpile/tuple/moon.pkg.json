@@ -5,6 +5,7 @@
     {
       "path": "tonyfettes/torch/bin/generate/nn/tuple",
       "alias": "generate/nn/tuple"
-    }
+    },
+    "tonyfettes/torch/bin/generate"
   ]
 }

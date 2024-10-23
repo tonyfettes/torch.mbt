@@ -35,8 +35,14 @@ fn main {
     functions.push(build_pytorch_transpile(i))
   }
   let content = String::concat(functions, separator="\n\n")
-  @fs.write_string_to_file(
-    path="../src/nn/internal/transpile/tuple.mbt",
-    ~content,
-  )
+  try {
+    @generate.write_on_change!(
+      path="../src/nn/internal/transpile/tuple.mbt",
+      ~content,
+    )
+  } catch {
+    error =>
+      $|Failed to write content to src/nn/internal/transpile/tuple.mbt: \{Show::to_string(error)}
+      |> println
+  }
 }
