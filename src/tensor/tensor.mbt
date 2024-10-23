@@ -1042,6 +1042,13 @@ pub fn Tensor::to_double(self : Tensor) -> Double {
   self.value[0].to_double()
 }
 
+pub fn Tensor::to_float(self : Tensor) -> Float {
+  if self.shape.length() != 0 {
+    abort("Tensor is not a scalar")
+  }
+  self.value[0]
+}
+
 test "Tensor::op_as_view" {
   let image = tensor(
     [
