@@ -8,9 +8,7 @@ fn should_ignore(item : String) -> Bool {
 }
 
 pub fn update(~path : String, ~version : String) -> Unit! {
-  // println("Updating modules in \{path} to version \{version}")
   for item in @fs.read_dir!(~path) {
-    // println("item: \{item}")
     if should_ignore(item) {
       continue
     }
