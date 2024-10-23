@@ -6,3 +6,5 @@
 /.python-version
 /node_modules/
 /_coverage/
+/torch.mbt.egg-info/
+/.moon/

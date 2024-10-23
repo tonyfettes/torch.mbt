@@ -1,2 +1,3 @@
 /.mooncakes/
 /target/
+__pycache__/
