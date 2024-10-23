@@ -16,11 +16,17 @@ pub fn save() -> String {
 
 pub fn infer(input : Bytes) -> FixedArray[Double] {
   let array = FixedArray::makei(input.length(), fn(i) { input[i].to_int() })
-  @mnist.infer(model.val, array)
+  @mnist.infer(model.val, array).map(fn(x) { x.to_double() })
 }
 
-pub fn train(batch : FixedArray[@export.Data], learning_rate : Double) -> Double {
-  let optimizer = @torch.SGD::new(model.val.parameters(), ~learning_rate)
+pub fn train(
+  batch : FixedArray[@export.Data],
+  learning_rate : Double
+) -> Double {
+  let optimizer = @torch/optim.SGD::new(
+    model.val.parameters(),
+    learning_rate=learning_rate.to_float(),
+  )
   let batch = batch.map(
     fn(data) {
       @mnist.Data::{
@@ -32,5 +38,5 @@ pub fn train(batch : FixedArray[@export.Data], learning_rate : Double) -> Double
       }
     },
   )
-  @mnist.train(model.val, optimizer, batch)
+  @mnist.train(model.val, optimizer, batch).to_double()
 }

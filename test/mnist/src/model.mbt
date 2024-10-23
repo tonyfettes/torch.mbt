@@ -1,1 +1,1 @@
-pub typealias Model = Simard
+pub typealias Model = LeNet5

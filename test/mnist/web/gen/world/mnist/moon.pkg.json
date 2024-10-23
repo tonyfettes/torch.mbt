@@ -9,6 +9,14 @@
       "alias": "mnist"
     },
     "tonyfettes/torch",
+    {
+      "path": "tonyfettes/torch/nn",
+      "alias": "torch/nn"
+    },
+    {
+      "path": "tonyfettes/torch/optim",
+      "alias": "torch/optim"
+    },
     { "path": "tonyfettes/torch/mnist/web/world/mnist", "alias": "export" }
   ]
 }

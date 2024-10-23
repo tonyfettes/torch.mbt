@@ -9,7 +9,7 @@ pub fn train[Model : @torch/nn.Module](
   model : Model,
   optimizer : @torch/optim.SGD,
   batch : FixedArray[Data]
-) -> Double {
+) -> Float {
   let input = batch.map(
     fn(data) {
       @torch.tensor(data.input.map(fn(x) { x.to_double() / 255.0 })).reshape(
@@ -31,5 +31,5 @@ pub fn train[Model : @torch/nn.Module](
   let loss = criterion.forward(output, target)
   loss.backward()
   optimizer.step()
-  loss.to_double()
+  loss.to_float()
 }

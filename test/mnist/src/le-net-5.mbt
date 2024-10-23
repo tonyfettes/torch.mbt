@@ -30,34 +30,10 @@ pub fn LeNet5::new() -> LeNet5 {
   )
 }
 
-pub fn LeNet5::forward(
-  self : LeNet5,
-  input : @torch.Tensor
-) -> @torch.Tensor {
-  let output = self._.0.forward(input)
-  let output = self._.1.forward(output)
-  let output = self._.2.forward(output)
-  let output = self._.3.forward(output)
-  let output = self._.4.forward(output)
-  let output = self._.5.forward(output)
-  let output = self._.6.forward(output)
-  let output = self._.7.forward(output)
-  let output = self._.8.forward(output)
-  let output = self._.9.forward(output)
-  let output = self._.10.forward(output)
-  let output = self._.11.forward(output)
-  output
+pub fn LeNet5::forward(self : LeNet5, input : @torch.Tensor) -> @torch.Tensor {
+  @torch/nn.Module::forward(self._, input)
 }
 
 pub fn LeNet5::parameters(self : LeNet5) -> Iter[@torch.Tensor] {
-  Iter::concat(
-    self._.0.parameters(),
-    Iter::concat(
-      self._.3.parameters(),
-      Iter::concat(
-        self._.7.parameters(),
-        Iter::concat(self._.9.parameters(), self._.11.parameters()),
-      ),
-    ),
-  )
+  @torch/nn.Module::parameters(self._)
 }
