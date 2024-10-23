@@ -19,25 +19,28 @@ extern "wasm" fn simd_f32x4_add(in0 : Int, in1 : Int, out : Int, len : Int) =
   #|
   #|  (br_if $loop (i32.lt_u (local.get $out) (local.get $end)))))
 
-extern "wasm" fn address_fixed_array_float(array : FixedArray[Float]) -> Int =
+extern "wasm" fn fixed_array_float_to_pointer(array : FixedArray[Float]) -> Int =
   #|(func (param i32) (result i32) local.get 0 i32.const 8 i32.add)
 
 fn fixed_array_simd_add(
-  in0 : FixedArray[Float],
-  in1 : FixedArray[Float],
-  out : FixedArray[Float],
-  len : Int
+  this : FixedArray[Float],
+  that : FixedArray[Float],
+  result : FixedArray[Float],
+  length : Int
 ) -> Unit {
   let alignment = 4
-  simd_f32x4_add(
-    address_fixed_array_float(in0),
-    address_fixed_array_float(in1),
-    address_fixed_array_float(out),
-    len / alignment,
-  )
-  let residue = len - len % alignment
-  for i in residue..<len {
-    out[i] = in0[i] * in1[i]
+  let blocks = length / alignment
+  if blocks != 0 {
+    simd_f32x4_add(
+      fixed_array_float_to_pointer(this),
+      fixed_array_float_to_pointer(that),
+      fixed_array_float_to_pointer(result),
+      blocks,
+    )
+  }
+  let residue = length - length % alignment
+  for i in residue..<length {
+    result[i] = this[i] + that[i]
   }
 }
 

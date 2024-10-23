@@ -20,21 +20,24 @@ extern "wasm" fn simd_f32x4_mul(in0 : Int, in1 : Int, out : Int, len : Int) =
   #|  (br_if $loop (i32.lt_u (local.get $out) (local.get $end)))))
 
 fn fixed_array_simd_mul(
-  in0 : FixedArray[Float],
-  in1 : FixedArray[Float],
-  out : FixedArray[Float],
-  len : Int
+  this : FixedArray[Float],
+  that : FixedArray[Float],
+  result : FixedArray[Float],
+  length : Int
 ) -> Unit {
   let alignment = 4
-  simd_f32x4_mul(
-    address_fixed_array_float(in0),
-    address_fixed_array_float(in1),
-    address_fixed_array_float(out),
-    len / alignment,
-  )
-  let residue = len - len % alignment
-  for i in residue..<len {
-    out[i] = in0[i] * in1[i]
+  let blocks = length / alignment
+  if blocks != 0 {
+    simd_f32x4_mul(
+      fixed_array_float_to_pointer(this),
+      fixed_array_float_to_pointer(that),
+      fixed_array_float_to_pointer(result),
+      length / alignment,
+    )
+  }
+  let residue = length - length % alignment
+  for i in residue..<length {
+    result[i] = this[i] * that[i]
   }
 }
 
