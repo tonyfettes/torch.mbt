@@ -7,6 +7,10 @@ NAME := mnist-model
 JCO := corepack pnpm exec jco
 JCO_FLAGS :=
 
+JCO_OUTPUTS := $(OUT)/$(NAME).core.wasm $(OUT)/$(NAME).d.ts $(OUT)/$(NAME).js
+
+default: $(JCO_OUTPUTS)
+
 define make_moon_rules
 ifeq ($(2),debug)
 target/$(1)/$(2)/build/$(3).wasm:
@@ -24,10 +28,6 @@ WIT  := wit
 TARGET := wasm
 PROFILE := debug
 BUILD := target/$(TARGET)/$(PROFILE)/build
-
-JCO_OUTPUTS := $(OUT)/$(NAME).core.wasm $(OUT)/$(NAME).d.ts $(OUT)/$(NAME).js
-
-default: $(JCO_OUTPUTS)
 
 ifeq ($(TARGET),wasm)
 ifeq ($(PROFILE),release)
