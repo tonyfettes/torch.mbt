@@ -15,15 +15,15 @@ test "Tensor::matmul - 2x3 * 3x2" {
 }
 
 test "Tensor::matmul - 1x2 * 2x2" {
-  let x = @tensor.Tensor::new([1.0, 2.0])
+  let x = @tensor.Tensor::new([[1.0, 2.0]])
   let w = @tensor.Tensor::new([[1.0, 2.0], [3.0, 4.0]])
-  inspect!(x.upgrade().matmul(w), content="[[7, 10]]")
+  inspect!(x.matmul(w), content="[[7, 10]]")
 }
 
 test "Tensor::matmul - 1x2 * 2x2" {
-  let x = @tensor.Tensor::new([2.0, 2.0])
+  let x = @tensor.Tensor::new([[2.0, 2.0]])
   let w = @tensor.Tensor::new([[2.0, 2.0], [2.0, 2.0]])
-  inspect!(x.upgrade().matmul(w), content="[[8, 8]]")
+  inspect!(x.matmul(w), content="[[8, 8]]")
 }
 
 test "matmul/8@8x16" {

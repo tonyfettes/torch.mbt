@@ -796,7 +796,7 @@ pub impl[X : TensorLike] TensorLike for FixedArray[X] with to_tensor(
     abort("No tensors to concatenate")
   }
   if tensors.length() == 1 {
-    return tensors[0].upgrade()
+    return tensors[0].reshape([1, ..tensors[0].shape])
   }
   for i in 1..<tensors.length() {
     if tensors[i].shape != tensors[0].shape {
@@ -989,15 +989,6 @@ fn Tensor::ones[Shape : @shape.Shape](
     },
     grad: FixedArray::make(total, 0.0),
   }
-}
-
-pub fn Tensor::upgrade(self : Tensor, ~dim : Int = 1) -> Tensor {
-  let old_dim = self.shape.length()
-  let shape = FixedArray::make(old_dim + dim, 1)
-  for i = 0; i < old_dim; i = i + 1 {
-    shape[i + dim] = self.shape[i]
-  }
-  self.reshape(shape)
 }
 
 pub fn Tensor::value(self : Tensor) -> FixedArray[Float] {
