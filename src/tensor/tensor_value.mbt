@@ -20,6 +20,8 @@ pub impl TensorValue for Float with to_tensor(
   }
 }
 
+pub impl Default for Float with default() -> Float { 0.0 }
+
 pub impl TensorValue for Double with to_tensor(
   self : Double,
   ~requires_grad : Bool
@@ -37,6 +39,8 @@ pub impl TensorValue for Double with to_tensor(
     grad: [0.0],
   }
 }
+
+pub impl Default for Double with default() -> Double { 0.0 }
 
 pub impl[X : TensorValue + Default] TensorValue for FixedArray[X] with to_tensor(
   self : FixedArray[X],
