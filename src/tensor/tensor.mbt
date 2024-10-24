@@ -222,13 +222,6 @@ pub fn Tensor::log(self : Tensor) -> Tensor {
   }
 }
 
-pub fn Tensor::dot(self : Tensor, other : Tensor) -> Tensor {
-  if self.shape.length() != 1 || other.shape.length() != 1 {
-    abort("Cannot dot product non-vectors")
-  }
-  Tensor::sum(self * other)
-}
-
 pub fn Tensor::mean(self : Tensor) -> Tensor {
   self.sum() / tensor(self.value.length().to_double())
 }
