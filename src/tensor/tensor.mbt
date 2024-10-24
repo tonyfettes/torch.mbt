@@ -39,34 +39,6 @@ pub enum Graph {
   ReLU(Tensor)
 } derive(Show)
 
-pub fn Tensor::get(self : Tensor, index : Array[Int]) -> Float {
-  if index.length() != self.shape.length() {
-    abort("Index length does not match tensor shape")
-  }
-  let mut offset = 0
-  for i = 0; i < index.length(); i = i + 1 {
-    if index[i] < 0 || index[i] >= self.shape[i] {
-      abort("Index out of bounds")
-    }
-    offset += index[i] * self.block[i]
-  }
-  self.value[offset]
-}
-
-pub fn Tensor::set(self : Tensor, index : Array[Int], value : Float) -> Unit {
-  if index.length() != self.shape.length() {
-    abort("Index length does not match tensor shape")
-  }
-  let mut offset = 0
-  for i = 0; i < index.length(); i = i + 1 {
-    if index[i] < 0 || index[i] >= self.shape[i] {
-      abort("Index out of bounds")
-    }
-    offset += index[i] * self.block[i]
-  }
-  self.value[offset] = value
-}
-
 pub fn Tensor::output(self : Tensor, logger : Logger) -> Unit {
   let shape = self.shape
   let dimension = shape.length()
