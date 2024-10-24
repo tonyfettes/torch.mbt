@@ -13,7 +13,7 @@ test (it : @test.T) {
     ],
   )
   it.write(@transpile.transpile(model, "model"))
-  it.snapshot!(filename="transpile/Linear.py")
+  it.snapshot!(filename="nn/Linear.py")
 }
 
 test (it : @test.T) {
@@ -35,7 +35,7 @@ test (it : @test.T) {
     ],
   )
   it.write(@transpile.transpile(model, "model"))
-  it.snapshot!(filename="transpile/MNIST/Sequential.py")
+  it.snapshot!(filename="nn/Sequential.py")
 }
 
 test (it : @test.T) {
@@ -55,5 +55,5 @@ test (it : @test.T) {
     @nn.Linear::new(84, 10),
   )
   it.write(@transpile.transpile(model, "model"))
-  it.snapshot!(filename="transpile/MNIST/Tuple.py")
+  it.snapshot!(filename="nn/Tuple.py")
 }
