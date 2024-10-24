@@ -136,52 +136,6 @@ pub fn Tensor::length(self : Tensor) -> Int {
   self.shape[0]
 }
 
-pub fn Tensor::op_as_view(
-  self : Tensor,
-  ~start : Int,
-  ~end? : Int
-) -> TensorView {
-  if self.shape.length() == 0 {
-    abort("Tensor is a scalar")
-  }
-  let end = match end {
-    None => self.shape[0]
-    Some(end) => {
-      if end > self.shape[0] {
-        abort(
-          "Tensor slice [\{start}, \{end}) out of bounds: [0, \{self.shape[0]})",
-        )
-      }
-      end
-    }
-  }
-  let index = [TensorIndex::Slice(start, end)]
-  TensorView::{ tensor: self, index }
-}
-
-test "panic Tensor::op_as_view - Scalar" {
-  let tensor = Tensor::new(1.0)
-  tensor[0:1] |> ignore
-}
-
-test "Tensor::op_as_view - Vector" {
-  let tensor = Tensor::new([0.0, 1.0, 2.0, 3.0])
-  inspect!(tensor[1:3], content="[1, 2]")
-  inspect!(tensor[1:], content="[1, 2, 3]")
-  inspect!(tensor[:3], content="[0, 1, 2]")
-}
-
-test "Tensor::op_as_view - Matrix" {
-  let tensor = Tensor::new([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]])
-  inspect!(tensor[1:2], content="[[3, 4, 5]]")
-  inspect!(tensor[1:], content="[[3, 4, 5]]")
-  inspect!(tensor[:2], content="[[0, 1, 2], [3, 4, 5]]")
-  inspect!(tensor[:], content="[[0, 1, 2], [3, 4, 5]]")
-  inspect!(tensor[:][1], content="[1, 4]")
-  inspect!(tensor[:][1:], content="[[1, 2], [4, 5]]")
-  inspect!(tensor[:][:], content="[[0, 1, 2], [3, 4, 5]]")
-}
-
 pub impl TensorLike for Tensor with to_tensor(self : Tensor) -> Tensor { self }
 
 fn Tensor::default() -> Tensor {
@@ -822,22 +776,6 @@ pub fn Tensor::to_float(self : Tensor) -> Float {
     abort("Tensor is not a scalar")
   }
   self.value[0]
-}
-
-test "Tensor::op_as_view" {
-  let image = tensor(
-    [
-      [0.0, 1.0, 2.0, 3.0],
-      [4.0, 5.0, 6.0, 7.0],
-      [8.0, 9.0, 10.0, 11.0],
-      [12.0, 13.0, 14.0, 15.0],
-    ],
-  )
-  inspect!(image[0:3][0:3], content="[[0, 1, 2], [4, 5, 6], [8, 9, 10]]")
-  inspect!(
-    image[0:3][0:3].to_tensor(),
-    content="[[0, 1, 2], [4, 5, 6], [8, 9, 10]]",
-  )
 }
 
 pub fn Tensor::zeros[Shape : @shape.Shape](
