@@ -136,10 +136,6 @@ pub fn Tensor::length(self : Tensor) -> Int {
   self.shape[0]
 }
 
-fn Tensor::default() -> Tensor {
-  abort("Unable to construct a tensor with default shape")
-}
-
 pub fn Tensor::op_sub(self : Tensor, other : Tensor) -> Tensor {
   let (self, other) = Tensor::broadcast(self, other)
   let length = self.value.length()
