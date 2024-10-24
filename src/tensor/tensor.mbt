@@ -249,7 +249,7 @@ fn Tensor::propagate(self : Tensor) -> Unit {
     Val => return
     Var => return
     Add(a, b) => {
-      for i = 0; i < self.grad.length(); i = i + 1 {
+      for i in 0..<self.grad.length() {
         a.grad[i] += self.grad[i]
         b.grad[i] += self.grad[i]
       }
@@ -257,15 +257,15 @@ fn Tensor::propagate(self : Tensor) -> Unit {
       b.propagate()
     }
     Sub(a, b) => {
-      for i = 0; i < self.grad.length(); i = i + 1 {
-        a.grad[i] = self.grad[i]
+      for i in 0..<self.grad.length() {
+        a.grad[i] += self.grad[i]
         b.grad[i] -= self.grad[i]
       }
       a.propagate()
       b.propagate()
     }
     Mul(a, b) => {
-      for i = 0; i < self.grad.length(); i = i + 1 {
+      for i in 0..<self.grad.length() {
         a.grad[i] += self.grad[i] * b.value[i]
         b.grad[i] += self.grad[i] * a.value[i]
       }
@@ -273,40 +273,33 @@ fn Tensor::propagate(self : Tensor) -> Unit {
       b.propagate()
     }
     Div(a, b) => {
-      if b.shape.length() == 0 {
-        for i = 0; i < self.grad.length(); i = i + 1 {
-          a.grad[i] += self.grad[i] / b.value[0]
-          b.grad[0] += -self.grad[i] * a.value[i] / b.value[0] / b.value[0]
-        }
-      } else {
-        for i = 0; i < self.grad.length(); i = i + 1 {
-          a.grad[i] += self.grad[i] / b.value[i]
-          b.grad[i] += -self.grad[i] * a.value[i] / b.value[i] / b.value[i]
-        }
+      for i in 0..<self.grad.length() {
+        a.grad[i] += self.grad[i] / b.value[i]
+        b.grad[i] -= self.grad[i] * a.value[i] / b.value[i] / b.value[i]
       }
       a.propagate()
       b.propagate()
     }
     Neg(a) => {
-      for i = 0; i < self.grad.length(); i = i + 1 {
+      for i in 0..<self.grad.length() {
         a.grad[i] -= self.grad[i]
       }
       a.propagate()
     }
     Exp(a) => {
-      for i = 0; i < self.grad.length(); i = i + 1 {
+      for i in 0..<self.grad.length() {
         a.grad[i] += self.grad[i] * self.value[i]
       }
       a.propagate()
     }
     Log(a) => {
-      for i = 0; i < self.grad.length(); i = i + 1 {
+      for i in 0..<self.grad.length() {
         a.grad[i] += self.grad[i] / a.value[i]
       }
       a.propagate()
     }
     Sum(x, m) => {
-      for i = 0; i < self.grad.length(); i = i + 1 {
+      for i in 0..<self.grad.length() {
         for j = 0; j < m[i].length(); j = j + 1 {
           x.grad[m[i][j]] += self.grad[i]
         }
@@ -314,15 +307,15 @@ fn Tensor::propagate(self : Tensor) -> Unit {
       x.propagate()
     }
     Pow(a, b) => {
-      for i = 0; i < self.grad.length(); i = i + 1 {
+      for i in 0..<self.grad.length() {
         a.grad[i] = self.grad[i] * b.to_float() * power(a.value[i], b - 1)
       }
       a.propagate()
     }
     MatMul(a, b) => {
-      for i = 0; i < a.shape[0]; i = i + 1 {
-        for j = 0; j < b.shape[1]; j = j + 1 {
-          for k = 0; k < a.shape[1]; k = k + 1 {
+      for i in 0..<a.shape[0] {
+        for j in 0..<b.shape[1] {
+          for k in 0..<a.shape[1] {
             a.grad[i * a.block[0] + k] += self.grad[i * a.shape[0] + j] *
               b.value[k * b.block[0] + j]
             b.grad[k * b.block[0] + j] += self.grad[i * a.shape[0] + j] *
@@ -334,13 +327,13 @@ fn Tensor::propagate(self : Tensor) -> Unit {
       b.propagate()
     }
     Get(x, m) => {
-      for i = 0; i < m.length(); i = i + 1 {
+      for i in 0..<m.length() {
         x.grad[m[i]] += self.grad[i]
       }
       x.propagate()
     }
     Cat(xs, m) => {
-      for i = 0; i < self.grad.length(); i = i + 1 {
+      for i in 0..<self.grad.length() {
         let (x, m) = m[i]
         xs[x].grad[m] += self.grad[i]
       }
@@ -350,7 +343,7 @@ fn Tensor::propagate(self : Tensor) -> Unit {
     }
     Nop(x) => x.propagate()
     ReLU(x) => {
-      for i = 0; i < self.grad.length(); i = i + 1 {
+      for i in 0..<self.grad.length() {
         x.grad[i] += self.grad[i] *
           (if self.value[i] > 0.0 { 1.0 } else { 0.0 })
       }
@@ -407,7 +400,7 @@ fn Tensor::check(self : Tensor) -> Unit {
 
 pub fn Tensor::backward(self : Tensor) -> Unit {
   self.ref()
-  for i = 0; i < self.grad.length(); i = i + 1 {
+  for i in 0..<self.grad.length() {
     self.grad[i] += 1.0
   }
   self.propagate()
