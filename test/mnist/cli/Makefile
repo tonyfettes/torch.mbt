@@ -3,7 +3,7 @@ PROFILES := debug release
 MOON_FLAGS :=
 PACKAGE := gen/gen
 
-default: src
+default: src/mnist/model
 
 define make_moon_rules
 ifeq ($(2),debug)

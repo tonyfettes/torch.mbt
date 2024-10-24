@@ -14,7 +14,8 @@ requires-python = ">= 3.11"
 
 [project.optional-dependencies]
 dev = [
-  "black"
+  "black",
+  "tensorboard"
 ]
 
 [project.scripts]

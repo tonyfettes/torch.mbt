@@ -6,7 +6,16 @@
     },
     {
       "path": "tonyfettes/torch/mnist/cli/world/mnist",
-      "alias": "mnist"
+      "alias": "world/mnist"
+    },
+    "tonyfettes/torch/mnist",
+    {
+      "path": "tonyfettes/torch/nn",
+      "alias": "torch/nn"
+    },
+    {
+      "path": "tonyfettes/torch/optim",
+      "alias": "torch/optim"
     }
   ]
 }
