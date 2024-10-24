@@ -139,3 +139,39 @@ test "Linear Regression" {
   inspect!(model.weight[0][0], content="1.9810588359832764")
   inspect!(model.bias[0], content="3.0104925632476807")
 }
+
+test "linear/consistent" (it : @test.T) {
+  @distributions.seed(b"12345678223456783234567842345678")
+  let distribution = @distributions.Uniform::new(-1.0, 1.0)
+  let model = @nn.Linear::new(8, 16)
+  let input = distribution.sample([1, 8])
+  let output = model.forward(input)
+  inspect!(input.shape, content="[1, 8]")
+  inspect!(model.weight.shape, content="[8, 16]")
+  let input_weight = input.matmul(model.weight)
+  inspect!(input_weight.shape, content="[1, 16]")
+  @json.inspect!(
+    input_weight,
+    content=[
+      [
+        -0.14556154608726501, 0.34053102135658264, -0.2727360129356384, 0.09315241873264313,
+        0.2314411699771881, 0.009322158992290497, -0.22513721883296967, 0.004441877827048302,
+        -0.35770153999328613, 0.3522055149078369, 0.015071108937263489, -0.34603962302207947,
+        0.2899203300476074, 0.3369878828525543, -0.37785059213638306, 0.22615067660808563,
+      ],
+    ],
+  )
+  it.writeln(
+    #|import torch
+    #|
+    #|def test_linear(snapshot):
+    $|    input = torch.tensor(\{input.to_json().stringify()})
+    $|    weight = torch.tensor(\{model.weight.to_json().stringify()})
+    $|    assert ((input @ weight).flatten() - torch.tensor(\{input_weight.flatten().to_json().stringify()})) == snapshot
+    $|    # bias = torch.tensor(\{model.bias.to_json().stringify()})
+    $|    # output = torch.nn.functional.linear(input, weight.transpose(-2, -1), bias)
+    $|    # assert torch.all(output == torch.tensor(\{output.to_json().stringify()}))
+    ,
+  )
+  it.snapshot!(filename="test_linear.py")
+}

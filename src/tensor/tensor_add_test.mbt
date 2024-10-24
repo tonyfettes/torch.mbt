@@ -26,7 +26,7 @@ test "Tensor::op_add/not-aligned" {
   inspect!(c, content="[7, 9, 11, 13, 15]")
 }
 
-test (it : @test.T) {
+test "add/consistent" (it : @test.T) {
   let distribution = @distributions.Uniform::new(-1.0, 1.0)
   let a = distribution.sample([2, 3, 4, 5])
   let b = distribution.sample([2, 3, 4, 5])
@@ -34,12 +34,12 @@ test (it : @test.T) {
   it.write(
     #|import torch
     #|
-    #|def test_add_random():
-    $|    a = torch.tensor(\{a})
-    $|    b = torch.tensor(\{b})
+    #|def test_add():
+    $|    a = torch.tensor(\{a.to_json().stringify()})
+    $|    b = torch.tensor(\{b.to_json().stringify()})
     #|    c = a + b
-    $|    assert (c == torch.tensor(\{c})).all()
+    $|    assert (c == torch.tensor(\{c.to_json().stringify()})).all()
     #|
   )
-  it.snapshot!(filename="test_add_random.py")
+  it.snapshot!(filename="test_add.py")
 }

@@ -11,3 +11,21 @@ test "Tensor::op_mul - negative" {
   let result = a * b
   inspect!(result, content="[-4, -10, -18]")
 }
+
+test "mul/consistent" (it : @test.T) {
+  let distribution = @distributions.Uniform::new(-1.0, 1.0)
+  let a = distribution.sample([2, 3, 4, 5])
+  let b = distribution.sample([2, 3, 4, 5])
+  let c = a * b
+  it.write(
+    #|import torch
+    #|
+    #|def test_mul():
+    $|    a = torch.tensor(\{a.to_json().stringify()})
+    $|    b = torch.tensor(\{b.to_json().stringify()})
+    #|    c = a * b
+    $|    assert (c == torch.tensor(\{c.to_json().stringify()})).all()
+    #|
+  )
+  it.snapshot!(filename="test_mul.py")
+}
