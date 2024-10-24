@@ -24,10 +24,10 @@ pub fn CrossEntropyLoss::forward(
   input : @tensor.Tensor,
   target : @tensor.Tensor
 ) -> @tensor.Tensor {
-  let input_shape = input.shape()
-  if input_shape != target.shape() {
+  let input_shape = input.shape
+  if input_shape != target.shape {
     abort(
-      "Input shape \{input.shape()} is not consistent with target shape \{target.shape()}",
+      "Input shape \{input.shape} is not consistent with target shape \{target.shape}",
     )
   }
   let dimension = input_shape.length()

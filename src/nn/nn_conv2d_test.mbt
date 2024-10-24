@@ -76,7 +76,7 @@ test "Conv2d - Multiple output channels" {
     content="[[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11], [12, 13, 14, 15]]",
   )
   let image = image.reshape([1, 1, 4, 4])
-  inspect!(image.shape(), content="[1, 1, 4, 4]")
+  inspect!(image.shape, content="[1, 1, 4, 4]")
   let layer = @nn.Conv2d::new(1, 3, kernel_size=(2, 2))
   @tensor.with_no_grad(
     fn() {
@@ -110,7 +110,7 @@ test "Conv2d - Multiple output channels" {
   inspect!(layer.weight[1][0], content="[[0, 0], [1, 1]]")
   inspect!(layer.weight[2][0], content="[[1, 0], [0, 1]]")
   let output = layer.forward(image)
-  inspect!(output.shape(), content="[1, 3, 3, 3]")
+  inspect!(output.shape, content="[1, 3, 3, 3]")
   inspect!(output[0][0], content="[[6, 8, 10], [14, 16, 18], [22, 24, 26]]")
   inspect!(output[0][1], content="[[9, 11, 13], [17, 19, 21], [25, 27, 29]]")
   inspect!(output[0][2], content="[[5, 7, 9], [13, 15, 17], [21, 23, 25]]")
@@ -435,7 +435,7 @@ test "Conv2d - Sigmoid - AvgPool2d" {
     learning_rate=0.1,
   )
   let output = @nn.Module::forward(model, image)
-  @json.inspect!(output.shape(), content=[1, 2, 2, 2])
+  @json.inspect!(output.shape, content=[1, 2, 2, 2])
   @json.inspect!(
     output[0],
     content=[

@@ -7,10 +7,6 @@ pub struct Tensor {
   grad : FixedArray[Float]
 }
 
-pub fn Tensor::shape(self : Tensor) -> FixedArray[Int] {
-  self.shape
-}
-
 pub let empty : Tensor = Tensor::{
   value: [],
   shape: [],
@@ -554,8 +550,4 @@ fn Tensor::ones[Shape : @shape.Shape](
     },
     grad: FixedArray::make(total, 0.0),
   }
-}
-
-pub fn Tensor::value(self : Tensor) -> FixedArray[Float] {
-  self.value
 }
