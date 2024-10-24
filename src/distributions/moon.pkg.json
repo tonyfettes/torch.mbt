@@ -1,5 +1,6 @@
 {
   "import": [
-    "tonyfettes/torch/tensor"
+    "tonyfettes/torch/tensor",
+    "tonyfettes/torch/shape"
   ]
 }
