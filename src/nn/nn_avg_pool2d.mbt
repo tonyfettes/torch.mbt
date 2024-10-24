@@ -25,14 +25,3 @@ pub fn AvgPool2d::forward(
 pub fn AvgPool2d::parameters(_self : AvgPool2d) -> Iter[@tensor.Tensor] {
   Iter::empty()
 }
-
-pub impl @transpile.ToPyTorchSource for AvgPool2d with transpile(
-  self : AvgPool2d,
-  transpiler : @transpile.PyTorchTranspiler
-) -> String {
-  let variable = transpiler.allocate()
-  transpiler.push_model(
-    "\{variable} = torch.nn.AvgPool2d(kernel_size=\{self.kernel_size}, stride=\{self.stride})",
-  )
-  variable
-}

@@ -14,12 +14,3 @@ pub fn Sigmoid::forward(
 pub fn Sigmoid::parameters(_self : Sigmoid) -> Iter[@tensor.Tensor] {
   return Iter::empty()
 }
-
-pub impl @transpile.ToPyTorchSource for Sigmoid with transpile(
-  _self : Sigmoid,
-  transpiler : @transpile.PyTorchTranspiler
-) -> String {
-  let variable = transpiler.allocate()
-  transpiler.push_model("\{variable} = torch.nn.Sigmoid()")
-  variable
-}

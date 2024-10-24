@@ -16,13 +16,4 @@ pub fn ReLU::parameters(_self : ReLU) -> Iter[@tensor.Tensor] {
   Iter::empty()
 }
 
-pub impl @transpile.ToPyTorchSource for ReLU with transpile(
-  _self : ReLU,
-  transpiler : @transpile.PyTorchTranspiler
-) -> String {
-  let variable = transpiler.allocate()
-  transpiler.push_model("\{variable} = torch.nn.ReLU()")
-  variable
-}
-
 pub struct ReLU6 {}

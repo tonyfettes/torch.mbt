@@ -1,4 +1,4 @@
-struct Sequential[Module] {
+pub struct Sequential[Module] {
   modules : Array[Module]
 }
 
@@ -35,27 +35,4 @@ pub fn Sequential::to_string(self : Sequential[Module]) -> String {
   let logger = StringBuilder::new()
   self.output(logger)
   logger.to_string()
-}
-
-pub impl[Module : Module + @transpile.ToPyTorchSource] @transpile.ToPyTorchSource for Sequential[
-  Module,
-] with transpile(
-  self : Sequential[Module],
-  transpiler : @transpile.PyTorchTranspiler
-) -> String {
-  let module_variables = []
-  for module in self.modules {
-    module_variables.push(
-      @transpile.ToPyTorchSource::transpile(module, transpiler),
-    )
-  }
-  let variable = transpiler.allocate()
-  transpiler.push_model("\{variable} = torch.nn.Sequential(")
-  transpiler.level = transpiler.level + 1
-  for module_variable in module_variables {
-    transpiler.push_model("\{module_variable},")
-  }
-  transpiler.level = transpiler.level - 1
-  transpiler.push_model(")")
-  variable
 }

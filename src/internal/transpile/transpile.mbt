@@ -1,4 +1,4 @@
-pub struct PyTorchTranspiler {
+pub struct Transpiler {
   mut ident : Int
   mut level : Int
   model : Array[(Int, String)]
@@ -6,41 +6,41 @@ pub struct PyTorchTranspiler {
   exports : Array[(String, String)]
 }
 
-pub fn PyTorchTranspiler::new() -> PyTorchTranspiler {
-  PyTorchTranspiler::{ ident: 0, level: 0, model: [], after: [], exports: [] }
+pub fn Transpiler::new() -> Transpiler {
+  Transpiler::{ ident: 0, level: 0, model: [], after: [], exports: [] }
 }
 
-pub fn PyTorchTranspiler::allocate(self : PyTorchTranspiler) -> String {
+pub fn Transpiler::allocate(self : Transpiler) -> String {
   let ident = self.ident
   self.ident = ident + 1
   "_layer\{ident}"
 }
 
-pub fn PyTorchTranspiler::push_model(
-  self : PyTorchTranspiler,
+pub fn Transpiler::push_model(
+  self : Transpiler,
   model : String
 ) -> Unit {
   let ident = self.level
   self.model.push((ident, model))
 }
 
-pub fn PyTorchTranspiler::push_after(
-  self : PyTorchTranspiler,
+pub fn Transpiler::push_after(
+  self : Transpiler,
   after : String
 ) -> Unit {
   let ident = self.level
   self.after.push((ident, after))
 }
 
-pub fn PyTorchTranspiler::export(
-  self : PyTorchTranspiler,
+pub fn Transpiler::export(
+  self : Transpiler,
   variable : String,
   identifier : String
 ) -> Unit {
   self.exports.push((variable, identifier))
 }
 
-pub fn PyTorchTranspiler::to_string(self : PyTorchTranspiler) -> String {
+pub fn Transpiler::to_string(self : Transpiler) -> String {
   let model = []
   for line in self.model {
     let (level, line) = line
@@ -74,16 +74,16 @@ pub fn PyTorchTranspiler::to_string(self : PyTorchTranspiler) -> String {
   $|__all__ = [\{__all__}]
 }
 
-pub trait ToPyTorchSource {
-  transpile(Self, PyTorchTranspiler) -> String
+pub trait Transpile {
+  transpile(Self, Transpiler) -> String
 }
 
-pub fn transpile[Module : ToPyTorchSource](
+pub fn transpile[Module : Transpile](
   module : Module,
   export : String
 ) -> String {
-  let transpiler = PyTorchTranspiler::new()
-  let variable = ToPyTorchSource::transpile(module, transpiler)
+  let transpiler = Transpiler::new()
+  let variable = Transpile::transpile(module, transpiler)
   transpiler.export(variable, export)
   transpiler.to_string()
 }

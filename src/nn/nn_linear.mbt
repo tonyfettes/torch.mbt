@@ -76,20 +76,3 @@ pub fn Linear::output(self : Linear, logger : Logger) -> Unit {
   }
   logger.write_string(")")
 }
-
-pub impl @transpile.ToPyTorchSource for Linear with transpile(
-  self : Linear,
-  transpiler : @transpile.PyTorchTranspiler
-) -> String {
-  let variable = transpiler.allocate()
-  transpiler.push_model(
-    "\{variable} = torch.nn.Linear(\{self.weight.shape[0]}, \{self.weight.shape[1]})",
-  )
-  transpiler.push_after(
-    "\{variable}.weight = torch.nn.Parameter(torch.tensor(\{self.weight.to_json().stringify()}).transpose(-2, -1))",
-  )
-  transpiler.push_after(
-    "\{variable}.bias = torch.nn.Parameter(torch.tensor(\{self.bias.to_json().stringify()}))",
-  )
-  variable
-}

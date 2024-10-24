@@ -20,12 +20,3 @@ pub fn Softmax::forward(
 pub fn Softmax::parameters(_self : Softmax) -> Iter[@tensor.Tensor] {
   Iter::empty()
 }
-
-pub impl @transpile.ToPyTorchSource for Softmax with transpile(
-  _self : Softmax,
-  transpiler : @transpile.PyTorchTranspiler
-) -> String {
-  let variable = transpiler.allocate()
-  transpiler.push_model("\{variable} = torch.nn.Softmax(dim=-1)")
-  variable
-}

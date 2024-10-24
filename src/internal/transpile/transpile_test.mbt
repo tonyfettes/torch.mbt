@@ -1,4 +1,4 @@
-trait Module: @nn.Module + @transpile.ToPyTorchSource {}
+trait Module: @nn.Module + @transpile.Transpile {}
 
 test (it : @test.T) {
   @distributions.seed(b"12345678223456783234567842345678")
@@ -13,7 +13,7 @@ test (it : @test.T) {
     ],
   )
   it.write(@transpile.transpile(model, "model"))
-  it.snapshot!(filename="ToPyTorchSource/Linear.py")
+  it.snapshot!(filename="transpile/Linear.py")
 }
 
 test (it : @test.T) {
@@ -35,7 +35,7 @@ test (it : @test.T) {
     ],
   )
   it.write(@transpile.transpile(model, "model"))
-  it.snapshot!(filename="ToPyTorchSource/MNIST/Sequential.py")
+  it.snapshot!(filename="transpile/MNIST/Sequential.py")
 }
 
 test (it : @test.T) {
@@ -55,5 +55,5 @@ test (it : @test.T) {
     @nn.Linear::new(84, 10),
   )
   it.write(@transpile.transpile(model, "model"))
-  it.snapshot!(filename="ToPyTorchSource/MNIST/Tuple.py")
+  it.snapshot!(filename="transpile/MNIST/Tuple.py")
 }

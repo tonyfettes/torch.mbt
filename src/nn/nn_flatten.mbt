@@ -17,12 +17,3 @@ pub fn Flatten::forward(
 pub fn Flatten::parameters(_self : Flatten) -> Iter[@tensor.Tensor] {
   Iter::empty()
 }
-
-pub impl @transpile.ToPyTorchSource for Flatten with transpile(
-  _self : Flatten,
-  transpiler : @transpile.PyTorchTranspiler
-) -> String {
-  let variable = transpiler.allocate()
-  transpiler.push_model("\{variable} = torch.nn.Flatten()")
-  variable
-}

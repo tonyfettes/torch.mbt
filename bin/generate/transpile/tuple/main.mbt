@@ -1,19 +1,19 @@
 fn build_pytorch_transpile(length : Int) -> String {
   let type_parameters = @generate/nn/tuple.build_type_parameters(
     length,
-    constraint="ToPyTorchSource",
+    constraint="Transpile",
   )
   let tuple_type = @generate/nn/tuple.build_tuple_type(length)
   let push_children = []
   for i in 0..<length {
     push_children.push(
-      "module_variables.push(ToPyTorchSource::transpile(self.\{i}, transpiler))",
+      "module_variables.push(Transpile::transpile(self.\{i}, transpiler))",
     )
   }
   let push_children = String::concat(push_children, separator="\n  ")
-  $|pub impl[\{type_parameters}] ToPyTorchSource for \{tuple_type} with transpile(
+  $|pub impl[\{type_parameters}] Transpile for \{tuple_type} with transpile(
   $|  self : \{tuple_type},
-  #|  transpiler : PyTorchTranspiler
+  #|  transpiler : Transpiler
   #|) -> String {
   #|  let module_variables = []
   $|  \{push_children}
@@ -37,12 +37,12 @@ fn main {
   let content = String::concat(functions, separator="\n\n")
   try {
     @generate.write_on_change!(
-      path="../src/nn/transpile/tuple.mbt",
+      path="../src/internal/transpile/tuple.mbt",
       ~content,
     )
   } catch {
     error =>
-      $|Failed to write content to src/nn/transpile/tuple.mbt: \{Show::to_string(error)}
+      $|Failed to write content to src/internal/transpile/tuple.mbt: \{Show::to_string(error)}
       |> println
   }
 }
