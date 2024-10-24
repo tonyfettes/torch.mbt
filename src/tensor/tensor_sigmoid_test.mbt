@@ -9,6 +9,7 @@ test "sigmoid" {
 }
 
 test "sigmoid/consistent" (it : @test.T) {
+  @distributions.seed(b"12345678223456783234567842345678")
   let distribution = @distributions.Uniform::new(-1.0, 1.0)
   let a = distribution.sample([2, 3, 4, 5])
   let c = a.sigmoid()
