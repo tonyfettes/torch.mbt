@@ -225,10 +225,6 @@ test "Tensor::op_as_view - Matrix" {
   inspect!(tensor[:][:], content="[[0, 1, 2], [3, 4, 5]]")
 }
 
-pub fn Tensor::to_tensor(self : Tensor) -> Tensor {
-  self
-}
-
 pub impl TensorLike for Tensor with to_tensor(self : Tensor) -> Tensor { self }
 
 fn Tensor::default() -> Tensor {
