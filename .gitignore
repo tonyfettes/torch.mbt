@@ -1,10 +1,11 @@
 /target/
 /.mooncakes/
-/.moonbit-lsp.json
 /.venv/
 /.envrc
 /.python-version
 /node_modules/
 /_coverage/
-/torch.mbt.egg-info/
 /.moon/
+
+__pycache__/
+*.egg-info/

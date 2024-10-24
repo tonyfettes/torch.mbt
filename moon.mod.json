@@ -9,5 +9,8 @@
   "source": "src",
   "include": [
     "src"
+  ],
+  "exclude": [
+    "__snapshot__"
   ]
 }

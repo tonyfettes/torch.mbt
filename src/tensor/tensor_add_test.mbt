@@ -25,3 +25,21 @@ test "Tensor::op_add/not-aligned" {
   let c = a + b
   inspect!(c, content="[7, 9, 11, 13, 15]")
 }
+
+test (it : @test.T) {
+  let distribution = @distributions.Uniform::new(-1.0, 1.0)
+  let a = distribution.sample([2, 3, 4, 5])
+  let b = distribution.sample([2, 3, 4, 5])
+  let c = a + b
+  it.write(
+    #|import torch
+    #|
+    #|def test_add_random():
+    $|    a = torch.tensor(\{a})
+    $|    b = torch.tensor(\{b})
+    #|    c = a + b
+    $|    assert (c == torch.tensor(\{c})).all()
+    #|
+  )
+  it.snapshot!(filename="test_add_random.py")
+}
