@@ -32,7 +32,7 @@ test "add/consistent" (it : @test.T) {
   let a = distribution.sample([2, 3, 4, 5])
   let b = distribution.sample([2, 3, 4, 5])
   let c = a + b
-  it.write(
+  it.writeln(
     #|import torch
     #|
     #|def test_add():
@@ -40,7 +40,6 @@ test "add/consistent" (it : @test.T) {
     $|    b = torch.tensor(\{b.to_json().stringify()})
     #|    c = a + b
     $|    assert (c == torch.tensor(\{c.to_json().stringify()})).all()
-    #|
   )
   it.snapshot!(filename="test_add.py")
 }

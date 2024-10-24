@@ -41,15 +41,36 @@ test "matmul/consistent" (it : @test.T) {
   let a = distribution.sample([1, 8])
   let b = distribution.sample([8, 16])
   let c = a.matmul(b)
-  it.write(
+  it.writeln(
     #|import torch
-    #|
+    ,
+  )
+  it.writeln(
     #|def test_matmul():
     $|    a = torch.tensor(\{a.to_json().stringify()})
     $|    b = torch.tensor(\{b.to_json().stringify()})
     #|    c = torch.matmul(a, b)
     $|    assert torch.allclose(c, torch.tensor(\{c.to_json().stringify()}))
-    #|
+    ,
+  )
+  let a = distribution.sample([2, 3])
+  let b = distribution.sample([3, 2])
+  let c = a.matmul(b)
+  let d = distribution.sample([2, 4])
+  let e = distribution.sample([4, 2])
+  let f = d.matmul(e)
+  let g = c.matmul(f)
+  it.writeln(
+    $|def test_matmul_multi():
+    $|    a = torch.tensor(\{a.to_json().stringify()})
+    $|    b = torch.tensor(\{b.to_json().stringify()})
+    $|    c = torch.matmul(a, b)
+    $|    d = torch.tensor(\{d.to_json().stringify()})
+    $|    e = torch.tensor(\{e.to_json().stringify()})
+    $|    f = torch.matmul(d, e)
+    $|    g = torch.matmul(c, f)
+    $|    assert torch.allclose(g, torch.tensor(\{g.to_json().stringify()}))
+    ,
   )
   it.snapshot!(filename="test_matmul.py")
 }
