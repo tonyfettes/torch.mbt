@@ -2,7 +2,7 @@
   "is-main": true,
   "import": [
     "moonbitlang/x/fs",
-    "tonyfettes/torch/nn/transpile",
+    "tonyfettes/torch/transpile",
     "tonyfettes/torch/mnist"
   ]
 }

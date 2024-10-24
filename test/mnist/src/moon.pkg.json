@@ -19,8 +19,8 @@
       "alias": "torch/shape"
     },
     {
-      "path": "tonyfettes/torch/nn/transpile",
-      "alias": "torch/nn/transpile"
+      "path": "tonyfettes/torch/transpile",
+      "alias": "torch/transpile"
     }
   ]
 }

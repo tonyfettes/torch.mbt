@@ -38,9 +38,9 @@ pub fn LeNet5::parameters(self : LeNet5) -> Iter[@torch.Tensor] {
   @torch/nn.Module::parameters(self._)
 }
 
-pub impl @torch/nn/transpile.ToPyTorchSource for LeNet5 with transpile(
+pub impl @torch/transpile.Transpile for LeNet5 with transpile(
   self : LeNet5,
-  transpiler : @torch/nn/transpile.PyTorchTranspiler
+  transpiler : @torch/transpile.Transpiler
 ) -> String {
-  @torch/nn/transpile.ToPyTorchSource::transpile(self._, transpiler)
+  @torch/transpile.Transpile::transpile(self._, transpiler)
 }

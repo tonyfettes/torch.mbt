@@ -37,12 +37,12 @@ fn main {
   let content = String::concat(functions, separator="\n\n")
   try {
     @generate.write_on_change!(
-      path="../src/internal/transpile/tuple.mbt",
+      path="../src/transpile/tuple.mbt",
       ~content,
     )
   } catch {
     error =>
-      $|Failed to write content to src/internal/transpile/tuple.mbt: \{Show::to_string(error)}
+      $|Failed to write content to src/transpile/tuple.mbt: \{Show::to_string(error)}
       |> println
   }
 }

@@ -1,7 +1,7 @@
 {
   "pre-build": [
     {
-      "input": "../../../bin/generate/transpile/tuple/main.mbt",
+      "input": "../../bin/generate/transpile/tuple/main.mbt",
       "output": "tuple.mbt",
       "command": "(cd bin && moon run generate/transpile/tuple) && moonfmt -w $output"
     }
