@@ -13,6 +13,10 @@
       "path": "tonyfettes/torch/optim",
       "alias": "torch/optim"
     },
+    {
+      "path": "tonyfettes/torch/shape",
+      "alias": "torch/shape"
+    },
     "tonyfettes/torch/mnist",
     "moonbitlang/x/fs",
     "tonyfettes/torch"
