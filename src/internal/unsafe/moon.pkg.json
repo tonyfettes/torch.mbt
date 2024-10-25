@@ -1,1 +1,6 @@
-{}
+{
+  "targets": {
+    "array.debug.mbt": ["debug"],
+    "array.release.mbt": ["release"]
+  }
+}
