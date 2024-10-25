@@ -6,6 +6,7 @@ OUT := src
 NAME := mnist-model
 JCO := corepack pnpm exec jco
 JCO_FLAGS :=
+WASM_OPT_FLAGS := --enable-gc --enable-multivalue --enable-reference-types --enable-bulk-memory --enable-simd
 
 JCO_OUTPUTS := $(OUT)/$(NAME).core.wasm $(OUT)/$(NAME).d.ts $(OUT)/$(NAME).js
 
@@ -47,7 +48,7 @@ endif
 	wasm-tools print $< > $@
 
 %.opt.wasm: %.wasm
-	wasm-opt --enable-gc --enable-multivalue --enable-reference-types --enable-bulk-memory $< -O3 -o $@
+	wasm-opt $(WASM_OPT_FLAGS) $< -O3 -o $@
 
 %.embedded.wasm: $(WIT) %.wasm
 	wasm-tools component embed $(WIT) $*.wasm -o $@ --encoding utf16
