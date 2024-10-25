@@ -164,7 +164,7 @@ test "linear/consistent" (it : @test.T) {
   it.writeln(
     #|import torch
     #|
-    #|def test_linear(snapshot):
+    #|def test_linear(snapshot: torch.Tensor):
     $|    input = torch.tensor(\{input.to_json().stringify()})
     $|    weight = torch.tensor(\{model.weight.to_json().stringify()})
     $|    bias = torch.tensor(\{model.bias.to_json().stringify()})
