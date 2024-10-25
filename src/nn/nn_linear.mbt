@@ -55,7 +55,7 @@ pub fn Linear::forward(self : Linear, input : @tensor.Tensor) -> @tensor.Tensor 
     )
   }
   let input = input.reshape([length, input_shape[di]])
-  let output = (input.matmul(self.weight) + self.bias)
+  let output = input.matmul(self.weight) + self.bias
   let output_shape = input_shape.copy()
   output_shape[di] = out_features
   output.reshape(output_shape)

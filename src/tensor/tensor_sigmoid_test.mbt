@@ -21,6 +21,7 @@ test "sigmoid/consistent" (it : @test.T) {
     #|    c = torch.sigmoid(a)
     $|    assert torch.allclose(c, torch.tensor(\{c.to_json().stringify()}))
     #|
+    ,
   )
   it.snapshot!(filename="test_sigmoid.py")
 }

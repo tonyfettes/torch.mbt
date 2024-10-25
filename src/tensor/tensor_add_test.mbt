@@ -40,6 +40,7 @@ test "add/consistent" (it : @test.T) {
     $|    b = torch.tensor(\{b.to_json().stringify()})
     #|    c = a + b
     $|    assert (c == torch.tensor(\{c.to_json().stringify()})).all()
+    ,
   )
   it.snapshot!(filename="test_add.py")
 }
