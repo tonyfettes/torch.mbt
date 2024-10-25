@@ -47,7 +47,7 @@ test "matmul/consistent" (it : @test.T) {
   let b = distribution.sample([2, 4])
   let c = a.matmul(b)
   it.writeln(
-    #|def test_matmul_1x2_2x4(snapshot):
+    #|def test_matmul_1x2_2x4():
     $|    a = torch.tensor(\{a.to_json().stringify()})
     $|    b = torch.tensor(\{b.to_json().stringify()})
     #|    c = torch.matmul(a, b)
@@ -59,7 +59,7 @@ test "matmul/consistent" (it : @test.T) {
   let b = distribution.sample([8, 16])
   let c = a.matmul(b)
   it.writeln(
-    #|def test_matmul_1x8_8x16(snapshot):
+    #|def test_matmul_1x8_8x16():
     $|    a = torch.tensor(\{a.to_json().stringify()})
     $|    b = torch.tensor(\{b.to_json().stringify()})
     #|    c = torch.matmul(a, b)
@@ -75,7 +75,7 @@ test "matmul/consistent" (it : @test.T) {
   let f = d.matmul(e)
   let g = c.matmul(f)
   it.writeln(
-    $|def test_matmul_multi_2x3_3x2_2x4_4x2(snapshot):
+    $|def test_matmul_multi_2x3_3x2_2x4_4x2():
     $|    a = torch.tensor(\{a.to_json().stringify()})
     $|    b = torch.tensor(\{b.to_json().stringify()})
     $|    c = torch.matmul(a, b)

@@ -21,7 +21,7 @@ test "mul/consistent" (it : @test.T) {
   it.write(
     #|import torch
     #|
-    #|def test_mul(snapshot):
+    #|def test_mul():
     $|    a = torch.tensor(\{a.to_json().stringify()})
     $|    b = torch.tensor(\{b.to_json().stringify()})
     #|    c = a * b

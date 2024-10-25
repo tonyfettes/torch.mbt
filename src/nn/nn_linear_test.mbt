@@ -164,7 +164,7 @@ test "linear/consistent" (it : @test.T) {
   it.writeln(
     #|import torch
     #|
-    #|def test_linear(snapshot):
+    #|def test_linear():
     $|    input = torch.tensor(\{input.to_json().stringify()})
     $|    weight = torch.tensor(\{model.weight.to_json().stringify()})
     $|    assert ((input @ weight).flatten() - torch.tensor(\{input_weight.flatten().to_json().stringify()})) == snapshot
