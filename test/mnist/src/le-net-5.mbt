@@ -40,7 +40,8 @@ pub fn LeNet5::parameters(self : LeNet5) -> Iter[@torch.Tensor] {
 
 pub impl @torch/transpile.Transpile for LeNet5 with transpile(
   self : LeNet5,
-  transpiler : @torch/transpile.Transpiler
-) -> String {
-  @torch/transpile.Transpile::transpile(self._, transpiler)
+  transpiler : @torch/transpile.Transpiler,
+  variable : String
+) -> Unit {
+  @torch/transpile.Transpile::transpile(self._, transpiler, variable)
 }
