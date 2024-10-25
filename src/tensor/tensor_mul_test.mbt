@@ -14,19 +14,20 @@ test "Tensor::op_mul - negative" {
 
 test "mul/consistent" (it : @test.T) {
   @distributions.seed(b"12345678223456783234567842345678")
-  let distribution = @distributions.Uniform::new(-1.0, 1.0)
+  let distribution = @distributions.Uniform::new(-1024.0, 1024.0)
   let a = distribution.sample([2, 3, 4, 5])
   let b = distribution.sample([2, 3, 4, 5])
   let c = a * b
   it.write(
     #|import torch
     #|
-    #|def test_mul():
+    #|def test_mul(snapshot):
     $|    a = torch.tensor(\{a.to_json().stringify()})
     $|    b = torch.tensor(\{b.to_json().stringify()})
     #|    c = a * b
-    $|    assert (c == torch.tensor(\{c.to_json().stringify()})).all()
+    $|    assert torch.allclose(c, torch.tensor(\{c.to_json().stringify()}))
     #|
+    ,
   )
   it.snapshot!(filename="test_mul.py")
 }

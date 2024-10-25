@@ -10,6 +10,7 @@
     "tonyfettes/torch/internal/debug"
   ],
   "test-import": [
-    "tonyfettes/torch/distributions"
+    "tonyfettes/torch/distributions",
+    "tonyfettes/torch/transpile"
   ]
 }

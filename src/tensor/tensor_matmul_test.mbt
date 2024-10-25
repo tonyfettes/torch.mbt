@@ -36,23 +36,37 @@ test "matmul/8@8x16" {
 }
 
 test "matmul/consistent" (it : @test.T) {
-  @distributions.seed(b"12345678223456783234567842345678")
-  let distribution = @distributions.Uniform::new(-1.0, 1.0)
-  let a = distribution.sample([1, 8])
-  let b = distribution.sample([8, 16])
-  let c = a.matmul(b)
   it.writeln(
     #|import torch
     ,
   )
+  @distributions.seed(b"12345678223456783234567842345678")
+  let distribution = @distributions.Uniform::new(-1024.0, 1024.0)
+  // 1x2 @ 2x4
+  let a = distribution.sample([1, 2])
+  let b = distribution.sample([2, 4])
+  let c = a.matmul(b)
   it.writeln(
-    #|def test_matmul():
+    #|def test_matmul_1x2_2x4(snapshot):
     $|    a = torch.tensor(\{a.to_json().stringify()})
     $|    b = torch.tensor(\{b.to_json().stringify()})
     #|    c = torch.matmul(a, b)
     $|    assert torch.allclose(c, torch.tensor(\{c.to_json().stringify()}))
     ,
   )
+  // 1x8 @ 8x16
+  let a = distribution.sample([1, 8])
+  let b = distribution.sample([8, 16])
+  let c = a.matmul(b)
+  it.writeln(
+    #|def test_matmul_1x8_8x16(snapshot):
+    $|    a = torch.tensor(\{a.to_json().stringify()})
+    $|    b = torch.tensor(\{b.to_json().stringify()})
+    #|    c = torch.matmul(a, b)
+    $|    assert torch.allclose(c, torch.tensor(\{c.to_json().stringify()}))
+    ,
+  )
+  // (2x3 @ 3x2) @ (2x4 @ 4x2)
   let a = distribution.sample([2, 3])
   let b = distribution.sample([3, 2])
   let c = a.matmul(b)
@@ -61,7 +75,7 @@ test "matmul/consistent" (it : @test.T) {
   let f = d.matmul(e)
   let g = c.matmul(f)
   it.writeln(
-    $|def test_matmul_multi():
+    $|def test_matmul_multi_2x3_3x2_2x4_4x2(snapshot):
     $|    a = torch.tensor(\{a.to_json().stringify()})
     $|    b = torch.tensor(\{b.to_json().stringify()})
     $|    c = torch.matmul(a, b)
