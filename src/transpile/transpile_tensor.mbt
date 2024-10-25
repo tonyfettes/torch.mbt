@@ -1,10 +1,9 @@
 pub impl Transpile for @tensor.Tensor with transpile(
   self : @tensor.Tensor,
-  transpiler : Transpiler
+  transpiler : Transpiler,
+  variable : String
 ) {
-  let variable = transpiler.allocate()
-  transpiler.push_model(
-    "\{variable} = torch.tensor(\{self.to_json().stringify()})",
+  transpiler.line(
+    "\{variable} = torch.tensor(\{self.to_json().stringify()}, dtype=torch.float32)",
   )
-  variable
 }

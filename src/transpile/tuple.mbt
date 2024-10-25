@@ -1,38 +1,50 @@
 pub impl[A : Transpile, B : Transpile] Transpile for (A, B) with transpile(
   self : (A, B),
-  transpiler : Transpiler
-) -> String {
+  transpiler : Transpiler,
+  variable : String
+) -> Unit {
   let module_variables = []
-  module_variables.push(Transpile::transpile(self.0, transpiler))
-  module_variables.push(Transpile::transpile(self.1, transpiler))
-  let variable = transpiler.allocate()
-  transpiler.push_model("\{variable} = torch.nn.Sequential(")
-  transpiler.level = transpiler.level + 1
-  for module_variable in module_variables {
-    transpiler.push_model("\{module_variable},")
-  }
-  transpiler.level = transpiler.level - 1
-  transpiler.push_model(")")
-  variable
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.0, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.1, transpiler, module_variable)
+  module_variables.push(module_variable)
+  transpiler.line("\{variable} = torch.nn.Sequential(")
+  transpiler.open(
+    fn() {
+      for module_variable in module_variables {
+        transpiler.line("\{module_variable},")
+      }
+    },
+  )
+  transpiler.line(")")
 }
 
 pub impl[A : Transpile, B : Transpile, C : Transpile] Transpile for (A, B, C) with transpile(
   self : (A, B, C),
-  transpiler : Transpiler
-) -> String {
+  transpiler : Transpiler,
+  variable : String
+) -> Unit {
   let module_variables = []
-  module_variables.push(Transpile::transpile(self.0, transpiler))
-  module_variables.push(Transpile::transpile(self.1, transpiler))
-  module_variables.push(Transpile::transpile(self.2, transpiler))
-  let variable = transpiler.allocate()
-  transpiler.push_model("\{variable} = torch.nn.Sequential(")
-  transpiler.level = transpiler.level + 1
-  for module_variable in module_variables {
-    transpiler.push_model("\{module_variable},")
-  }
-  transpiler.level = transpiler.level - 1
-  transpiler.push_model(")")
-  variable
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.0, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.1, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.2, transpiler, module_variable)
+  module_variables.push(module_variable)
+  transpiler.line("\{variable} = torch.nn.Sequential(")
+  transpiler.open(
+    fn() {
+      for module_variable in module_variables {
+        transpiler.line("\{module_variable},")
+      }
+    },
+  )
+  transpiler.line(")")
 }
 
 pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile] Transpile for (
@@ -40,21 +52,33 @@ pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile] Transpile f
   B,
   C,
   D,
-) with transpile(self : (A, B, C, D), transpiler : Transpiler) -> String {
+) with transpile(
+  self : (A, B, C, D),
+  transpiler : Transpiler,
+  variable : String
+) -> Unit {
   let module_variables = []
-  module_variables.push(Transpile::transpile(self.0, transpiler))
-  module_variables.push(Transpile::transpile(self.1, transpiler))
-  module_variables.push(Transpile::transpile(self.2, transpiler))
-  module_variables.push(Transpile::transpile(self.3, transpiler))
-  let variable = transpiler.allocate()
-  transpiler.push_model("\{variable} = torch.nn.Sequential(")
-  transpiler.level = transpiler.level + 1
-  for module_variable in module_variables {
-    transpiler.push_model("\{module_variable},")
-  }
-  transpiler.level = transpiler.level - 1
-  transpiler.push_model(")")
-  variable
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.0, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.1, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.2, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.3, transpiler, module_variable)
+  module_variables.push(module_variable)
+  transpiler.line("\{variable} = torch.nn.Sequential(")
+  transpiler.open(
+    fn() {
+      for module_variable in module_variables {
+        transpiler.line("\{module_variable},")
+      }
+    },
+  )
+  transpiler.line(")")
 }
 
 pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpile] Transpile for (
@@ -63,22 +87,36 @@ pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpi
   C,
   D,
   E,
-) with transpile(self : (A, B, C, D, E), transpiler : Transpiler) -> String {
+) with transpile(
+  self : (A, B, C, D, E),
+  transpiler : Transpiler,
+  variable : String
+) -> Unit {
   let module_variables = []
-  module_variables.push(Transpile::transpile(self.0, transpiler))
-  module_variables.push(Transpile::transpile(self.1, transpiler))
-  module_variables.push(Transpile::transpile(self.2, transpiler))
-  module_variables.push(Transpile::transpile(self.3, transpiler))
-  module_variables.push(Transpile::transpile(self.4, transpiler))
-  let variable = transpiler.allocate()
-  transpiler.push_model("\{variable} = torch.nn.Sequential(")
-  transpiler.level = transpiler.level + 1
-  for module_variable in module_variables {
-    transpiler.push_model("\{module_variable},")
-  }
-  transpiler.level = transpiler.level - 1
-  transpiler.push_model(")")
-  variable
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.0, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.1, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.2, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.3, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.4, transpiler, module_variable)
+  module_variables.push(module_variable)
+  transpiler.line("\{variable} = torch.nn.Sequential(")
+  transpiler.open(
+    fn() {
+      for module_variable in module_variables {
+        transpiler.line("\{module_variable},")
+      }
+    },
+  )
+  transpiler.line(")")
 }
 
 pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpile, F : Transpile] Transpile for (
@@ -88,23 +126,39 @@ pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpi
   D,
   E,
   F,
-) with transpile(self : (A, B, C, D, E, F), transpiler : Transpiler) -> String {
+) with transpile(
+  self : (A, B, C, D, E, F),
+  transpiler : Transpiler,
+  variable : String
+) -> Unit {
   let module_variables = []
-  module_variables.push(Transpile::transpile(self.0, transpiler))
-  module_variables.push(Transpile::transpile(self.1, transpiler))
-  module_variables.push(Transpile::transpile(self.2, transpiler))
-  module_variables.push(Transpile::transpile(self.3, transpiler))
-  module_variables.push(Transpile::transpile(self.4, transpiler))
-  module_variables.push(Transpile::transpile(self.5, transpiler))
-  let variable = transpiler.allocate()
-  transpiler.push_model("\{variable} = torch.nn.Sequential(")
-  transpiler.level = transpiler.level + 1
-  for module_variable in module_variables {
-    transpiler.push_model("\{module_variable},")
-  }
-  transpiler.level = transpiler.level - 1
-  transpiler.push_model(")")
-  variable
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.0, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.1, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.2, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.3, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.4, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.5, transpiler, module_variable)
+  module_variables.push(module_variable)
+  transpiler.line("\{variable} = torch.nn.Sequential(")
+  transpiler.open(
+    fn() {
+      for module_variable in module_variables {
+        transpiler.line("\{module_variable},")
+      }
+    },
+  )
+  transpiler.line(")")
 }
 
 pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpile, F : Transpile, G : Transpile] Transpile for (
@@ -115,24 +169,42 @@ pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpi
   E,
   F,
   G,
-) with transpile(self : (A, B, C, D, E, F, G), transpiler : Transpiler) -> String {
+) with transpile(
+  self : (A, B, C, D, E, F, G),
+  transpiler : Transpiler,
+  variable : String
+) -> Unit {
   let module_variables = []
-  module_variables.push(Transpile::transpile(self.0, transpiler))
-  module_variables.push(Transpile::transpile(self.1, transpiler))
-  module_variables.push(Transpile::transpile(self.2, transpiler))
-  module_variables.push(Transpile::transpile(self.3, transpiler))
-  module_variables.push(Transpile::transpile(self.4, transpiler))
-  module_variables.push(Transpile::transpile(self.5, transpiler))
-  module_variables.push(Transpile::transpile(self.6, transpiler))
-  let variable = transpiler.allocate()
-  transpiler.push_model("\{variable} = torch.nn.Sequential(")
-  transpiler.level = transpiler.level + 1
-  for module_variable in module_variables {
-    transpiler.push_model("\{module_variable},")
-  }
-  transpiler.level = transpiler.level - 1
-  transpiler.push_model(")")
-  variable
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.0, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.1, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.2, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.3, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.4, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.5, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.6, transpiler, module_variable)
+  module_variables.push(module_variable)
+  transpiler.line("\{variable} = torch.nn.Sequential(")
+  transpiler.open(
+    fn() {
+      for module_variable in module_variables {
+        transpiler.line("\{module_variable},")
+      }
+    },
+  )
+  transpiler.line(")")
 }
 
 pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpile, F : Transpile, G : Transpile, H : Transpile] Transpile for (
@@ -144,25 +216,45 @@ pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpi
   F,
   G,
   H,
-) with transpile(self : (A, B, C, D, E, F, G, H), transpiler : Transpiler) -> String {
+) with transpile(
+  self : (A, B, C, D, E, F, G, H),
+  transpiler : Transpiler,
+  variable : String
+) -> Unit {
   let module_variables = []
-  module_variables.push(Transpile::transpile(self.0, transpiler))
-  module_variables.push(Transpile::transpile(self.1, transpiler))
-  module_variables.push(Transpile::transpile(self.2, transpiler))
-  module_variables.push(Transpile::transpile(self.3, transpiler))
-  module_variables.push(Transpile::transpile(self.4, transpiler))
-  module_variables.push(Transpile::transpile(self.5, transpiler))
-  module_variables.push(Transpile::transpile(self.6, transpiler))
-  module_variables.push(Transpile::transpile(self.7, transpiler))
-  let variable = transpiler.allocate()
-  transpiler.push_model("\{variable} = torch.nn.Sequential(")
-  transpiler.level = transpiler.level + 1
-  for module_variable in module_variables {
-    transpiler.push_model("\{module_variable},")
-  }
-  transpiler.level = transpiler.level - 1
-  transpiler.push_model(")")
-  variable
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.0, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.1, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.2, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.3, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.4, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.5, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.6, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.7, transpiler, module_variable)
+  module_variables.push(module_variable)
+  transpiler.line("\{variable} = torch.nn.Sequential(")
+  transpiler.open(
+    fn() {
+      for module_variable in module_variables {
+        transpiler.line("\{module_variable},")
+      }
+    },
+  )
+  transpiler.line(")")
 }
 
 pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpile, F : Transpile, G : Transpile, H : Transpile, I : Transpile] Transpile for (
@@ -175,26 +267,48 @@ pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpi
   G,
   H,
   I,
-) with transpile(self : (A, B, C, D, E, F, G, H, I), transpiler : Transpiler) -> String {
+) with transpile(
+  self : (A, B, C, D, E, F, G, H, I),
+  transpiler : Transpiler,
+  variable : String
+) -> Unit {
   let module_variables = []
-  module_variables.push(Transpile::transpile(self.0, transpiler))
-  module_variables.push(Transpile::transpile(self.1, transpiler))
-  module_variables.push(Transpile::transpile(self.2, transpiler))
-  module_variables.push(Transpile::transpile(self.3, transpiler))
-  module_variables.push(Transpile::transpile(self.4, transpiler))
-  module_variables.push(Transpile::transpile(self.5, transpiler))
-  module_variables.push(Transpile::transpile(self.6, transpiler))
-  module_variables.push(Transpile::transpile(self.7, transpiler))
-  module_variables.push(Transpile::transpile(self.8, transpiler))
-  let variable = transpiler.allocate()
-  transpiler.push_model("\{variable} = torch.nn.Sequential(")
-  transpiler.level = transpiler.level + 1
-  for module_variable in module_variables {
-    transpiler.push_model("\{module_variable},")
-  }
-  transpiler.level = transpiler.level - 1
-  transpiler.push_model(")")
-  variable
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.0, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.1, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.2, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.3, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.4, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.5, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.6, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.7, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.8, transpiler, module_variable)
+  module_variables.push(module_variable)
+  transpiler.line("\{variable} = torch.nn.Sequential(")
+  transpiler.open(
+    fn() {
+      for module_variable in module_variables {
+        transpiler.line("\{module_variable},")
+      }
+    },
+  )
+  transpiler.line(")")
 }
 
 pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpile, F : Transpile, G : Transpile, H : Transpile, I : Transpile, J : Transpile] Transpile for (
@@ -208,27 +322,51 @@ pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpi
   H,
   I,
   J,
-) with transpile(self : (A, B, C, D, E, F, G, H, I, J), transpiler : Transpiler) -> String {
+) with transpile(
+  self : (A, B, C, D, E, F, G, H, I, J),
+  transpiler : Transpiler,
+  variable : String
+) -> Unit {
   let module_variables = []
-  module_variables.push(Transpile::transpile(self.0, transpiler))
-  module_variables.push(Transpile::transpile(self.1, transpiler))
-  module_variables.push(Transpile::transpile(self.2, transpiler))
-  module_variables.push(Transpile::transpile(self.3, transpiler))
-  module_variables.push(Transpile::transpile(self.4, transpiler))
-  module_variables.push(Transpile::transpile(self.5, transpiler))
-  module_variables.push(Transpile::transpile(self.6, transpiler))
-  module_variables.push(Transpile::transpile(self.7, transpiler))
-  module_variables.push(Transpile::transpile(self.8, transpiler))
-  module_variables.push(Transpile::transpile(self.9, transpiler))
-  let variable = transpiler.allocate()
-  transpiler.push_model("\{variable} = torch.nn.Sequential(")
-  transpiler.level = transpiler.level + 1
-  for module_variable in module_variables {
-    transpiler.push_model("\{module_variable},")
-  }
-  transpiler.level = transpiler.level - 1
-  transpiler.push_model(")")
-  variable
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.0, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.1, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.2, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.3, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.4, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.5, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.6, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.7, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.8, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.9, transpiler, module_variable)
+  module_variables.push(module_variable)
+  transpiler.line("\{variable} = torch.nn.Sequential(")
+  transpiler.open(
+    fn() {
+      for module_variable in module_variables {
+        transpiler.line("\{module_variable},")
+      }
+    },
+  )
+  transpiler.line(")")
 }
 
 pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpile, F : Transpile, G : Transpile, H : Transpile, I : Transpile, J : Transpile, K : Transpile] Transpile for (
@@ -245,29 +383,52 @@ pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpi
   K,
 ) with transpile(
   self : (A, B, C, D, E, F, G, H, I, J, K),
-  transpiler : Transpiler
-) -> String {
+  transpiler : Transpiler,
+  variable : String
+) -> Unit {
   let module_variables = []
-  module_variables.push(Transpile::transpile(self.0, transpiler))
-  module_variables.push(Transpile::transpile(self.1, transpiler))
-  module_variables.push(Transpile::transpile(self.2, transpiler))
-  module_variables.push(Transpile::transpile(self.3, transpiler))
-  module_variables.push(Transpile::transpile(self.4, transpiler))
-  module_variables.push(Transpile::transpile(self.5, transpiler))
-  module_variables.push(Transpile::transpile(self.6, transpiler))
-  module_variables.push(Transpile::transpile(self.7, transpiler))
-  module_variables.push(Transpile::transpile(self.8, transpiler))
-  module_variables.push(Transpile::transpile(self.9, transpiler))
-  module_variables.push(Transpile::transpile(self.10, transpiler))
-  let variable = transpiler.allocate()
-  transpiler.push_model("\{variable} = torch.nn.Sequential(")
-  transpiler.level = transpiler.level + 1
-  for module_variable in module_variables {
-    transpiler.push_model("\{module_variable},")
-  }
-  transpiler.level = transpiler.level - 1
-  transpiler.push_model(")")
-  variable
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.0, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.1, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.2, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.3, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.4, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.5, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.6, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.7, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.8, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.9, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.10, transpiler, module_variable)
+  module_variables.push(module_variable)
+  transpiler.line("\{variable} = torch.nn.Sequential(")
+  transpiler.open(
+    fn() {
+      for module_variable in module_variables {
+        transpiler.line("\{module_variable},")
+      }
+    },
+  )
+  transpiler.line(")")
 }
 
 pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpile, F : Transpile, G : Transpile, H : Transpile, I : Transpile, J : Transpile, K : Transpile, L : Transpile] Transpile for (
@@ -285,30 +446,55 @@ pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpi
   L,
 ) with transpile(
   self : (A, B, C, D, E, F, G, H, I, J, K, L),
-  transpiler : Transpiler
-) -> String {
+  transpiler : Transpiler,
+  variable : String
+) -> Unit {
   let module_variables = []
-  module_variables.push(Transpile::transpile(self.0, transpiler))
-  module_variables.push(Transpile::transpile(self.1, transpiler))
-  module_variables.push(Transpile::transpile(self.2, transpiler))
-  module_variables.push(Transpile::transpile(self.3, transpiler))
-  module_variables.push(Transpile::transpile(self.4, transpiler))
-  module_variables.push(Transpile::transpile(self.5, transpiler))
-  module_variables.push(Transpile::transpile(self.6, transpiler))
-  module_variables.push(Transpile::transpile(self.7, transpiler))
-  module_variables.push(Transpile::transpile(self.8, transpiler))
-  module_variables.push(Transpile::transpile(self.9, transpiler))
-  module_variables.push(Transpile::transpile(self.10, transpiler))
-  module_variables.push(Transpile::transpile(self.11, transpiler))
-  let variable = transpiler.allocate()
-  transpiler.push_model("\{variable} = torch.nn.Sequential(")
-  transpiler.level = transpiler.level + 1
-  for module_variable in module_variables {
-    transpiler.push_model("\{module_variable},")
-  }
-  transpiler.level = transpiler.level - 1
-  transpiler.push_model(")")
-  variable
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.0, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.1, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.2, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.3, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.4, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.5, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.6, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.7, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.8, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.9, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.10, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.11, transpiler, module_variable)
+  module_variables.push(module_variable)
+  transpiler.line("\{variable} = torch.nn.Sequential(")
+  transpiler.open(
+    fn() {
+      for module_variable in module_variables {
+        transpiler.line("\{module_variable},")
+      }
+    },
+  )
+  transpiler.line(")")
 }
 
 pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpile, F : Transpile, G : Transpile, H : Transpile, I : Transpile, J : Transpile, K : Transpile, L : Transpile, M : Transpile] Transpile for (
@@ -327,31 +513,58 @@ pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpi
   M,
 ) with transpile(
   self : (A, B, C, D, E, F, G, H, I, J, K, L, M),
-  transpiler : Transpiler
-) -> String {
+  transpiler : Transpiler,
+  variable : String
+) -> Unit {
   let module_variables = []
-  module_variables.push(Transpile::transpile(self.0, transpiler))
-  module_variables.push(Transpile::transpile(self.1, transpiler))
-  module_variables.push(Transpile::transpile(self.2, transpiler))
-  module_variables.push(Transpile::transpile(self.3, transpiler))
-  module_variables.push(Transpile::transpile(self.4, transpiler))
-  module_variables.push(Transpile::transpile(self.5, transpiler))
-  module_variables.push(Transpile::transpile(self.6, transpiler))
-  module_variables.push(Transpile::transpile(self.7, transpiler))
-  module_variables.push(Transpile::transpile(self.8, transpiler))
-  module_variables.push(Transpile::transpile(self.9, transpiler))
-  module_variables.push(Transpile::transpile(self.10, transpiler))
-  module_variables.push(Transpile::transpile(self.11, transpiler))
-  module_variables.push(Transpile::transpile(self.12, transpiler))
-  let variable = transpiler.allocate()
-  transpiler.push_model("\{variable} = torch.nn.Sequential(")
-  transpiler.level = transpiler.level + 1
-  for module_variable in module_variables {
-    transpiler.push_model("\{module_variable},")
-  }
-  transpiler.level = transpiler.level - 1
-  transpiler.push_model(")")
-  variable
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.0, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.1, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.2, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.3, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.4, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.5, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.6, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.7, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.8, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.9, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.10, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.11, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.12, transpiler, module_variable)
+  module_variables.push(module_variable)
+  transpiler.line("\{variable} = torch.nn.Sequential(")
+  transpiler.open(
+    fn() {
+      for module_variable in module_variables {
+        transpiler.line("\{module_variable},")
+      }
+    },
+  )
+  transpiler.line(")")
 }
 
 pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpile, F : Transpile, G : Transpile, H : Transpile, I : Transpile, J : Transpile, K : Transpile, L : Transpile, M : Transpile, N : Transpile] Transpile for (
@@ -371,32 +584,61 @@ pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpi
   N,
 ) with transpile(
   self : (A, B, C, D, E, F, G, H, I, J, K, L, M, N),
-  transpiler : Transpiler
-) -> String {
+  transpiler : Transpiler,
+  variable : String
+) -> Unit {
   let module_variables = []
-  module_variables.push(Transpile::transpile(self.0, transpiler))
-  module_variables.push(Transpile::transpile(self.1, transpiler))
-  module_variables.push(Transpile::transpile(self.2, transpiler))
-  module_variables.push(Transpile::transpile(self.3, transpiler))
-  module_variables.push(Transpile::transpile(self.4, transpiler))
-  module_variables.push(Transpile::transpile(self.5, transpiler))
-  module_variables.push(Transpile::transpile(self.6, transpiler))
-  module_variables.push(Transpile::transpile(self.7, transpiler))
-  module_variables.push(Transpile::transpile(self.8, transpiler))
-  module_variables.push(Transpile::transpile(self.9, transpiler))
-  module_variables.push(Transpile::transpile(self.10, transpiler))
-  module_variables.push(Transpile::transpile(self.11, transpiler))
-  module_variables.push(Transpile::transpile(self.12, transpiler))
-  module_variables.push(Transpile::transpile(self.13, transpiler))
-  let variable = transpiler.allocate()
-  transpiler.push_model("\{variable} = torch.nn.Sequential(")
-  transpiler.level = transpiler.level + 1
-  for module_variable in module_variables {
-    transpiler.push_model("\{module_variable},")
-  }
-  transpiler.level = transpiler.level - 1
-  transpiler.push_model(")")
-  variable
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.0, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.1, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.2, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.3, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.4, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.5, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.6, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.7, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.8, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.9, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.10, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.11, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.12, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.13, transpiler, module_variable)
+  module_variables.push(module_variable)
+  transpiler.line("\{variable} = torch.nn.Sequential(")
+  transpiler.open(
+    fn() {
+      for module_variable in module_variables {
+        transpiler.line("\{module_variable},")
+      }
+    },
+  )
+  transpiler.line(")")
 }
 
 pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpile, F : Transpile, G : Transpile, H : Transpile, I : Transpile, J : Transpile, K : Transpile, L : Transpile, M : Transpile, N : Transpile, O : Transpile] Transpile for (
@@ -417,33 +659,64 @@ pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpi
   O,
 ) with transpile(
   self : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O),
-  transpiler : Transpiler
-) -> String {
+  transpiler : Transpiler,
+  variable : String
+) -> Unit {
   let module_variables = []
-  module_variables.push(Transpile::transpile(self.0, transpiler))
-  module_variables.push(Transpile::transpile(self.1, transpiler))
-  module_variables.push(Transpile::transpile(self.2, transpiler))
-  module_variables.push(Transpile::transpile(self.3, transpiler))
-  module_variables.push(Transpile::transpile(self.4, transpiler))
-  module_variables.push(Transpile::transpile(self.5, transpiler))
-  module_variables.push(Transpile::transpile(self.6, transpiler))
-  module_variables.push(Transpile::transpile(self.7, transpiler))
-  module_variables.push(Transpile::transpile(self.8, transpiler))
-  module_variables.push(Transpile::transpile(self.9, transpiler))
-  module_variables.push(Transpile::transpile(self.10, transpiler))
-  module_variables.push(Transpile::transpile(self.11, transpiler))
-  module_variables.push(Transpile::transpile(self.12, transpiler))
-  module_variables.push(Transpile::transpile(self.13, transpiler))
-  module_variables.push(Transpile::transpile(self.14, transpiler))
-  let variable = transpiler.allocate()
-  transpiler.push_model("\{variable} = torch.nn.Sequential(")
-  transpiler.level = transpiler.level + 1
-  for module_variable in module_variables {
-    transpiler.push_model("\{module_variable},")
-  }
-  transpiler.level = transpiler.level - 1
-  transpiler.push_model(")")
-  variable
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.0, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.1, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.2, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.3, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.4, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.5, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.6, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.7, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.8, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.9, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.10, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.11, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.12, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.13, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.14, transpiler, module_variable)
+  module_variables.push(module_variable)
+  transpiler.line("\{variable} = torch.nn.Sequential(")
+  transpiler.open(
+    fn() {
+      for module_variable in module_variables {
+        transpiler.line("\{module_variable},")
+      }
+    },
+  )
+  transpiler.line(")")
 }
 
 pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpile, F : Transpile, G : Transpile, H : Transpile, I : Transpile, J : Transpile, K : Transpile, L : Transpile, M : Transpile, N : Transpile, O : Transpile, P : Transpile] Transpile for (
@@ -465,32 +738,65 @@ pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpi
   P,
 ) with transpile(
   self : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P),
-  transpiler : Transpiler
-) -> String {
+  transpiler : Transpiler,
+  variable : String
+) -> Unit {
   let module_variables = []
-  module_variables.push(Transpile::transpile(self.0, transpiler))
-  module_variables.push(Transpile::transpile(self.1, transpiler))
-  module_variables.push(Transpile::transpile(self.2, transpiler))
-  module_variables.push(Transpile::transpile(self.3, transpiler))
-  module_variables.push(Transpile::transpile(self.4, transpiler))
-  module_variables.push(Transpile::transpile(self.5, transpiler))
-  module_variables.push(Transpile::transpile(self.6, transpiler))
-  module_variables.push(Transpile::transpile(self.7, transpiler))
-  module_variables.push(Transpile::transpile(self.8, transpiler))
-  module_variables.push(Transpile::transpile(self.9, transpiler))
-  module_variables.push(Transpile::transpile(self.10, transpiler))
-  module_variables.push(Transpile::transpile(self.11, transpiler))
-  module_variables.push(Transpile::transpile(self.12, transpiler))
-  module_variables.push(Transpile::transpile(self.13, transpiler))
-  module_variables.push(Transpile::transpile(self.14, transpiler))
-  module_variables.push(Transpile::transpile(self.15, transpiler))
-  let variable = transpiler.allocate()
-  transpiler.push_model("\{variable} = torch.nn.Sequential(")
-  transpiler.level = transpiler.level + 1
-  for module_variable in module_variables {
-    transpiler.push_model("\{module_variable},")
-  }
-  transpiler.level = transpiler.level - 1
-  transpiler.push_model(")")
-  variable
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.0, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.1, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.2, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.3, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.4, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.5, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.6, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.7, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.8, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.9, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.10, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.11, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.12, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.13, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.14, transpiler, module_variable)
+  module_variables.push(module_variable)
+  let module_variable = transpiler.allocate()
+  Transpile::transpile(self.15, transpiler, module_variable)
+  module_variables.push(module_variable)
+  transpiler.line("\{variable} = torch.nn.Sequential(")
+  transpiler.open(
+    fn() {
+      for module_variable in module_variables {
+        transpiler.line("\{module_variable},")
+      }
+    },
+  )
+  transpiler.line(")")
 }
