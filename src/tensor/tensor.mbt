@@ -313,13 +313,16 @@ fn Tensor::propagate(self : Tensor) -> Unit {
       a.propagate()
     }
     MatMul(a, b) => {
-      for i in 0..<a.shape[0] {
-        for j in 0..<b.shape[1] {
-          for k in 0..<a.shape[1] {
-            a.grad[i * a.block[0] + k] += self.grad[i * a.shape[0] + j] *
-              b.value[k * b.block[0] + j]
-            b.grad[k * b.block[0] + j] += self.grad[i * a.shape[0] + j] *
-              a.value[i * a.block[0] + k]
+      let row = a.shape[0]
+      let col = b.shape[1]
+      let key = a.shape[1]
+      for r = 0; r < row; r = r + 1 {
+        for c = 0; c < col; c = c + 1 {
+          for k = 0; k < key; k = k + 1 {
+            a.grad[r * key + k] += self.grad[r * col + c] *
+              b.value[k * col + c]
+            b.grad[k * col + c] += self.grad[r * col + c] *
+              a.value[r * key + k]
           }
         }
       }
