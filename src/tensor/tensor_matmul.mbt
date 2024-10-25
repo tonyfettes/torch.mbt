@@ -11,24 +11,25 @@ pub fn Tensor::matmul(self : Tensor, other : Tensor) -> Tensor {
       "Matrix dimensions do not match: \{self_shape[0]}x\{self_shape[1]} * \{other_shape[0]}x\{other_shape[1]}",
     )
   }
-  let output : FixedArray[Float] = FixedArray::make(
-    self_shape[0] * other_shape[1],
-    0.0,
-  )
-  for i = 0; i < self_shape[0]; i = i + 1 {
-    for j = 0; j < other_shape[1]; j = j + 1 {
-      for k = 0; k < self_shape[1]; k = k + 1 {
-        output[i * other_shape[1] + j] += self_value[i * self_shape[1] + k] *
-          other_value[k * other_shape[1] + j]
+  let row = self_shape[0]
+  let col = other_shape[1]
+  let key = self_shape[1]
+  let total = row * col
+  let value : FixedArray[Float] = FixedArray::make(total, 0.0)
+  for r = 0; r < row; r = r + 1 {
+    for c = 0; c < col; c = c + 1 {
+      for k = 0; k < key; k = k + 1 {
+        // value[r][c] += self_value[r][k] * other_value[k][c]
+        value[r * col + c] += self_value[r * key + k] * other_value[k * col + c]
       }
     }
   }
   Tensor::{
-    value: output,
-    shape: [self_shape[0], other_shape[1]],
-    block: [other_shape[1], 1],
+    value,
+    shape: [row, col],
+    block: [col, 1],
     graph: Graph::MatMul(self, other),
     ref: 0,
-    grad: FixedArray::make(self_shape[0] * other_shape[1], 0.0),
+    grad: FixedArray::make(total, 0.0),
   }
 }
