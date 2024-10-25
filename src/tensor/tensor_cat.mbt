@@ -54,6 +54,6 @@ pub fn Tensor::cat(tensors : FixedArray[Tensor], ~dim : Int = 0) -> Tensor {
     block,
     graph: Cat(tensors, FixedArray::from_array(index)),
     ref: 0,
-    grad: FixedArray::make(value.length(), 0.0),
+    grad: FixedArray::make(value.length(), (0.0 : Float)),
   }
 }

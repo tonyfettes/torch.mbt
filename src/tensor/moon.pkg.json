@@ -7,7 +7,8 @@
   },
   "import": [
     "tonyfettes/torch/shape",
-    "tonyfettes/torch/internal/debug"
+    "tonyfettes/torch/internal/debug",
+    "tonyfettes/torch/internal/unsafe"
   ],
   "test-import": [
     "tonyfettes/torch/distributions",

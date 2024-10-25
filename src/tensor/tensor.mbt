@@ -1,10 +1,10 @@
 pub struct Tensor {
-  value : FixedArray[Float]
-  shape : FixedArray[Int]
-  block : FixedArray[Int]
+  value : @unsafe.UnsafeArray[Float]
+  shape : @unsafe.UnsafeArray[Int]
+  block : @unsafe.UnsafeArray[Int]
   mut graph : Graph
   mut ref : Int
-  grad : FixedArray[Float]
+  grad : @unsafe.UnsafeArray[Float]
 }
 
 pub let empty : Tensor = Tensor::{
@@ -26,11 +26,11 @@ pub enum Graph {
   Neg(Tensor)
   Exp(Tensor)
   Log(Tensor)
-  Sum(Tensor, FixedArray[Array[Int]])
+  Sum(Tensor, @unsafe.UnsafeArray[Array[Int]])
   Pow(Tensor, Int)
   MatMul(Tensor, Tensor)
-  Get(Tensor, FixedArray[Int])
-  Cat(FixedArray[Tensor], FixedArray[(Int, Int)])
+  Get(Tensor, @unsafe.UnsafeArray[Int])
+  Cat(@unsafe.UnsafeArray[Tensor], @unsafe.UnsafeArray[(Int, Int)])
   Nop(Tensor)
   ReLU(Tensor)
 } derive(Show)
@@ -107,7 +107,7 @@ pub fn Tensor::length(self : Tensor) -> Int {
 pub fn Tensor::op_sub(self : Tensor, other : Tensor) -> Tensor {
   let (self, other) = Tensor::broadcast(self, other)
   let length = self.value.length()
-  let value : FixedArray[Float] = FixedArray::make(length, 0.0)
+  let value : FixedArray[Float] = FixedArray::make(length, (0.0 : Float))
   for i = 0; i < self.value.length(); i = i + 1 {
     value[i] = self.value[i] - other.value[i]
   }
@@ -117,13 +117,13 @@ pub fn Tensor::op_sub(self : Tensor, other : Tensor) -> Tensor {
     block: self.block,
     graph: Graph::Sub(self, other),
     ref: 0,
-    grad: FixedArray::make(length, 0.0),
+    grad: FixedArray::make(length, (0.0 : Float)),
   }
 }
 
 pub fn Tensor::op_neg(self : Tensor) -> Tensor {
   let length = self.value.length()
-  let output : FixedArray[Float] = FixedArray::make(length, 0.0)
+  let output : FixedArray[Float] = FixedArray::make(length, (0.0 : Float))
   for i = 0; i < self.value.length(); i = i + 1 {
     output[i] = -self.value[i]
   }
@@ -133,14 +133,14 @@ pub fn Tensor::op_neg(self : Tensor) -> Tensor {
     block: self.block,
     graph: Graph::Neg(self),
     ref: 0,
-    grad: FixedArray::make(length, 0.0),
+    grad: FixedArray::make(length, (0.0 : Float)),
   }
 }
 
 pub fn Tensor::op_div(self : Tensor, other : Tensor) -> Tensor {
   let (self, other) = Tensor::broadcast(self, other)
   let length = self.value.length()
-  let output : FixedArray[Float] = FixedArray::make(length, 0.0)
+  let output : FixedArray[Float] = FixedArray::make(length, (0.0 : Float))
   for i = 0; i < self.value.length(); i = i + 1 {
     output[i] = self.value[i] / other.value[i]
   }
@@ -150,7 +150,7 @@ pub fn Tensor::op_div(self : Tensor, other : Tensor) -> Tensor {
     block: self.block,
     graph: Graph::Div(self, other),
     ref: 0,
-    grad: FixedArray::make(length, 0.0),
+    grad: FixedArray::make(length, (0.0 : Float)),
   }
 }
 
@@ -228,8 +228,8 @@ fn Tensor::ref(self : Tensor) -> Unit {
       b.ref()
     }
     Cat(xs, _) =>
-      for x in xs {
-        x.ref()
+      for i in 0..<xs.length() {
+        xs[i].ref()
       }
     Get(x, _) => x.ref()
     Nop(x) => x.ref()
@@ -335,10 +335,8 @@ fn Tensor::propagate(self : Tensor) -> Unit {
       for r = 0; r < row; r = r + 1 {
         for c = 0; c < col; c = c + 1 {
           for k = 0; k < key; k = k + 1 {
-            a_grad[r * key + k] += self_grad[r * col + c] *
-              b.value[k * col + c]
-            b_grad[k * col + c] += self_grad[r * col + c] *
-              a.value[r * key + k]
+            a_grad[r * key + k] += self_grad[r * col + c] * b.value[k * col + c]
+            b_grad[k * col + c] += self_grad[r * col + c] * a.value[r * key + k]
           }
         }
       }
@@ -357,8 +355,8 @@ fn Tensor::propagate(self : Tensor) -> Unit {
         let (x, m) = m[i]
         xs[x].grad[m] += self_grad[i]
       }
-      for x in xs {
-        x.propagate()
+      for i in 0..<xs.length() {
+        xs[i].propagate()
       }
     }
     Nop(x) => x.propagate()
@@ -410,8 +408,8 @@ fn Tensor::check(self : Tensor) -> Unit {
     }
     Get(a, _) => a.check()
     Cat(xs, _) =>
-      for x in xs {
-        x.check()
+      for i in 0..<xs.length() {
+        xs[i].check()
       }
     Nop(x) => x.check()
     ReLU(x) => x.check()
@@ -499,12 +497,12 @@ test "Tensor::bacward - MatMul" {
 
 pub fn Tensor::reLU(self : Tensor) -> Tensor {
   Tensor::{
-    value: self.value.map(fn { x => if x > 0.0 { x } else { 0.0 } }),
+    value: self.value._.map(fn { x => if x > 0.0 { x } else { (0.0 : Float) } }),
     shape: self.shape,
     block: self.block,
     graph: Graph::ReLU(self),
     ref: 0,
-    grad: FixedArray::make(self.value.length(), 0.0),
+    grad: FixedArray::make(self.value.length(), (0.0 : Float)),
   }
 }
 
@@ -540,7 +538,7 @@ pub fn Tensor::zeros[Shape : @shape.Shape](
     } else {
       Graph::Val
     },
-    grad: FixedArray::make(total, 0.0),
+    grad: FixedArray::make(total, (0.0 : Float)),
   }
 }
 
@@ -562,6 +560,14 @@ fn Tensor::ones[Shape : @shape.Shape](
     } else {
       Graph::Val
     },
-    grad: FixedArray::make(total, 0.0),
+    grad: FixedArray::make(total, (0.0 : Float)),
   }
+}
+
+pub fn Tensor::shape(self : Tensor) -> FixedArray[Int] {
+  self.shape._
+}
+
+pub fn Tensor::value(self : Tensor) -> FixedArray[Float] {
+  self.value._
 }

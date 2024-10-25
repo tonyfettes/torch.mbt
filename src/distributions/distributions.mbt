@@ -90,7 +90,7 @@ pub fn Categorical::sample(self : Categorical) -> Int {
     abort("Categorical distribution only supports 1D probabilities")
   }
   let mut choice = rand.val.float()
-  for index, value in self.probs.value {
+  for index, value in self.probs.value._ {
     choice = choice - value
     if choice <= 0.0 {
       return index

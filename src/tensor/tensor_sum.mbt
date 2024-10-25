@@ -44,6 +44,6 @@ pub fn Tensor::sum(self : Tensor, ~dim : @shape.Shape = ()) -> Tensor {
     block,
     graph: Graph::Sum(self, index),
     ref: 0,
-    grad: FixedArray::make(total, 0.0),
+    grad: FixedArray::make(total, (0.0 : Float)),
   }
 }

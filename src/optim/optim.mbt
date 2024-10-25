@@ -17,7 +17,7 @@ pub fn SGD::new(
 
 pub fn SGD::zero_grad(self : SGD) -> Unit {
   for parameter in self.parameters {
-    parameter.grad.fill(0.0)
+    parameter.grad._.fill(0.0)
   }
 }
 

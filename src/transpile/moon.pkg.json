@@ -8,7 +8,8 @@
   ],
   "import": [
     "tonyfettes/torch/tensor",
-    "tonyfettes/torch/nn"
+    "tonyfettes/torch/nn",
+    "tonyfettes/torch/internal/unsafe"
   ],
   "test-import": [
     "tonyfettes/torch/shape",

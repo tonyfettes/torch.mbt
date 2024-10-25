@@ -27,7 +27,7 @@ pub fn Tensor::iter(self : Tensor, ~dim : Int = 0) -> Iter[Tensor] {
             block,
             graph: Get(self, index),
             ref: 0,
-            grad: FixedArray::make(total, 0.0),
+            grad: FixedArray::make(total, (0.0 : Float)),
           }
           return yield(tensor)
         }

@@ -15,7 +15,7 @@ pub fn Tensor::matmul(self : Tensor, other : Tensor) -> Tensor {
   let col = other_shape[1]
   let key = self_shape[1]
   let total = row * col
-  let value : FixedArray[Float] = FixedArray::make(total, 0.0)
+  let value = @unsafe.UnsafeArray::make(total, (0.0 : Float))
   for r = 0; r < row; r = r + 1 {
     for c = 0; c < col; c = c + 1 {
       for k = 0; k < key; k = k + 1 {
@@ -30,6 +30,6 @@ pub fn Tensor::matmul(self : Tensor, other : Tensor) -> Tensor {
     block: [col, 1],
     graph: Graph::MatMul(self, other),
     ref: 0,
-    grad: FixedArray::make(total, 0.0),
+    grad: FixedArray::make(total, (0.0 : Float)),
   }
 }

@@ -15,10 +15,10 @@ pub impl[X : TensorLike] TensorLike for FixedArray[X] with to_tensor(
     abort("No tensors to concatenate")
   }
   if tensors.length() == 1 {
-    return tensors[0].reshape([1, ..tensors[0].shape])
+    return tensors[0].reshape([1, ..tensors[0].shape._])
   }
   for i in 1..<tensors.length() {
-    if tensors[i].shape != tensors[0].shape {
+    if tensors[i].shape._ != tensors[0].shape._ {
       abort(
         "Tensor at \{i} has shape \{tensors[i].shape}, which is not the same as \{tensors[0].shape}",
       )
@@ -26,7 +26,7 @@ pub impl[X : TensorLike] TensorLike for FixedArray[X] with to_tensor(
   }
   let shape = FixedArray::make(tensors[0].shape.length() + 1, 0)
   shape[0] = tensors.length()
-  for i, s in tensors[0].shape {
+  for i, s in tensors[0].shape._ {
     shape[i + 1] = s
   }
   let block = compute_block_size(shape)
@@ -44,7 +44,7 @@ pub impl[X : TensorLike] TensorLike for FixedArray[X] with to_tensor(
     block,
     graph: Cat(tensors, index),
     ref: 0,
-    grad: FixedArray::make(value.length(), 0.0),
+    grad: FixedArray::make(value.length(), (0.0 : Float)),
   }
 }
 

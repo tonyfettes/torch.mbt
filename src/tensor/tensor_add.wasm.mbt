@@ -19,22 +19,19 @@ extern "wasm" fn simd_f32x4_add(in0 : Int, in1 : Int, out : Int, len : Int) =
   #|
   #|  (br_if $loop (i32.lt_u (local.get $out) (local.get $end)))))
 
-extern "wasm" fn fixed_array_float_to_pointer(array : FixedArray[Float]) -> Int =
-  #|(func (param i32) (result i32) local.get 0 i32.const 8 i32.add)
-
 fn fixed_array_simd_add(
-  this : FixedArray[Float],
-  that : FixedArray[Float],
-  result : FixedArray[Float],
+  this : @unsafe.UnsafeArray[Float],
+  that : @unsafe.UnsafeArray[Float],
+  result : @unsafe.UnsafeArray[Float],
   length : Int
 ) -> Unit {
   let alignment = 4
   let blocks = length / alignment
   if blocks != 0 {
     simd_f32x4_add(
-      fixed_array_float_to_pointer(this),
-      fixed_array_float_to_pointer(that),
-      fixed_array_float_to_pointer(result),
+      this.reinterpret_as_int(),
+      that.reinterpret_as_int(),
+      result.reinterpret_as_int(),
       blocks,
     )
   }
@@ -47,7 +44,7 @@ fn fixed_array_simd_add(
 pub fn Tensor::op_add(self : Tensor, other : Tensor) -> Tensor {
   let (self, other) = Tensor::broadcast(self, other)
   let length = self.value.length()
-  let value : FixedArray[Float] = FixedArray::make(length, 0.0)
+  let value : FixedArray[Float] = FixedArray::make(length, (0.0 : Float))
   fixed_array_simd_add(self.value, other.value, value, length)
   Tensor::{
     value,
@@ -55,6 +52,6 @@ pub fn Tensor::op_add(self : Tensor, other : Tensor) -> Tensor {
     block: self.block,
     graph: Graph::Add(self, other),
     ref: 0,
-    grad: FixedArray::make(length, 0.0),
+    grad: FixedArray::make(length, (0.0 : Float)),
   }
 }

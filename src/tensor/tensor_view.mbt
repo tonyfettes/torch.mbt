@@ -222,7 +222,7 @@ pub fn TensorView::to_tensor(self : TensorView) -> Tensor {
     block,
     graph: Graph::Get(self.tensor, index),
     ref: 0,
-    grad: FixedArray::make(total, 0.0),
+    grad: FixedArray::make(total, (0.0 : Float)),
   }
 }
 

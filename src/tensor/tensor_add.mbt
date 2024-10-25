@@ -1,7 +1,7 @@
 pub fn Tensor::op_add(self : Tensor, other : Tensor) -> Tensor {
   let (self, other) = Tensor::broadcast(self, other)
   let length = self.value.length()
-  let value : FixedArray[Float] = FixedArray::make(length, 0.0)
+  let value = FixedArray::make(length, (0.0 : Float))
   for i = 0; i < length; i = i + 1 {
     value[i] = self.value[i] + other.value[i]
   }
@@ -11,6 +11,6 @@ pub fn Tensor::op_add(self : Tensor, other : Tensor) -> Tensor {
     block: self.block,
     graph: Graph::Add(self, other),
     ref: 0,
-    grad: FixedArray::make(length, 0.0),
+    grad: FixedArray::make(length, (0.0 : Float)),
   }
 }

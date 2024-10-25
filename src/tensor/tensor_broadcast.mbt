@@ -73,7 +73,7 @@ pub fn Tensor::broadcast(self : Tensor, other : Tensor) -> (Tensor, Tensor) {
       block: broad_block,
       graph: Graph::Get(self, FixedArray::from_array(self_index)),
       ref: 0,
-      grad: FixedArray::make(total, 0.0),
+      grad: FixedArray::make(total, (0.0 : Float)),
     },
     Tensor::{
       value: FixedArray::from_array(other_value),
@@ -81,7 +81,7 @@ pub fn Tensor::broadcast(self : Tensor, other : Tensor) -> (Tensor, Tensor) {
       block: broad_block,
       graph: Graph::Get(other, FixedArray::from_array(other_index)),
       ref: 0,
-      grad: FixedArray::make(total, 0.0),
+      grad: FixedArray::make(total, (0.0 : Float)),
     },
   )
   // if self.shape.length() != 0 {

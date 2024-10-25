@@ -20,18 +20,18 @@ extern "wasm" fn simd_f32x4_mul(in0 : Int, in1 : Int, out : Int, len : Int) =
   #|  (br_if $loop (i32.lt_u (local.get $out) (local.get $end)))))
 
 fn fixed_array_simd_mul(
-  this : FixedArray[Float],
-  that : FixedArray[Float],
-  result : FixedArray[Float],
+  this : @unsafe.UnsafeArray[Float],
+  that : @unsafe.UnsafeArray[Float],
+  result : @unsafe.UnsafeArray[Float],
   length : Int
 ) -> Unit {
   let alignment = 4
   let blocks = length / alignment
   if blocks != 0 {
     simd_f32x4_mul(
-      fixed_array_float_to_pointer(this),
-      fixed_array_float_to_pointer(that),
-      fixed_array_float_to_pointer(result),
+      this.reinterpret_as_int(),
+      that.reinterpret_as_int(),
+      result.reinterpret_as_int(),
       length / alignment,
     )
   }
@@ -43,7 +43,7 @@ fn fixed_array_simd_mul(
 
 pub fn Tensor::op_mul(self : Tensor, other : Tensor) -> Tensor {
   let length = self.value.length()
-  let output : FixedArray[Float] = FixedArray::make(length, 0.0)
+  let output : FixedArray[Float] = FixedArray::make(length, (0.0 : Float))
   fixed_array_simd_mul(self.value, other.value, output, length)
   Tensor::{
     value: output,
@@ -51,6 +51,6 @@ pub fn Tensor::op_mul(self : Tensor, other : Tensor) -> Tensor {
     block: self.block,
     graph: Graph::Mul(self, other),
     ref: 0,
-    grad: FixedArray::make(length, 0.0),
+    grad: FixedArray::make(length, (0.0 : Float)),
   }
 }
