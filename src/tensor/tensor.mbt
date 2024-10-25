@@ -245,83 +245,99 @@ fn Tensor::propagate(self : Tensor) -> Unit {
   if self.ref != 0 {
     return
   }
+  let self_grad = self.grad
   match self.graph {
     Val => return
     Var => return
     Add(a, b) => {
-      for i in 0..<self.grad.length() {
-        a.grad[i] += self.grad[i]
-        b.grad[i] += self.grad[i]
+      let a_grad = a.grad
+      let b_grad = b.grad
+      for i in 0..<self_grad.length() {
+        a_grad[i] += self_grad[i]
+        b_grad[i] += self_grad[i]
       }
       a.propagate()
       b.propagate()
     }
     Sub(a, b) => {
-      for i in 0..<self.grad.length() {
-        a.grad[i] += self.grad[i]
-        b.grad[i] -= self.grad[i]
+      let a_grad = a.grad
+      let b_grad = b.grad
+      for i in 0..<self_grad.length() {
+        a_grad[i] += self_grad[i]
+        b_grad[i] -= self_grad[i]
       }
       a.propagate()
       b.propagate()
     }
     Mul(a, b) => {
-      for i in 0..<self.grad.length() {
-        a.grad[i] += self.grad[i] * b.value[i]
-        b.grad[i] += self.grad[i] * a.value[i]
+      let a_grad = a.grad
+      let b_grad = b.grad
+      for i in 0..<self_grad.length() {
+        a_grad[i] += self_grad[i] * b.value[i]
+        b_grad[i] += self_grad[i] * a.value[i]
       }
       a.propagate()
       b.propagate()
     }
     Div(a, b) => {
-      for i in 0..<self.grad.length() {
-        a.grad[i] += self.grad[i] / b.value[i]
-        b.grad[i] -= self.grad[i] * a.value[i] / b.value[i] / b.value[i]
+      let a_grad = a.grad
+      let b_grad = b.grad
+      for i in 0..<self_grad.length() {
+        a_grad[i] += self_grad[i] / b.value[i]
+        b_grad[i] -= self_grad[i] * a.value[i] / b.value[i] / b.value[i]
       }
       a.propagate()
       b.propagate()
     }
     Neg(a) => {
-      for i in 0..<self.grad.length() {
-        a.grad[i] -= self.grad[i]
+      let a_grad = a.grad
+      for i in 0..<self_grad.length() {
+        a_grad[i] -= self_grad[i]
       }
       a.propagate()
     }
     Exp(a) => {
-      for i in 0..<self.grad.length() {
-        a.grad[i] += self.grad[i] * self.value[i]
+      let a_grad = a.grad
+      for i in 0..<self_grad.length() {
+        a_grad[i] += self_grad[i] * self.value[i]
       }
       a.propagate()
     }
     Log(a) => {
-      for i in 0..<self.grad.length() {
-        a.grad[i] += self.grad[i] / a.value[i]
+      let a_grad = a.grad
+      for i in 0..<self_grad.length() {
+        a_grad[i] += self_grad[i] / a.value[i]
       }
       a.propagate()
     }
     Sum(x, m) => {
-      for i in 0..<self.grad.length() {
+      for i in 0..<self_grad.length() {
         for j = 0; j < m[i].length(); j = j + 1 {
-          x.grad[m[i][j]] += self.grad[i]
+          x.grad[m[i][j]] += self_grad[i]
         }
       }
       x.propagate()
     }
     Pow(a, b) => {
-      for i in 0..<self.grad.length() {
-        a.grad[i] = self.grad[i] * b.to_float() * power(a.value[i], b - 1)
+      let a_grad = a.grad
+      for i in 0..<self_grad.length() {
+        a_grad[i] = self_grad[i] * b.to_float() * power(a.value[i], b - 1)
       }
       a.propagate()
     }
     MatMul(a, b) => {
-      let row = a.shape[0]
+      let a_shape = a.shape
+      let a_grad = a.grad
+      let b_grad = b.grad
+      let row = a_shape[0]
       let col = b.shape[1]
-      let key = a.shape[1]
+      let key = a_shape[1]
       for r = 0; r < row; r = r + 1 {
         for c = 0; c < col; c = c + 1 {
           for k = 0; k < key; k = k + 1 {
-            a.grad[r * key + k] += self.grad[r * col + c] *
+            a_grad[r * key + k] += self_grad[r * col + c] *
               b.value[k * col + c]
-            b.grad[k * col + c] += self.grad[r * col + c] *
+            b_grad[k * col + c] += self_grad[r * col + c] *
               a.value[r * key + k]
           }
         }
@@ -329,28 +345,30 @@ fn Tensor::propagate(self : Tensor) -> Unit {
       a.propagate()
       b.propagate()
     }
-    Get(x, m) => {
+    Get(a, m) => {
+      let a_grad = a.grad
       for i in 0..<m.length() {
-        x.grad[m[i]] += self.grad[i]
+        a_grad[m[i]] += self_grad[i]
       }
-      x.propagate()
+      a.propagate()
     }
     Cat(xs, m) => {
-      for i in 0..<self.grad.length() {
+      for i in 0..<self_grad.length() {
         let (x, m) = m[i]
-        xs[x].grad[m] += self.grad[i]
+        xs[x].grad[m] += self_grad[i]
       }
       for x in xs {
         x.propagate()
       }
     }
     Nop(x) => x.propagate()
-    ReLU(x) => {
-      for i in 0..<self.grad.length() {
-        x.grad[i] += self.grad[i] *
+    ReLU(a) => {
+      let a_grad = a.grad
+      for i in 0..<self_grad.length() {
+        a_grad[i] += self_grad[i] *
           (if self.value[i] > 0.0 { 1.0 } else { 0.0 })
       }
-      x.propagate()
+      a.propagate()
     }
   }
 }
