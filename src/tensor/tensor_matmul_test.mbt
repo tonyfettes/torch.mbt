@@ -48,10 +48,10 @@ test "matmul/consistent" (it : @test.T) {
   let c = a.matmul(b)
   it.writeln(
     #|def test_matmul_1x2_2x4():
-    $|    a = torch.tensor(\{a.to_json().stringify()})
-    $|    b = torch.tensor(\{b.to_json().stringify()})
+    $|    a = torch.tensor(\{a.to_json().stringify()}, dtype=torch.float32)
+    $|    b = torch.tensor(\{b.to_json().stringify()}, dtype=torch.float32)
     #|    c = torch.matmul(a, b)
-    $|    assert torch.allclose(c, torch.tensor(\{c.to_json().stringify()}))
+    $|    assert torch.allclose(c, torch.tensor(\{c.to_json().stringify()}, dtype=torch.float32))
     ,
   )
   // 1x8 @ 8x16
@@ -60,10 +60,10 @@ test "matmul/consistent" (it : @test.T) {
   let c = a.matmul(b)
   it.writeln(
     #|def test_matmul_1x8_8x16():
-    $|    a = torch.tensor(\{a.to_json().stringify()})
-    $|    b = torch.tensor(\{b.to_json().stringify()})
+    $|    a = torch.tensor(\{a.to_json().stringify()}, dtype=torch.float32)
+    $|    b = torch.tensor(\{b.to_json().stringify()}, dtype=torch.float32)
     #|    c = torch.matmul(a, b)
-    $|    assert torch.allclose(c, torch.tensor(\{c.to_json().stringify()}))
+    $|    assert torch.allclose(c, torch.tensor(\{c.to_json().stringify()}, dtype=torch.float32))
     ,
   )
   // (2x3 @ 3x2) @ (2x4 @ 4x2)
@@ -76,14 +76,14 @@ test "matmul/consistent" (it : @test.T) {
   let g = c.matmul(f)
   it.writeln(
     $|def test_matmul_multi_2x3_3x2_2x4_4x2():
-    $|    a = torch.tensor(\{a.to_json().stringify()})
-    $|    b = torch.tensor(\{b.to_json().stringify()})
+    $|    a = torch.tensor(\{a.to_json().stringify()}, dtype=torch.float32)
+    $|    b = torch.tensor(\{b.to_json().stringify()}, dtype=torch.float32)
     $|    c = torch.matmul(a, b)
-    $|    d = torch.tensor(\{d.to_json().stringify()})
-    $|    e = torch.tensor(\{e.to_json().stringify()})
+    $|    d = torch.tensor(\{d.to_json().stringify()}, dtype=torch.float32)
+    $|    e = torch.tensor(\{e.to_json().stringify()}, dtype=torch.float32)
     $|    f = torch.matmul(d, e)
     $|    g = torch.matmul(c, f)
-    $|    assert torch.allclose(g, torch.tensor(\{g.to_json().stringify()}))
+    $|    assert torch.allclose(g, torch.tensor(\{g.to_json().stringify()}, dtype=torch.float32))
     ,
   )
   it.snapshot!(filename="test_matmul.py")

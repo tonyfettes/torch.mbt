@@ -164,13 +164,12 @@ test "linear/consistent" (it : @test.T) {
   it.writeln(
     #|import torch
     #|
-    #|def test_linear():
+    #|def test_linear(snapshot):
     $|    input = torch.tensor(\{input.to_json().stringify()})
     $|    weight = torch.tensor(\{model.weight.to_json().stringify()})
-    $|    assert ((input @ weight).flatten() - torch.tensor(\{input_weight.flatten().to_json().stringify()})) == snapshot
-    $|    # bias = torch.tensor(\{model.bias.to_json().stringify()})
-    $|    # output = torch.nn.functional.linear(input, weight.transpose(-2, -1), bias)
-    $|    # assert torch.all(output == torch.tensor(\{output.to_json().stringify()}))
+    $|    bias = torch.tensor(\{model.bias.to_json().stringify()})
+    $|    output = torch.nn.functional.linear(input, weight.transpose(-2, -1), bias)
+    $|    assert output - torch.tensor(\{output.to_json().stringify()}) == snapshot
     ,
   )
   it.snapshot!(filename="test_linear.py")
