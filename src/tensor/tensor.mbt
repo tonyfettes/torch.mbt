@@ -33,6 +33,12 @@ pub enum Graph {
   Cat(@unsafe.UnsafeArray[Tensor], @unsafe.UnsafeArray[(Int, Int)])
   Nop(Tensor)
   ReLU(Tensor)
+  Correlate2d(
+    ~image : Tensor,
+    ~kernel : Tensor,
+    ~stride : (Int, Int),
+    ~padding : (Int, Int)
+  )
 } derive(Show)
 
 pub fn Tensor::output(self : Tensor, logger : Logger) -> Unit {
@@ -234,6 +240,10 @@ fn Tensor::ref(self : Tensor) -> Unit {
     Get(x, _) => x.ref()
     Nop(x) => x.ref()
     ReLU(x) => x.ref()
+    Correlate2d(~image, ~kernel, ..) => {
+      image.ref()
+      kernel.ref()
+    }
   }
 }
 
@@ -368,6 +378,42 @@ fn Tensor::propagate(self : Tensor) -> Unit {
       }
       a.propagate()
     }
+    Correlate2d(~image, ~kernel, ~stride, ~padding) => {
+      for i in 0..<self.shape[0] {
+        for j in 0..<self.shape[1] {
+          let i_start = i * stride.0 - padding.0
+          let pi_start = @math.maximum(0, i_start)
+          let ki_start = @math.maximum(0, -i_start)
+          let i_length = @math.minimum(
+            kernel.shape[0] - ki_start,
+            image.shape[0] - pi_start,
+          )
+          let j_start = j * stride.1 - padding.1
+          let pj_start = @math.maximum(0, j_start)
+          let kj_start = @math.maximum(0, -j_start)
+          let j_length = @math.minimum(
+            kernel.shape[1] - kj_start,
+            image.shape[1] - pj_start,
+          )
+          for k in 0..<i_length {
+            let pj_base = (pi_start + k) * image.shape[1]
+            let kj_base = (ki_start + k) * kernel.shape[1]
+            for l in 0..<j_length {
+              let image_value = image.value[pj_base + pj_start + l]
+              let kernel_value = kernel.value[kj_base + kj_start + l]
+              image.grad[pj_base + pj_start + l] += self_grad[i * self.shape[1] +
+                j] *
+                kernel_value
+              kernel.grad[kj_base + kj_start + l] += self_grad[i * self.shape[1] +
+                j] *
+                image_value
+            }
+          }
+        }
+      }
+      image.propagate()
+      kernel.propagate()
+    }
   }
 }
 
@@ -413,6 +459,10 @@ fn Tensor::check(self : Tensor) -> Unit {
       }
     Nop(x) => x.check()
     ReLU(x) => x.check()
+    Correlate2d(~image, ~kernel, ..) => {
+      image.check()
+      kernel.check()
+    }
   }
   self.ref = -1
 }
