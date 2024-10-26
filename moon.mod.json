@@ -5,7 +5,7 @@
   "repository": "https://github.com/tonyfettes/torch.mbt",
   "license": "Apache-2.0",
   "keywords": [],
-  "description": "",
+  "description": "PyTorch-like tensor operations implemented in MoonBit",
   "source": "src",
   "include": [
     "src"
