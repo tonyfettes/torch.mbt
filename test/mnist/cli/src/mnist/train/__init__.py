@@ -54,6 +54,7 @@ class MoonBitTrainer:
         input = [(bytes(data["image"]), data["label"]) for data in batch]
         return self.model.train(self.store, input, self.learning_rate)
 
+
 def main():
     test_path = Path("data/mnist_handwritten_test.json.gz")
     train_path = Path("data/mnist_handwritten_train.json.gz")
@@ -64,8 +65,8 @@ def main():
     with gzip.open(train_path, "rt") as train_file:
         train_dataset = json.load(train_file)
 
-    learning_rate = 0.001
-    batch_size = 8
+    learning_rate = 0.01
+    batch_size = 256
 
     moonbit_trainer = MoonBitTrainer(learning_rate)
     pytorch_trainer = PyTorchTrainer(mnist.refer.model, learning_rate)
