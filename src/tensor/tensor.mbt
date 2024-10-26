@@ -33,6 +33,7 @@ pub enum Graph {
   Cat(@unsafe.UnsafeArray[Tensor], @unsafe.UnsafeArray[(Int, Int)])
   Nop(Tensor)
   ReLU(Tensor)
+  AvgPool2d(Tensor, ~kernel_size : (Int, Int), ~stride : (Int, Int))
   Correlate2d(
     ~image : Tensor,
     ~kernel : Tensor,
@@ -240,6 +241,7 @@ fn Tensor::ref(self : Tensor) -> Unit {
     Get(x, _) => x.ref()
     Nop(x) => x.ref()
     ReLU(x) => x.ref()
+    AvgPool2d(x, ..) => x.ref()
     Correlate2d(~image, ~kernel, ..) => {
       image.ref()
       kernel.ref()
@@ -378,6 +380,47 @@ fn Tensor::propagate(self : Tensor) -> Unit {
       }
       a.propagate()
     }
+    AvgPool2d(x, ~kernel_size, ~stride) => {
+      fn index4d(
+        block : @unsafe.UnsafeArray[Int],
+        n : Int,
+        c : Int,
+        h : Int,
+        w : Int
+      ) -> Int {
+        return n * block[0] + c * block[1] + h * block[2] + w
+      }
+
+      let iN = self.shape[0]
+      let iC = self.shape[1]
+      let oH = self.shape[2]
+      let oW = self.shape[3]
+      let kH = kernel_size.0
+      let kW = kernel_size.1
+      let kA = (kH * kW).to_float()
+      for n = 0; n < iN; n = n + 1 {
+        for c = 0; c < iC; c = c + 1 {
+          for h = 0; h < oH; h = h + 1 {
+            for w = 0; w < oW; w = w + 1 {
+              for i = 0; i < kH; i = i + 1 {
+                for j = 0; j < kW; j = j + 1 {
+                  let i = index4d(
+                    x.block,
+                    n,
+                    c,
+                    h * stride.0 + i,
+                    w * stride.1 + j,
+                  )
+                  let o = index4d(self.block, n, c, h, w)
+                  x.grad[i] += self_grad[o] / kA
+                }
+              }
+            }
+          }
+        }
+      }
+      x.propagate()
+    }
     Correlate2d(~image, ~kernel, ~stride, ~padding) => {
       for i in 0..<self.shape[0] {
         for j in 0..<self.shape[1] {
@@ -459,6 +502,7 @@ fn Tensor::check(self : Tensor) -> Unit {
       }
     Nop(x) => x.check()
     ReLU(x) => x.check()
+    AvgPool2d(x, ..) => x.check()
     Correlate2d(~image, ~kernel, ..) => {
       image.check()
       kernel.check()
