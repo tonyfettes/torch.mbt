@@ -28,14 +28,12 @@ class PyTorchTrainer:
 
     def train(self, batch: list[Data]) -> float:
         batch_size = len(batch)
-        input = (
-            torch.tensor([data["image"] for data in batch])
-            .float()
-            .reshape(batch_size, 1, 28, 28)
-        )
+        image = torch.tensor([data["image"] for data in batch])
+        normalized = image / 255.0
+        input = normalized.float().view(batch_size, 1, 28, 28)
         label = torch.tensor([data["label"] for data in batch])
         self.optimizer.zero_grad()
-        output = self.model(input)
+        output = self.model(input / 255.0)
         loss: torch.Tensor = self.criterion(output, label)
         loss.backward()
         self.optimizer.step()
