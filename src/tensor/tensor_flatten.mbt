@@ -19,5 +19,12 @@ pub fn Tensor::flatten(self : Tensor, ~start : Int = 0, ~end? : Int) -> Tensor {
   }
   let shape = FixedArray::from_array(shape)
   let block = compute_block_size(shape)
-  Tensor::{ ..self, block, shape }
+  Tensor::{
+    value: self.value,
+    shape,
+    block,
+    ref: 0,
+    graph: Nop(self),
+    grad: self.grad
+   }
 }
