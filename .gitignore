@@ -1,11 +1,16 @@
+# MoonBit
 /target/
 /.mooncakes/
-/.venv/
-/.envrc
-/.python-version
-/node_modules/
 /_coverage/
 /.moon/
 
+# Javascript
+/node_modules/
+
+# Python
+/.venv/
+/.envrc
+/.python-version
+.pytest_cache/
 __pycache__/
 *.egg-info/
