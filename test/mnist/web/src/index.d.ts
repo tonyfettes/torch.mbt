@@ -5,8 +5,6 @@ import type MnistImage from "./mnist-image.mjs";
 import type MnistTrainer from "./mnist-trainer.mjs";
 
 declare global {
-  const Plot: typeof import("@observablehq/plot");
-
   interface HTMLElementTagNameMap {
     "mnist-card": MnistCard;
     "mnist-image": MnistImage;
