@@ -70,18 +70,21 @@ def main():
     moonbit_trainer = MoonBitTrainer(learning_rate)
     pytorch_trainer = PyTorchTrainer(mnist.refer.model, learning_rate)
 
-    for i in range(0, len(train_dataset), batch_size):
-        batch = train_dataset[i : i + batch_size]
+    for epoch in range(0, 3):
+        for i in range(0, len(train_dataset), batch_size):
+            batch = train_dataset[i : i + batch_size]
+            step = epoch * len(train_dataset) + i
+            print(f"== epoch {epoch} step {i} ==")
 
-        moonbit_loss = moonbit_trainer.train(batch)
-        pytorch_loss = pytorch_trainer.train(batch)
-        print(f"> torch.mbt: {moonbit_loss}")
-        writer.add_scalar("MoonBit/loss", moonbit_loss, i)
+            moonbit_loss = moonbit_trainer.train(batch)
+            pytorch_loss = pytorch_trainer.train(batch)
+            print(f"> torch.mbt: {moonbit_loss}")
+            writer.add_scalar("MoonBit/loss", moonbit_loss, step)
 
-        print(f"> PyTorch  : {pytorch_loss}")
-        writer.add_scalar("PyTorch/loss", pytorch_loss, i)
+            print(f"> PyTorch  : {pytorch_loss}")
+            writer.add_scalar("PyTorch/loss", pytorch_loss, step)
 
-        writer.add_scalar("diff", abs(moonbit_loss - pytorch_loss), i)
+            writer.add_scalar("diff", abs(moonbit_loss - pytorch_loss), step)
 
     writer.flush()
     writer.close()
