@@ -1,1 +1,1 @@
-pub typealias Model = LeNet5
+pub typealias Model = LeNet5ReLU
