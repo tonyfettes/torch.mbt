@@ -34,6 +34,7 @@ pub enum Graph {
   Nop(Tensor)
   ReLU(Tensor)
   AvgPool2d(Tensor, ~kernel_size : (Int, Int), ~stride : (Int, Int))
+  MaxPool2d(Tensor, @unsafe.UnsafeArray[Int])
   Correlate2d(
     ~image : Tensor,
     ~kernel : Tensor,
@@ -242,6 +243,7 @@ fn Tensor::ref(self : Tensor) -> Unit {
     Nop(x) => x.ref()
     ReLU(x) => x.ref()
     AvgPool2d(x, ..) => x.ref()
+    MaxPool2d(x, _) => x.ref()
     Correlate2d(~image, ~kernel, ..) => {
       image.ref()
       kernel.ref()
@@ -421,6 +423,11 @@ fn Tensor::propagate(self : Tensor) -> Unit {
       }
       x.propagate()
     }
+    MaxPool2d(x, m) => {
+      for i = 0; i < self.value.length(); i = i + 1 {
+        x.grad[m[i]] += self_grad[i]
+      }
+    }
     Correlate2d(~image, ~kernel, ~stride, ~padding) => {
       for i in 0..<self.shape[0] {
         for j in 0..<self.shape[1] {
@@ -503,6 +510,7 @@ fn Tensor::check(self : Tensor) -> Unit {
     Nop(x) => x.check()
     ReLU(x) => x.check()
     AvgPool2d(x, ..) => x.check()
+    MaxPool2d(x, _) => x.check()
     Correlate2d(~image, ~kernel, ..) => {
       image.check()
       kernel.check()
