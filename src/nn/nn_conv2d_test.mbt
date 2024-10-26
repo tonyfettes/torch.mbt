@@ -485,7 +485,7 @@ test "MNIST" {
   let label = 5
   let image = @tensor.tensor(
     [
-      0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -520,35 +520,34 @@ test "MNIST" {
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    ],
+    ].map(fn(i) { i.to_float() / 255.0 }),
   ).reshape([1, 1, 28, 28])
-  let model : @nn.Sequential[@nn.Module] = @nn.Sequential::new(
-    [
-      @nn.Conv2d::new(1, 6, kernel_size=5, padding=2),
-      @nn.Sigmoid::new(),
-      @nn.AvgPool2d::new(2, stride=2),
-      @nn.Conv2d::new(6, 16, kernel_size=5),
-      @nn.Sigmoid::new(),
-      @nn.AvgPool2d::new(2, stride=2),
-      @nn.Flatten::new(),
-      @nn.Linear::new(400, 120),
-      @nn.Sigmoid::new(),
-      @nn.Linear::new(120, 84),
-      @nn.Sigmoid::new(),
-      @nn.Linear::new(84, 10),
-    ],
+  let tuple = (
+    @nn.Conv2d::new(1, 6, kernel_size=5, padding=2),
+    @nn.Sigmoid::new(),
+    @nn.AvgPool2d::new(2, stride=2),
+    @nn.Conv2d::new(6, 16, kernel_size=5),
+    @nn.Sigmoid::new(),
+    @nn.AvgPool2d::new(2, stride=2),
+    @nn.Flatten::new(),
+    @nn.Linear::new(400, 120),
+    @nn.Sigmoid::new(),
+    @nn.Linear::new(120, 84),
+    @nn.Sigmoid::new(),
+    @nn.Linear::new(84, 10),
   )
+  let model = tuple as @nn.Module
   let optimizer = @optim.SGD::new(model.parameters(), learning_rate=0.1)
   let criterion = @nn.CrossEntropyLoss::new()
   let output = model.forward(image)
-  @json.inspect!(output[0][label], content=-0.33656442165374756)
+  @json.inspect!(output[0][label], content=-0.3357795178890228)
   let target = FixedArray::make(10, 0.0)
   target[label] = 1.0
   let loss = criterion.forward(output, @tensor.tensor([target]))
-  @json.inspect!(loss, content=2.67559814453125)
+  @json.inspect!(loss, content=2.6749267578125)
   optimizer.zero_grad()
   loss.backward()
   optimizer.step()
   let output = model.forward(image)
-  inspect!(output[0][label], content="NaN")
+  inspect!(output[0][label], content="1.8095554113388062")
 }
