@@ -5,7 +5,7 @@ PACKAGE := gen/gen
 OUT := src
 NAME := mnist-model
 JCO := corepack pnpm exec jco
-JCO_FLAGS :=
+JCO_FLAGS := --no-nodejs-compat
 WASM_OPT_FLAGS := --enable-gc --enable-multivalue --enable-reference-types --enable-bulk-memory --enable-simd
 
 JCO_OUTPUTS := $(OUT)/$(NAME).core.wasm $(OUT)/$(NAME).d.ts $(OUT)/$(NAME).js
