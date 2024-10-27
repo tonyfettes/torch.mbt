@@ -30,9 +30,9 @@
     }
   },
   "import": [
-    { "path": "tonyfettes/torch/mnist/web/ffi", "alias": "ffi" },
-    { "path": "tonyfettes/torch/mnist/web/gen/world/mnist", "alias": "mnist" },
-    { "path": "tonyfettes/torch/mnist/web/world/mnist", "alias": "mnist0" }
+    { "path": "tonyfettes/torch/mnist/ffi", "alias": "ffi" },
+    { "path": "tonyfettes/torch/mnist/gen/world/mnist", "alias": "mnist" },
+    { "path": "tonyfettes/torch/mnist/world/mnist", "alias": "mnist0" }
   ],
   "targets": {
     "ffi.wasm-gc.mbt": ["wasm-gc"],

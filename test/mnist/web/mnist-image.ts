@@ -50,7 +50,11 @@ class MnistImage extends WebComponent(HTMLElement) {
       this.loadImage(src);
     }
   }
-  override attributeChangedCallback(name: string, _oldValue: string, newValue: string) {
+  override attributeChangedCallback(
+    name: string,
+    _oldValue: string,
+    newValue: string,
+  ) {
     if (name === "src") {
       this.loadImage(newValue);
     }

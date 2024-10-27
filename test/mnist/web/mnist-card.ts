@@ -24,7 +24,7 @@ class MnistCard extends WebComponent(HTMLElement) {
       this.dispatchEvent(
         new CustomEvent("mnist-select", {
           detail: context.getImageData(0, 0, 28, 28),
-        })
+        }),
       );
     };
     if (!this._image) {
@@ -70,7 +70,7 @@ class MnistCard extends WebComponent(HTMLElement) {
   override attributeChangedCallback(
     name: string,
     _oldValue: string,
-    newValue: string
+    newValue: string,
   ) {
     if (name === "image") {
       this.loadImage(newValue);

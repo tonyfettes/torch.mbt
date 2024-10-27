@@ -1,8 +1,7 @@
-# MNIST example using torch.mbt
-
-## Download dataset
+# MNIST Web application
 
 ```bash
-pip install -r ../../../requirements.txt
-python3 scripts/download.py --format json --output ./data ./data
+pnpm install
+make main
+pnpm exec serve src/
 ```

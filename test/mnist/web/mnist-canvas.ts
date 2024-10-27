@@ -1,6 +1,6 @@
 import WebComponent from "./web-component";
 import mnistWorker from "./mnist-worker";
-import template from './mnist-canvas.html?template';
+import template from "./mnist-canvas.html?template";
 
 class MnistCanvas extends WebComponent(HTMLElement) {
   private isDrawing: boolean;

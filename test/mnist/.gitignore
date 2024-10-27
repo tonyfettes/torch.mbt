@@ -1,4 +1,9 @@
 /.mooncakes/
 /target/
-/data/
-/model.json
+
+/node_modules/
+/dist/
+
+/scripts/mnist-model.js
+/scripts/mnist-model.d.ts
+/scripts/mnist-model.core.wasm

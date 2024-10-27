@@ -5,18 +5,18 @@ interface MnistWorker extends Worker {
   addEventListener(
     type: "message",
     listener: (this: MnistWorker, ev: MessageEvent<MnistWorkerResponse>) => any,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   addEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
 }
 
 const mnistWorker: MnistWorker = new Worker(
   new URL("./mnist.worker.ts", import.meta.url),
-  { type: "module" }
+  { type: "module" },
 );
 
 export default mnistWorker;

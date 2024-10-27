@@ -10,7 +10,7 @@ class MnistGallery extends WebComponent(HTMLElement) {
   override attributeChangedCallback(
     name: string,
     _oldValue: string,
-    newValue: string
+    newValue: string,
   ) {
     if (name === "src") {
       for (const element of this.shadowRoot?.children ?? []) {
@@ -48,7 +48,7 @@ class MnistGallery extends WebComponent(HTMLElement) {
             this.dispatchEvent(
               new CustomEvent("mnist-select", {
                 detail: event.detail,
-              })
+              }),
             );
           });
           card.setAttribute("label", data.label.toString());

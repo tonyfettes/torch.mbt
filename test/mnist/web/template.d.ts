@@ -1,4 +1,4 @@
-declare module '*?template' {
+declare module "*?template" {
   const template: HTMLTemplateElement;
   export default template;
 }

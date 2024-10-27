@@ -26,7 +26,7 @@ class MnistDatabase {
    * Fetch the MNIST data.
    */
   private static async fetchDataset(
-    url: string
+    url: string,
   ): Promise<{ image: number[]; label: number }[]> {
     const response = await fetch(url);
     if (!response.ok || !response.body) {
@@ -94,7 +94,7 @@ class MnistDatabase {
    */
   async getDataset(
     name: string,
-    mode: IDBTransactionMode
+    mode: IDBTransactionMode,
   ): Promise<IDBObjectStore> {
     const database = await this.getDatabase();
     return new Promise((resolve) => {
@@ -112,7 +112,7 @@ class MnistDatabase {
    */
   async getData(
     name: string,
-    key: number
+    key: number,
   ): Promise<{ image: number[]; label: number }> {
     const objectStore = await this.getDataset(name, "readonly");
     const request = objectStore.get(key + 1);
