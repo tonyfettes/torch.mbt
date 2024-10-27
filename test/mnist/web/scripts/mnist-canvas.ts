@@ -1,54 +1,18 @@
-import mnistWorker from "./mnist-worker.mjs";
+import WebComponent from "./web-component";
+import mnistWorker from "./mnist-worker";
+import template from './mnist-canvas.html?template';
 
-// @ts-check
-const template = document.createElement("template");
-template.innerHTML = `<style>
-  .mnist-canvas {
-    display: flex;
-    flex-direction: column;
-    width: fit-content;
-    gap: 8px;
-  }
-  .mnist-canvas-toolbar {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-  }
-</style>
-<div class="mnist-canvas">
-  <canvas
-    width="28"
-    height="28"
-    style="border: 1px solid black; image-rendering: pixelated"
-  ></canvas>
-  <div class="mnist-canvas-toolbar">
-    <button id="clear">Clear</button>
-  </div>
-</div>`;
-
-class MnistCanvas extends HTMLElement {
+class MnistCanvas extends WebComponent(HTMLElement) {
+  private isDrawing: boolean;
+  private lastX: number;
+  private lastY: number;
   constructor() {
     super();
-    /**
-     * @private
-     * @type {boolean}
-     */
     this.isDrawing = false;
-    /**
-     * @private
-     * @type {number}
-     */
     this.lastX = 0;
-    /**
-     * @private
-     * @type {number}
-     */
     this.lastY = 0;
   }
-  /**
-   * @param {ImageData} imageData
-   */
-  setImageData(imageData) {
+  setImageData(imageData: ImageData) {
     const canvas = this.shadowRoot?.querySelector("canvas");
     if (!canvas) {
       return;
@@ -60,11 +24,7 @@ class MnistCanvas extends HTMLElement {
     context.putImageData(imageData, 0, 0);
     this.dispatchDrawEvent(imageData);
   }
-  /**
-   * @param {ImageData} imageData
-   * @returns {void}
-   */
-  dispatchDrawEvent(imageData) {
+  private dispatchDrawEvent(imageData: ImageData): void {
     const data = imageData.data;
     const input = new Uint8Array(data.length / 4);
     for (let i = 0; i < data.length; i += 4) {
@@ -72,7 +32,7 @@ class MnistCanvas extends HTMLElement {
     }
     mnistWorker.postMessage({ type: "infer", data: input });
   }
-  connectedCallback() {
+  override connectedCallback() {
     this.attachShadow({ mode: "open" });
     this.shadowRoot?.appendChild(template.content.cloneNode(true));
     const canvas = this.shadowRoot?.querySelector("canvas");
@@ -81,7 +41,7 @@ class MnistCanvas extends HTMLElement {
     }
     canvas.style.width = "224px";
     canvas.style.height = "224px";
-    const context = canvas.getContext("2d");
+    const context = canvas.getContext("2d", { willReadFrequently: true });
     if (!context) {
       return;
     }
@@ -123,7 +83,5 @@ class MnistCanvas extends HTMLElement {
     });
   }
 }
-
-customElements.define("mnist-canvas", MnistCanvas);
 
 export default MnistCanvas;

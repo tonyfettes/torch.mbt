@@ -1,7 +1,5 @@
-// @ts-check
-import MnistCard from "./mnist-card.mjs";
-import mnistDatabase from "./mnist-database.mjs";
-import WebComponent from "./web-component.mjs";
+import mnistDatabase from "./mnist-database";
+import WebComponent from "./web-component";
 
 /**
  * MNIST Gallery
@@ -9,13 +7,11 @@ import WebComponent from "./web-component.mjs";
 class MnistGallery extends WebComponent(HTMLElement) {
   /** @override */
   static observedAttributes = ["src"];
-  /**
-   * @param {string} name
-   * @param {string} oldValue
-   * @param {string} newValue
-   * @override
-   */
-  attributeChangedCallback(name, oldValue, newValue) {
+  override attributeChangedCallback(
+    name: string,
+    _oldValue: string,
+    newValue: string
+  ) {
     if (name === "src") {
       for (const element of this.shadowRoot?.children ?? []) {
         this.shadowRoot?.removeChild(element);
@@ -23,11 +19,7 @@ class MnistGallery extends WebComponent(HTMLElement) {
       this.loadGallery(newValue);
     }
   }
-  /**
-   * @param {string} src
-   * @returns {Promise<void>}
-   */
-  async loadGallery(src) {
+  async loadGallery(src: string): Promise<void> {
     const shadowRoot = this.shadowRoot;
     if (!shadowRoot) {
       return;
@@ -56,7 +48,7 @@ class MnistGallery extends WebComponent(HTMLElement) {
             this.dispatchEvent(
               new CustomEvent("mnist-select", {
                 detail: event.detail,
-              }),
+              })
             );
           });
           card.setAttribute("label", data.label.toString());
@@ -66,10 +58,7 @@ class MnistGallery extends WebComponent(HTMLElement) {
       this.shadowRoot.appendChild(rowDiv);
     }
   }
-  /**
-   * @override
-   */
-  connectedCallback() {
+  override connectedCallback() {
     this.style.display = "flex";
     this.style.flexDirection = "column";
     this.style.alignItems = "center";
@@ -83,7 +72,5 @@ class MnistGallery extends WebComponent(HTMLElement) {
     }
   }
 }
-
-customElements.define("mnist-gallery", MnistGallery);
 
 export default MnistGallery;

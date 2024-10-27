@@ -1,8 +1,9 @@
-/src/mnist-model.js
-/src/mnist-model.d.ts
-/src/mnist-model.core.wasm
-/src/mnist-model.json
-/src/data/
 /.mooncakes/
 /target/
+
 /node_modules/
+/dist/
+
+/scripts/mnist-model.js
+/scripts/mnist-model.d.ts
+/scripts/mnist-model.core.wasm

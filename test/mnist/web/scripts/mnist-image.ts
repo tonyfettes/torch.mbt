@@ -1,32 +1,21 @@
-// @ts-check
-
-import WebComponent from "./web-component.mjs";
-
-const template = document.createElement("template");
-template.innerHTML = `<canvas
-  width="28"
-  height="28"
-></canvas>`;
+import WebComponent from "./web-component";
+import template from "./mnist-image.html?template";
 
 /**
  * MNIST image.
  */
 class MnistImage extends WebComponent(HTMLElement) {
-  /**
-   * @override
-   */
-  static observedAttributes = ["src"];
+  static override observedAttributes = ["src"];
   /**
    * Load the image.
-   * @param {string} [url]
    */
-  async loadImage(url) {
+  async loadImage(url: string) {
     const canvas = this.shadowRoot?.querySelector("canvas");
     if (!canvas) {
       console.error("MnistImage.loadImage.canvas");
       return;
     }
-    const context = canvas.getContext("2d");
+    const context = canvas.getContext("2d", { willReadFrequently: true });
     if (!context) {
       console.error("MnistImage.loadImage.context");
       return;
@@ -51,10 +40,7 @@ class MnistImage extends WebComponent(HTMLElement) {
     context.putImageData(imageData, 0, 0);
     this.dispatchEvent(new Event("mnist-image-load"));
   }
-  /**
-   * @override
-   */
-  connectedCallback() {
+  override connectedCallback() {
     this.attachShadow({ mode: "open" });
     this.style.height = "28px";
     this.style.width = "28px";
@@ -64,13 +50,7 @@ class MnistImage extends WebComponent(HTMLElement) {
       this.loadImage(src);
     }
   }
-  /**
-   * @param {string} name
-   * @param {string} _oldValue
-   * @param {string} newValue
-   * @override
-   */
-  attributeChangedCallback(name, _oldValue, newValue) {
+  override attributeChangedCallback(name: string, _oldValue: string, newValue: string) {
     if (name === "src") {
       this.loadImage(newValue);
     }
@@ -79,7 +59,5 @@ class MnistImage extends WebComponent(HTMLElement) {
     return this.shadowRoot?.querySelector("canvas")?.getContext("2d");
   }
 }
-
-customElements.define("mnist-image", MnistImage);
 
 export default MnistImage;

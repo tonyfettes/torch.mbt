@@ -1,28 +1,14 @@
-// @ts-check
-/**
- * @typedef {'test' | 'train'} MnistDatasetName
- */
-
 /**
  * MNIST database.
  */
 class MnistDatabase {
+  private _database: IDBDatabase | IDBOpenDBRequest;
+  private _dataset: Record<string, EventTarget | null>;
   /**
    * Create a new MNIST database.
-   * @param {string} name - The database name
    */
-  constructor(name) {
-    /**
-     * @type {IDBDatabase | IDBOpenDBRequest}
-     * @property
-     * @private
-     */
+  constructor(name: string) {
     this._database = window.indexedDB.open(name);
-    /**
-     * @type {Record<string, EventTarget?>}
-     * @property
-     * @private
-     */
     this._dataset = {
       test: null,
       train: null,
@@ -30,23 +16,18 @@ class MnistDatabase {
   }
   /**
    * MNIST database URL.
-   * @type {Record<string, string>}
-   * @property
-   * @readonly
-   * @private
    */
-  static URL = {
+  private static readonly URL: Record<string, string> = {
     test: "https://media.githubusercontent.com/media/lorenmh/mnist_handwritten_json/master/mnist_handwritten_test.json.gz",
     train:
       "https://media.githubusercontent.com/media/lorenmh/mnist_handwritten_json/master/mnist_handwritten_train.json.gz",
   };
   /**
    * Fetch the MNIST data.
-   * @private
-   * @param {string} url - The URL of the MNIST data
-   * @returns {Promise<{ image: number[], label: number }[]>}
    */
-  static async fetchDataset(url) {
+  private static async fetchDataset(
+    url: string
+  ): Promise<{ image: number[]; label: number }[]> {
     const response = await fetch(url);
     if (!response.ok || !response.body) {
       throw new Error(`Failed to fetch MNIST dataset from ${url}`);
@@ -57,11 +38,8 @@ class MnistDatabase {
   }
   /**
    * Upgrade the database.
-   * @private
-   * @param {IDBDatabase} database - The database
-   * @returns {void}
    */
-  upgradeDatabase(database) {
+  private upgradeDatabase(database: IDBDatabase): void {
     for (const [name, url] of Object.entries(MnistDatabase.URL)) {
       if (this._dataset[name]) {
         continue;
@@ -75,7 +53,7 @@ class MnistDatabase {
         const objectStore = database
           .transaction(name, "readwrite")
           .objectStore(name);
-        for (const [index, data] of dataset.entries()) {
+        for (const [_index, data] of dataset.entries()) {
           objectStore.add(data);
         }
         objectStore.transaction.oncomplete = () => {
@@ -88,10 +66,8 @@ class MnistDatabase {
   }
   /**
    * Get the database.
-   * @private
-   * @returns {Promise<IDBDatabase>}
    */
-  async getDatabase() {
+  private async getDatabase(): Promise<IDBDatabase> {
     return await new Promise((resolve, reject) => {
       if (this._database instanceof IDBDatabase) {
         resolve(this._database);
@@ -115,12 +91,11 @@ class MnistDatabase {
   }
   /**
    * Get the database.
-   * @private
-   * @param {string} name
-   * @param {IDBTransactionMode} mode
-   * @returns {Promise<IDBObjectStore>}
    */
-  async getDataset(name, mode) {
+  async getDataset(
+    name: string,
+    mode: IDBTransactionMode
+  ): Promise<IDBObjectStore> {
     const database = await this.getDatabase();
     return new Promise((resolve) => {
       if (!this._dataset[name]) {
@@ -134,15 +109,15 @@ class MnistDatabase {
   }
   /**
    * Get the data.
-   * @param {string} name
-   * @param {number} key
-   * @returns {Promise<{ image: number[], label: number }>}
    */
-  async getData(name, key) {
+  async getData(
+    name: string,
+    key: number
+  ): Promise<{ image: number[]; label: number }> {
     const objectStore = await this.getDataset(name, "readonly");
     const request = objectStore.get(key + 1);
     return new Promise((resolve, reject) => {
-      request.onsuccess = (event) => {
+      request.onsuccess = (_event) => {
         // @ts-ignore
         resolve(request.result);
       };

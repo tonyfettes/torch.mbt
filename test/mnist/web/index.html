@@ -1,8 +1,15 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <script src="./index.mjs" type="module"></script>
-    <link rel="stylesheet" href="./index.css" />
+    <script src="/scripts/index.ts" type="module"></script>
+    <style>
+      .mnist-infer {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 16px;
+      }
+    </style>
   </head>
   <body>
     <h1>MNIST</h1>
@@ -17,7 +24,7 @@
       >)
     </blockquote>
     <h2>Inference</h2>
-    <div class="mnist-infer">
+    <div id="mnist-infer">
       <mnist-canvas></mnist-canvas>
       <mnist-chart></mnist-chart>
     </div>

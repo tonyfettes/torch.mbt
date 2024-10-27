@@ -1,0 +1,23 @@
+<style>
+  #wrapper {
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    gap: 8px;
+  }
+  #toolbar {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+  }
+</style>
+<div id="wrapper">
+  <canvas
+    width="28"
+    height="28"
+    style="border: 1px solid black; image-rendering: pixelated"
+  ></canvas>
+  <div id="toolbar">
+    <button id="clear">Clear</button>
+  </div>
+</div>
