@@ -54,7 +54,7 @@ pub impl[X : TensorValue + Default] TensorValue for FixedArray[X] with to_tensor
   }
   let shape = FixedArray::make(element.shape.length() + 1, 0)
   shape[0] = self.length()
-  for i, s in element.shape._ {
+  for i, s in element.shape {
     shape[i + 1] = s
   }
   let block = compute_block_size(shape)
@@ -90,7 +90,7 @@ pub impl[X : TensorValue + Default] TensorValue for Array[X] with to_tensor(
   }
   let shape = FixedArray::make(element.shape.length() + 1, 0)
   shape[0] = self.length()
-  for i, s in element.shape._ {
+  for i, s in element.shape {
     shape[i + 1] = s
   }
   let block = compute_block_size(shape)

@@ -25,7 +25,7 @@ pub fn CrossEntropyLoss::forward(
   target : @tensor.Tensor
 ) -> @tensor.Tensor {
   let input_shape = input.shape
-  if input_shape._ != target.shape._ {
+  if input_shape != target.shape {
     abort(
       "Input shape \{input.shape} is not consistent with target shape \{target.shape}",
     )

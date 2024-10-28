@@ -435,7 +435,7 @@ test "Conv2d - Sigmoid - AvgPool2d" {
     learning_rate=0.1,
   )
   let output = @nn.Module::forward(model, image)
-  @json.inspect!(output.shape._, content=[1, 2, 2, 2])
+  @json.inspect!(output.shape, content=[1, 2, 2, 2])
   @json.inspect!(
     output[0],
     content=[
