@@ -20,7 +20,7 @@ JCO_OUTPUTS := $(JCO_OUT)/$(JCO_NAME).core.wasm $(JCO_OUT)/$(JCO_NAME).d.ts $(JC
 PY_OUT := cli
 PY_NAME := mnist/model
 
-default: $(JCO_OUTPUTS)
+default: $(JCO_OUTPUTS) $(PY_OUT)/$(PY_NAME)
 
 define make_moon_rules
 ifeq ($(2),debug)
