@@ -1,5 +1,5 @@
 pub struct Data {
-  input : FixedArray[Int]
+  input : FixedArray[Float]
   label : Int
 }
 
@@ -12,7 +12,7 @@ pub fn train[Model : @torch/nn.Module](
 ) -> Float {
   let input = batch.map(
     fn(data) {
-      @torch.tensor(data.input.map(fn(x) { x.to_double() / 255.0 })).reshape(
+      @torch.tensor(data.input).reshape(
         [1, 28, 28],
       )
     },

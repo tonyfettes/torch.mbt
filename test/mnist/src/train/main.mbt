@@ -44,7 +44,10 @@ fn eval(model : @torch/nn.Module, dataset : Array[Data]) -> Double {
   accuracy
 }
 
-fn train[Module : @torch/nn.Module](model : Module, dataset : Array[Data]) -> Unit {
+fn train[Module : @torch/nn.Module](
+  model : Module,
+  dataset : Array[Data]
+) -> Unit {
   let criterion = @torch/nn.CrossEntropyLoss::new()
   let optimizer = @torch/optim.SGD::new(model.parameters(), learning_rate=0.01)
   let mut step = 0
@@ -61,11 +64,14 @@ fn train[Module : @torch/nn.Module](model : Module, dataset : Array[Data]) -> Un
         },
       )
       let input = @torch.stack(input)
-      let target = FixedArray::makei(batch, fn(b) {
-        let target = FixedArray::make(10, 0.0)
-        target[dataset[i + b].label] = 1.0
-        target
-      })
+      let target = FixedArray::makei(
+        batch,
+        fn(b) {
+          let target = FixedArray::make(10, 0.0)
+          target[dataset[i + b].label] = 1.0
+          target
+        },
+      )
       let target = @torch.tensor(target)
       let output = model.forward(input)
       optimizer.zero_grad()

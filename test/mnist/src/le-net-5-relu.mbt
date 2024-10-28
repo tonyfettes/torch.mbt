@@ -30,7 +30,10 @@ pub fn LeNet5ReLU::new() -> LeNet5ReLU {
   )
 }
 
-pub fn LeNet5ReLU::forward(self : LeNet5ReLU, input : @torch.Tensor) -> @torch.Tensor {
+pub fn LeNet5ReLU::forward(
+  self : LeNet5ReLU,
+  input : @torch.Tensor
+) -> @torch.Tensor {
   @torch/nn.Module::forward(self._, input)
 }
 

@@ -18,7 +18,7 @@ pub fn wasmExportSavePostReturn(p0 : Int) -> Unit {
 }
 
 pub fn wasmExportInfer(p0 : Int, p1 : Int) -> Int {
-  let result = @ffi.ptr2bytes(p0, p1)
+  let result = @ffi.ptr2double_array(p0, p1)
   let result0 : FixedArray[Double] = @mnist.infer(result)
   @ffi.store32(return_area + 4, result0.length())
   @ffi.store32(return_area + 0, @ffi.double_array2ptr(result0))
@@ -30,12 +30,15 @@ pub fn wasmExportInferPostReturn(p0 : Int) -> Unit {
 }
 
 pub fn wasmExportTrain(p0 : Int, p1 : Int, p2 : Double) -> Double {
-  let array : FixedArray[@mnist0.Data] = FixedArray::makei(
+  let array : FixedArray[(FixedArray[Double], Int)] = FixedArray::makei(
     p1,
     fn(index) {
       let base = p0 + index * 12
-      let result = @ffi.ptr2bytes(@ffi.load32(base + 0), @ffi.load32(base + 4))
-      @mnist0.Data::{ input: result, label: @ffi.load32(base + 8) }
+      let result = @ffi.ptr2double_array(
+        @ffi.load32(base + 0),
+        @ffi.load32(base + 4),
+      )
+      (result, @ffi.load32(base + 8))
     },
   )
   @ffi.free(p0)

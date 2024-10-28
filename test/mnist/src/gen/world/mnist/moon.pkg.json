@@ -16,7 +16,6 @@
     {
       "path": "tonyfettes/torch/optim",
       "alias": "torch/optim"
-    },
-    { "path": "tonyfettes/torch/mnist/world/mnist", "alias": "export" }
+    }
   ]
 }

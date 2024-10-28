@@ -31,11 +31,6 @@
   },
   "import": [
     { "path": "tonyfettes/torch/mnist/ffi", "alias": "ffi" },
-    { "path": "tonyfettes/torch/mnist/gen/world/mnist", "alias": "mnist" },
-    { "path": "tonyfettes/torch/mnist/world/mnist", "alias": "mnist0" }
-  ],
-  "targets": {
-    "ffi.wasm-gc.mbt": ["wasm-gc"],
-    "ffi.mbt": ["not", "wasm-gc"]
-  }
+    { "path": "tonyfettes/torch/mnist/gen/world/mnist", "alias": "mnist" }
+  ]
 }

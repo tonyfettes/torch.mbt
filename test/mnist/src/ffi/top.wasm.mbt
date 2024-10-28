@@ -139,7 +139,7 @@ pub fn ptr2int64_array(ptr : Int) -> FixedArray[Int64] {
 extern "wasm" fn ptr2double_array_ffi(ptr : Int) -> FixedArray[Double] =
   #|(func (param i32) (result i32) local.get 0 i32.const 8 i32.sub)
 
-pub fn ptr2double_array(ptr : Int) -> FixedArray[Double] {
+pub fn ptr2double_array(ptr : Int, _len : Int) -> FixedArray[Double] {
   set_64_header_ffi(ptr - 4)
   ptr2double_array_ffi(ptr)
 }
