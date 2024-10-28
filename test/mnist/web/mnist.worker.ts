@@ -7,7 +7,10 @@ export type MnistWorkerRequest =
     }
   | {
       type: "train";
-      data: [Float64Array, label: number][];
+      data: {
+        batch: [Float64Array, label: number][];
+        learningRate: number;
+      }
     };
 
 export type MnistWorkerResponse =
@@ -28,7 +31,7 @@ self.addEventListener("message", (event: MessageEvent<MnistWorkerRequest>) => {
       self.postMessage({ type: "infer", data: result });
       break;
     case "train":
-      const loss = MnistModel.train(data, 0.001);
+      const loss = MnistModel.train(data.batch, data.learningRate);
       self.postMessage({ type: "train", data: loss });
       break;
   }

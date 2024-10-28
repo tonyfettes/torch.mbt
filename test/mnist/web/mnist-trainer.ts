@@ -58,7 +58,10 @@ class MnistTrainer extends WebComponent(HTMLElement) {
         }
         mnistWorker.postMessage({
           type: "train",
-          data: batch,
+          data: {
+            batch,
+            learningRate: 0.001
+          }
         });
       }
     }
