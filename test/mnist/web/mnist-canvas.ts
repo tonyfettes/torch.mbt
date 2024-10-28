@@ -26,9 +26,9 @@ class MnistCanvas extends WebComponent(HTMLElement) {
   }
   private dispatchDrawEvent(imageData: ImageData): void {
     const data = imageData.data;
-    const input = new Uint8Array(data.length / 4);
+    const input = new Float64Array(data.length / 4);
     for (let i = 0; i < data.length; i += 4) {
-      input[i / 4] = data[i + 3];
+      input[i / 4] = data[i + 3] / 255.0;
     }
     mnistWorker.postMessage({ type: "infer", data: input });
   }

@@ -50,11 +50,11 @@ class MnistTrainer extends WebComponent(HTMLElement) {
     });
     for (let epoch = 0; epoch < 1; epoch++) {
       for (let i = 0; i < 60000; i += this._batchSize) {
-        const batch = [];
+        const batch: [Float64Array, number][] = [];
         for (let b = 0; b < this._batchSize; b++) {
           const data = await mnistDatabase.getData("train", i);
-          const input = new Uint8Array(data.image);
-          batch.push({ input, label: data.label });
+          const input = new Float64Array(data.image.map((x) => x / 255));
+          batch.push([input, data.label]);
         }
         mnistWorker.postMessage({
           type: "train",

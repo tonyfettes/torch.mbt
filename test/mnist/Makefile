@@ -2,13 +2,17 @@ TARGETS := wasm wasm-gc
 PROFILES := debug release
 MOON_FLAGS :=
 PACKAGE := gen/gen
-OUT := scripts
-NAME := mnist-model
-JCO := corepack pnpm exec jco
-JCO_FLAGS := --no-nodejs-compat
+
 WASM_OPT_FLAGS := --enable-gc --enable-multivalue --enable-reference-types --enable-bulk-memory --enable-simd
 
+JCO_OUT := web
+JCO_NAME := mnist-model
+JCO := corepack pnpm exec jco
+JCO_FLAGS := --no-nodejs-compat
 JCO_OUTPUTS := $(OUT)/$(NAME).core.wasm $(OUT)/$(NAME).d.ts $(OUT)/$(NAME).js
+
+PY_OUT := cli
+PY_NAME := mnist/model
 
 default: $(JCO_OUTPUTS)
 
@@ -32,17 +36,20 @@ BUILD := target/$(TARGET)/$(PROFILE)/build
 
 ifeq ($(TARGET),wasm)
 ifeq ($(PROFILE),release)
-$(JCO_OUTPUTS) &: $(BUILD)/$(PACKAGE).opt.component.wasm
-	$(JCO) transpile $(JCO_FLAGS) $< -o $(OUT)/ --name $(NAME)
+$(JCO_OUTPUTS) &: $(BUILD)/$(PACKAGE).opt.utf16.component.wasm
+	$(JCO) transpile $(JCO_FLAGS) $< -o $(JCO_OUT)/ --name $(JCO_NAME)
 else
-$(JCO_OUTPUTS) &: $(BUILD)/$(PACKAGE).component.wasm
-	$(JCO) transpile $(JCO_FLAGS) $< -o $(OUT)/ --name $(NAME)
+$(JCO_OUTPUTS) &: $(BUILD)/$(PACKAGE).utf16.component.wasm
+	$(JCO) transpile $(JCO_FLAGS) $< -o $(JCO_OUT)/ --name $(JCO_NAME)
 endif
 else ifeq ($(TARGET),wasm-gc)
-$(JCO_OUTPUTS) &: target/wasm/$(PROFILE)/build/$(PACKAGE).component.wasm target/wasm-gc/$(PROFILE)/build/$(PACKAGE).wasm
-	$(JCO) transpile $(JCO_FLAGS) $< -o $(OUT)/ --name $(NAME)
-	cp target/wasm-gc/$(PROFILE)/build/$(PACKAGE).wasm $(OUT)/$(NAME).core.wasm
+$(JCO_OUTPUTS) &: target/wasm/$(PROFILE)/build/$(PACKAGE).utf16.component.wasm target/wasm-gc/$(PROFILE)/build/$(PACKAGE).wasm
+	$(JCO) transpile $(JCO_FLAGS) $< -o $(JCO_OUT)/ --name $(JCO_NAME)
+	cp target/wasm-gc/$(PROFILE)/build/$(PACKAGE).wasm $(JCO_OUT)/$(JCO_NAME).core.wasm
 endif
+
+$(PY_OUT)/$(PY_NAME): target/wasm/$(PROFILE)/build/$(PACKAGE).utf8.component.wasm
+	python3 -m wasmtime.bindgen $< --out-dir $@
 
 %.wat: %.wasm
 	wasm-tools print $< > $@
@@ -50,7 +57,10 @@ endif
 %.opt.wasm: %.wasm
 	wasm-opt $(WASM_OPT_FLAGS) $< -O3 -o $@
 
-%.embedded.wasm: $(WIT) %.wasm
+%.utf8.embedded.wasm: $(WIT) %.wasm
+	wasm-tools component embed $(WIT) $*.wasm -o $@
+
+%.utf16.embedded.wasm: $(WIT) %.wasm
 	wasm-tools component embed $(WIT) $*.wasm -o $@ --encoding utf16
 
 %.component.wasm: %.embedded.wasm

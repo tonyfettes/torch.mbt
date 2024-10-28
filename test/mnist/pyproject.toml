@@ -22,5 +22,4 @@ dev = [
 train = "mnist.train:main"
 
 [tool.setuptools.packages.find]
-where = ["src"]
-# include = ["bin"]
+where = ["cli"]

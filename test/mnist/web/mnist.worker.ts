@@ -3,11 +3,11 @@ import * as MnistModel from "./mnist-model";
 export type MnistWorkerRequest =
   | {
       type: "infer";
-      data: MnistModel.Input;
+      data: Float64Array;
     }
   | {
       type: "train";
-      data: MnistModel.Batch;
+      data: [Float64Array, label: number][];
     };
 
 export type MnistWorkerResponse =
