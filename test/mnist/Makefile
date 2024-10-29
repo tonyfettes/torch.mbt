@@ -43,9 +43,15 @@ $(JCO_OUTPUTS) &: $(BUILD)/$(PACKAGE).utf16.component.wasm
 	$(JCO) transpile $(JCO_FLAGS) $< -o $(JCO_OUT)/ --name $(JCO_NAME)
 endif
 else ifeq ($(TARGET),wasm-gc)
+ifeq ($(PROFILE),release)
 $(JCO_OUTPUTS) &: target/wasm/$(PROFILE)/build/$(PACKAGE).utf16.component.wasm | target/wasm-gc/$(PROFILE)/build/$(PACKAGE).wasm
 	$(JCO) transpile $(JCO_FLAGS) $< -o $(JCO_OUT)/ --name $(JCO_NAME)
 	cp target/wasm-gc/$(PROFILE)/build/$(PACKAGE).wasm $(JCO_OUT)/$(JCO_NAME).core.wasm
+else
+$(JCO_OUTPUTS) &: target/wasm/$(PROFILE)/build/$(PACKAGE).utf16.component.wasm | target/wasm-gc/$(PROFILE)/build/$(PACKAGE).opt.wasm
+	$(JCO) transpile $(JCO_FLAGS) $< -o $(JCO_OUT)/ --name $(JCO_NAME)
+	cp target/wasm-gc/$(PROFILE)/build/$(PACKAGE).wasm $(JCO_OUT)/$(JCO_NAME).core.wasm
+endif
 endif
 
 $(PY_OUT)/$(PY_NAME): target/wasm/$(PROFILE)/build/$(PACKAGE).utf8.component.wasm
