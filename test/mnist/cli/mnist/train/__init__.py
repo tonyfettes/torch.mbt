@@ -51,7 +51,10 @@ class MoonBitTrainer:
         self.learning_rate = learning_rate
 
     def train(self, batch: list[Data]) -> float:
-        input = [([value / 255.0 for value in data["image"]], data["label"]) for data in batch]
+        input = [
+            ([value / 255.0 for value in data["image"]], data["label"])
+            for data in batch
+        ]
         return self.model.train(self.store, input, self.learning_rate)
 
 
