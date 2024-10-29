@@ -41,18 +41,6 @@ class MnistTrainer extends WebComponent(HTMLElement) {
    * Train the model.
    */
   async train(): Promise<void> {
-    mnistWorker.addEventListener("message", (event) => {
-      const { type, data } = event.data;
-      if (type !== "train") {
-        return;
-      }
-      const step = this._logs.length;
-      this._logs.push({
-        step,
-        loss: data,
-      });
-      this.plotLoss();
-    });
     for (let epoch = 0; epoch < 1; epoch++) {
       for (let i = 0; i < 60000; i += this._batchSize) {
         const batch: [Float64Array, number][] = [];
@@ -67,6 +55,26 @@ class MnistTrainer extends WebComponent(HTMLElement) {
             batch,
             learningRate: 0.001,
           },
+        });
+        await new Promise<void>((resolve) => {
+          mnistWorker.addEventListener(
+            "message",
+            (event) => {
+              const { type, data } = event.data;
+              if (type !== "train") {
+                return;
+              }
+              this._logs.push({
+                step: i,
+                loss: data,
+              });
+              this.plotLoss();
+              resolve();
+            },
+            {
+              once: true,
+            }
+          );
         });
       }
     }
