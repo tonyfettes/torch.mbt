@@ -37,25 +37,22 @@ class MnistChart extends WebComponent(HTMLElement) {
     this.attachShadow({ mode: "open" });
     this.shadowRoot?.appendChild(template.content.cloneNode(true));
     this.loadChart(Array(10).fill(0.0));
-    mnistWorker.addEventListener(
-      "message",
-      (event) => {
-        const { type, data } = event.data;
-        if (type === "infer") {
-          const max = Math.max(...data);
-          const exp = [];
-          for (const val of data) {
-            exp.push(Math.exp(val - max));
-          }
-          const sum = exp.reduce((a, b) => a + b, 0);
-          const probabilities = [];
-          for (const value of exp) {
-            probabilities.push(value / sum);
-          }
-          this.loadChart(probabilities);
+    mnistWorker.addEventListener("message", (event) => {
+      const { type, data } = event.data;
+      if (type === "infer") {
+        const max = Math.max(...data);
+        const exp = [];
+        for (const val of data) {
+          exp.push(Math.exp(val - max));
         }
+        const sum = exp.reduce((a, b) => a + b, 0);
+        const probabilities = [];
+        for (const value of exp) {
+          probabilities.push(value / sum);
+        }
+        this.loadChart(probabilities);
       }
-    );
+    });
   }
 }
 

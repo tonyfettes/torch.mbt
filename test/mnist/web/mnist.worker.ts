@@ -10,7 +10,7 @@ export type MnistWorkerRequest =
       data: {
         batch: [Float64Array, label: number][];
         learningRate: number;
-      }
+      };
     };
 
 export type MnistWorkerResponse =

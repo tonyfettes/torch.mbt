@@ -21,7 +21,12 @@ class MnistTrainer extends WebComponent(HTMLElement) {
   }
   private async plotLoss() {
     const newPlot = Plot.plot({
-      marks: [Plot.lineY(this._logs, { x: "step", y: "loss" })],
+      marks: [
+        Plot.lineY(this._logs.slice(Math.max(0, this._logs.length - 1000)), {
+          x: "step",
+          y: "loss",
+        }),
+      ],
     });
     if (this._lossPlot) {
       this.shadowRoot
@@ -60,8 +65,8 @@ class MnistTrainer extends WebComponent(HTMLElement) {
           type: "train",
           data: {
             batch,
-            learningRate: 0.001
-          }
+            learningRate: 0.001,
+          },
         });
       }
     }
