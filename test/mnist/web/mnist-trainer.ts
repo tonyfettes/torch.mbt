@@ -92,7 +92,7 @@ class MnistTrainer extends WebComponent(HTMLElement) {
                 return;
               }
               this._logs.push({
-                step: i,
+                step: epoch * 60000 + i,
                 loss: data,
               });
               this.plotLoss();
