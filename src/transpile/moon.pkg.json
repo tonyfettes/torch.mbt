@@ -13,7 +13,6 @@
   ],
   "test-import": [
     "tonyfettes/torch/shape",
-    "tonyfettes/torch/distributions",
-    "tonyfettes/torch/nn"
+    "tonyfettes/torch/distributions"
   ]
 }

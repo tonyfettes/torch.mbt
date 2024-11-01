@@ -18,6 +18,5 @@
     "tonyfettes/torch/distributions",
     "tonyfettes/torch/optim",
     "tonyfettes/torch/internal/unsafe"
-  ],
-  "test-import": ["tonyfettes/torch/tensor"]
+  ]
 }
