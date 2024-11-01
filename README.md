@@ -24,7 +24,7 @@ PyTorch-like tensor operations implemented in MoonBit.
 
    ```moonbit
    fn main {
-     tensor = @torch.tensor(1.0)
+     let tensor = @torch.tensor(1.0)
      println("\{tensor}")
    }
    ```
