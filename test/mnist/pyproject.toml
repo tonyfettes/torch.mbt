@@ -19,7 +19,7 @@ dev = [
 ]
 
 [project.scripts]
-train = "mnist.train:main"
+mnist = "mnist:main"
 
 [tool.setuptools.packages.find]
 where = ["cli"]
