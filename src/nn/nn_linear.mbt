@@ -13,10 +13,10 @@ pub fn Linear::new(
   ~weight_distribution? : @distributions.Continuous,
   ~bias_distribution? : @distributions.Continuous
 ) -> Linear {
-  let in_features_sqrt = in_features.to_double().sqrt()
+  let in_features_sqrt = in_features.to_float().sqrt()
   let weight_distribution = match weight_distribution {
     None => {
-      let in_features_sqrt_inv = 1.0 / in_features_sqrt
+      let in_features_sqrt_inv = (1.0 : Float) / in_features_sqrt
       @distributions.Uniform::new(-in_features_sqrt_inv, in_features_sqrt_inv)
       as @distributions.Continuous
     }
@@ -24,7 +24,7 @@ pub fn Linear::new(
   }
   let bias_distribution = match bias_distribution {
     None => {
-      let bound = 1.0 / in_features_sqrt
+      let bound = (1.0 : Float) / in_features_sqrt
       @distributions.Uniform::new(-bound, bound) as @distributions.Continuous
     }
     Some(distrib) => distrib

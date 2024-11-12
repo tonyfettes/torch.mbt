@@ -423,11 +423,10 @@ fn Tensor::propagate(self : Tensor) -> Unit {
       }
       x.propagate()
     }
-    MaxPool2d(x, m) => {
+    MaxPool2d(x, m) =>
       for i = 0; i < self.value.length(); i = i + 1 {
         x.grad[m[i]] += self_grad[i]
       }
-    }
     Correlate2d(~image, ~kernel, ~stride, ~padding) => {
       for i in 0..<self.shape[0] {
         for j in 0..<self.shape[1] {
