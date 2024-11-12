@@ -1,0 +1,6 @@
+{
+  "import": [
+    "tonyfettes/torch/tensor",
+    "tonyfettes/torch/distributions"
+  ]
+}

@@ -1,6 +1,7 @@
 pub(readonly) trait Continuous {
   sample_value(Self) -> Float
   sample(Self, FixedArray[Int]) -> @tensor.Tensor
+  sample_inplace(Self, @tensor.Tensor) -> Unit
 }
 
 impl Continuous with sample(self : Self, shape : FixedArray[Int]) -> @tensor.Tensor {
@@ -13,6 +14,12 @@ impl Continuous with sample(self : Self, shape : FixedArray[Int]) -> @tensor.Ten
     sample.push(Continuous::sample_value(self))
   }
   @tensor.Tensor::new(sample).reshape(shape)
+}
+
+impl Continuous with sample_inplace(self : Self, tensor : @tensor.Tensor) -> Unit {
+  for i = 0; i < tensor.value.length(); i = i + 1 {
+    tensor.value[i] = Continuous::sample_value(self)
+  }
 }
 
 pub(readonly) trait Discrete {
@@ -41,6 +48,10 @@ pub fn Uniform::sample(
   Continuous::sample(self, shape)
 }
 
+pub fn Uniform::sample_inplace(self : Uniform, tensor : @tensor.Tensor) -> Unit {
+  Continuous::sample_inplace(self, tensor)
+}
+
 let normal_buffer : Array[Double] = []
 
 pub fn normal(~mean : Double = 0.0, ~std : Double = 1.0) -> Double {
@@ -51,8 +62,8 @@ pub fn normal(~mean : Double = 0.0, ~std : Double = 1.0) -> Double {
   let u1 = rand.val.double()
   let u2 = rand.val.double()
   let r = (-2.0 * u1.ln()).sqrt()
-  let z0 = r * @math.cos(2.0 * pi * u2)
-  let z1 = r * @math.sin(2.0 * pi * u2)
+  let z0 = r * @math.cos(2.0 * @math.PI * u2)
+  let z1 = r * @math.sin(2.0 * @math.PI * u2)
   normal_buffer.push(z1)
   return z0 * std + mean
 }
@@ -61,8 +72,6 @@ pub struct Normal {
   mean : Double
   std : Double
 }
-
-let pi = 0x3.243F6A8885A308CA8A54
 
 pub fn Normal::new(~mean : Double = 0.0, ~std : Double = 1.0) -> Normal {
   Normal::{ mean, std }
