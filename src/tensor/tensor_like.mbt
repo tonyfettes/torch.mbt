@@ -1,4 +1,4 @@
-pub trait TensorLike {
+trait TensorLike {
   to_tensor(Self) -> Tensor
 }
 

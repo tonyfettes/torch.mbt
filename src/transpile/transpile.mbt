@@ -45,7 +45,7 @@ pub fn Transpiler::to_string(self : Transpiler) -> String {
   $|__all__ = [\{__all__}]
 }
 
-pub trait Transpile {
+pub(open) trait Transpile {
   transpile(Self, Transpiler, String) -> Unit
 }
 

@@ -4,8 +4,7 @@
   "deps": {
     "tonyfettes/torch": {
       "path": "../.."
-    },
-    "moonbitlang/x": "0.4.11"
+    }
   },
   "readme": "README.md",
   "source": "src"

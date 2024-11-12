@@ -166,7 +166,7 @@ pub fn Tensor::mean(self : Tensor) -> Tensor {
   self.sum() / tensor(self.value.length().to_double())
 }
 
-pub trait Default {
+pub(readonly) trait Default {
   default() -> Self
 }
 

@@ -1,8 +1,5 @@
-pub trait IContinuous {
-  _sample(Self) -> Double
-}
-
-pub trait Continuous: IContinuous {
+pub(readonly) trait Continuous {
+  sample_value(Self) -> Double
   sample(Self, FixedArray[Int]) -> @tensor.Tensor
 }
 
@@ -13,16 +10,16 @@ impl Continuous with sample(self : Self, shape : FixedArray[Int]) -> @tensor.Ten
   }
   let sample = []
   for i = 0; i < size; i = i + 1 {
-    sample.push(IContinuous::_sample(self))
+    sample.push(Continuous::sample_value(self))
   }
   @tensor.Tensor::new(sample).reshape(shape)
 }
 
-pub trait Discrete {
+pub(readonly) trait Discrete {
   sample(Self) -> Int
 }
 
-pub impl IContinuous for Double with _sample(self : Double) -> Double { self }
+pub impl Continuous for Double with sample_value(self : Double) -> Double { self }
 
 struct Uniform {
   lower : Double
@@ -33,7 +30,7 @@ pub fn Uniform::new(lower : Double, upper : Double) -> Uniform {
   Uniform::{ lower, upper }
 }
 
-pub impl IContinuous for Uniform with _sample(self : Uniform) -> Double {
+pub impl Continuous for Uniform with sample_value(self : Uniform) -> Double {
   rand.val.double() * (self.upper - self.lower) + self.lower
 }
 

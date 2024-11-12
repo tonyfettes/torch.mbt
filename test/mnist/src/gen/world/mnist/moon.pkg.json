@@ -1,17 +1,11 @@
 {
   "import": [
     {
-      "path": "tonyfettes/torch/mnist/ffi",
-      "alias": "ffi"
-    },
-    {
       "path": "tonyfettes/torch/mnist",
       "alias": "mnist"
     },
-    "tonyfettes/torch",
     {
       "path": "tonyfettes/torch/nn",
-      "alias": "torch/nn"
     },
     {
       "path": "tonyfettes/torch/optim",

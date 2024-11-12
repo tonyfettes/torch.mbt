@@ -11,11 +11,7 @@ pub fn train[Model : @torch/nn.Module](
   batch : FixedArray[Data]
 ) -> Float {
   let input = batch.map(
-    fn(data) {
-      @torch.tensor(data.input).reshape(
-        [1, 28, 28],
-      )
-    },
+    fn(data) { @torch.tensor(data.input).reshape([1, 28, 28]) },
   )
   let input = @torch/tensor.stack(input)
   let target = batch.map(

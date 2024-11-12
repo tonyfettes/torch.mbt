@@ -150,7 +150,7 @@ fn set_64_header_ffi(offset : Int) -> Unit {
   store8(offset, 241)
 }
 
-pub trait Any {}
+pub(open) trait Any {}
 
 pub struct Cleanup {
   address : Int
