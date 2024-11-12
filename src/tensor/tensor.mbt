@@ -69,97 +69,9 @@ pub fn Tensor::to_string(self : Tensor) -> String {
   Show::to_string(self.value)
 }
 
-pub fn Tensor::op_get(self : Tensor, index : Int) -> TensorView {
-  if self.shape.length() == 0 {
-    abort("Tensor is a scalar")
-  }
-  if index >= self.shape[0] {
-    abort("Tensor element access \{index} out of bounds [0, \{self.shape[0]}")
-  }
-  TensorView::{ tensor: self, index: [Index(index)] }
-}
-
-pub fn Tensor::op_set[X : TensorValue](
-  self : Tensor,
-  index : Int,
-  other : X
-) -> Unit {
-  if not(no_grad.val) {
-    match self.graph {
-      Val => ()
-      _ =>
-        abort(
-          "a view of a leaf Variable that requires grad is being used in an in-place operation.",
-        )
-    }
-  }
-  let other = other.to_tensor(requires_grad=false)
-  let offset = index * self.block[0]
-  for i = 0; i < self.block[0]; i = i + 1 {
-    self.value[offset + i] = other.value[i]
-  }
-}
-
-test "Tensor::op_set" {
-  let tensor = Tensor::new([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
-  tensor[1] = [7.0, 8.0, 9.0]
-  inspect!(tensor, content="[[1, 2, 3], [7, 8, 9]]")
-  tensor[0] = [0.0, 1.0, 2.0]
-  inspect!(tensor, content="[[0, 1, 2], [7, 8, 9]]")
-}
 
 pub fn Tensor::length(self : Tensor) -> Int {
   self.shape[0]
-}
-
-pub fn Tensor::op_sub(self : Tensor, other : Tensor) -> Tensor {
-  let (self, other) = Tensor::broadcast(self, other)
-  let length = self.value.length()
-  let value : FixedArray[Float] = FixedArray::make(length, (0.0 : Float))
-  for i = 0; i < self.value.length(); i = i + 1 {
-    value[i] = self.value[i] - other.value[i]
-  }
-  Tensor::{
-    value,
-    shape: self.shape,
-    block: self.block,
-    graph: Graph::Sub(self, other),
-    ref: 0,
-    grad: FixedArray::make(length, (0.0 : Float)),
-  }
-}
-
-pub fn Tensor::op_neg(self : Tensor) -> Tensor {
-  let length = self.value.length()
-  let output : FixedArray[Float] = FixedArray::make(length, (0.0 : Float))
-  for i = 0; i < self.value.length(); i = i + 1 {
-    output[i] = -self.value[i]
-  }
-  Tensor::{
-    value: output,
-    shape: self.shape,
-    block: self.block,
-    graph: Graph::Neg(self),
-    ref: 0,
-    grad: FixedArray::make(length, (0.0 : Float)),
-  }
-}
-
-pub fn Tensor::op_div(self : Tensor, other : Tensor) -> Tensor {
-  let (self, other) = Tensor::broadcast(self, other)
-  let length = self.value.length()
-  let output : FixedArray[Float] = FixedArray::make(length, (0.0 : Float))
-  for i = 0; i < self.value.length(); i = i + 1 {
-    output[i] = self.value[i] / other.value[i]
-  }
-  Tensor::{
-    value: output,
-    shape: self.shape,
-    block: self.block,
-    graph: Graph::Div(self, other),
-    ref: 0,
-    grad: FixedArray::make(length, (0.0 : Float)),
-  }
 }
 
 pub fn Tensor::mean(self : Tensor) -> Tensor {
