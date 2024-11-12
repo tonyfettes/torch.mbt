@@ -145,6 +145,15 @@ test "linear/consistent" (it : @test.T) {
   let distribution = @distributions.Uniform::new(-1.0, 1.0)
   let model = @nn.Linear::new(8, 16)
   let input = distribution.sample([1, 8])
+  @json.inspect!(
+    input,
+    content=[
+      [
+        -0.4301600456237793, 0.7356255054473877, 0.7850341796875, 0.32139527797698975,
+        0.6747739315032959, 0.8503944873809814, 0.2769254446029663, -0.5336059331893921,
+      ],
+    ],
+  )
   let output = model.forward(input)
   inspect!(input.shape, content="[1, 8]")
   inspect!(model.weight.shape, content="[8, 16]")
@@ -154,10 +163,10 @@ test "linear/consistent" (it : @test.T) {
     input_weight,
     content=[
       [
-        -0.14556154608726501, 0.34053102135658264, -0.2727360129356384, 0.09315241873264313,
-        0.2314411699771881, 0.009322158992290497, -0.22513721883296967, 0.004441877827048302,
-        -0.35770153999328613, 0.3522055149078369, 0.015071108937263489, -0.34603962302207947,
-        0.2899203300476074, 0.3369878828525543, -0.37785059213638306, 0.22615067660808563,
+        -0.14556150138378143, 0.34053102135658264, -0.2727360129356384, 0.09315243363380432,
+        0.2314411848783493, 0.009322114288806915, -0.22513717412948608, 0.004441825672984123,
+        -0.35770153999328613, 0.35220563411712646, 0.015071094036102295, -0.3460395932197571,
+        0.28992030024528503, 0.3369879126548767, -0.3778506815433502, 0.22615066170692444,
       ],
     ],
   )
@@ -165,9 +174,9 @@ test "linear/consistent" (it : @test.T) {
     #|import torch
     #|
     #|def test_linear(snapshot: torch.Tensor):
-    $|    input = torch.tensor(\{input.to_json().stringify()})
-    $|    weight = torch.tensor(\{model.weight.to_json().stringify()})
-    $|    bias = torch.tensor(\{model.bias.to_json().stringify()})
+    $|    input = torch.tensor(\{input.to_json().stringify()}, dtype=torch.float32)
+    $|    weight = torch.tensor(\{model.weight.to_json().stringify()}, dtype=torch.float32)
+    $|    bias = torch.tensor(\{model.bias.to_json().stringify()}, dtype=torch.float32)
     $|    output = torch.nn.functional.linear(input, weight.transpose(-2, -1), bias)
     $|    assert output - torch.tensor(\{output.to_json().stringify()}) == snapshot
     ,

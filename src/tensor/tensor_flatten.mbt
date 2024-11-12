@@ -25,6 +25,6 @@ pub fn Tensor::flatten(self : Tensor, ~start : Int = 0, ~end? : Int) -> Tensor {
     block,
     ref: 0,
     graph: Nop(self),
-    grad: self.grad
-   }
+    grad: self.grad,
+  }
 }

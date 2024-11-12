@@ -22,7 +22,7 @@ pub fn Conv2d::new[KernelSize : @shape.Shape2d](
     for k in kernel_size {
       n *= k
     }
-    let stdv = 1.0 / n.to_double().sqrt()
+    let stdv = (1.0 : Float) / n.to_float().sqrt()
     @distributions.Uniform::new(-stdv, stdv)
   }
   let weight = Array::makei(

@@ -1,5 +1,5 @@
 pub(readonly) trait Continuous {
-  sample_value(Self) -> Double
+  sample_value(Self) -> Float
   sample(Self, FixedArray[Int]) -> @tensor.Tensor
 }
 
@@ -19,19 +19,19 @@ pub(readonly) trait Discrete {
   sample(Self) -> Int
 }
 
-pub impl Continuous for Double with sample_value(self : Double) -> Double { self }
+pub impl Continuous for Float with sample_value(self : Float) -> Float { self }
 
 struct Uniform {
-  lower : Double
-  upper : Double
+  lower : Float
+  upper : Float
 }
 
-pub fn Uniform::new(lower : Double, upper : Double) -> Uniform {
+pub fn Uniform::new(lower : Float, upper : Float) -> Uniform {
   Uniform::{ lower, upper }
 }
 
-pub impl Continuous for Uniform with sample_value(self : Uniform) -> Double {
-  rand.val.double() * (self.upper - self.lower) + self.lower
+pub impl Continuous for Uniform with sample_value(self : Uniform) -> Float {
+  rand.val.double().to_float() * (self.upper - self.lower) + self.lower
 }
 
 pub fn Uniform::sample(
