@@ -285,7 +285,7 @@ pub fn ptr2double_array(ptr : Int, len : Int) -> FixedArray[Double] {
   array
 }
 
-pub trait Any {}
+pub(open) trait Any {}
 
 pub struct Cleanup {
   address : Int

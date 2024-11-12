@@ -1,4 +1,4 @@
-pub trait Shape {
+pub(readonly) trait Shape {
   to_fixed_array(Self) -> FixedArray[Int]
 }
 
@@ -22,7 +22,7 @@ pub impl Shape for FixedArray[Int] with to_fixed_array(self : FixedArray[Int]) -
   self
 }
 
-pub trait Shape2d {
+pub(readonly) trait Shape2d {
   to_fixed_array(Self) -> FixedArray[Int]
   to_tuple(Self) -> (Int, Int)
 }

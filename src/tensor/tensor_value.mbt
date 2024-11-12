@@ -1,4 +1,4 @@
-pub trait TensorValue: Show {
+trait TensorValue: Show {
   to_tensor(Self, ~requires_grad : Bool) -> Tensor
 }
 
@@ -115,3 +115,5 @@ pub impl[X : TensorValue + Default] TensorValue for Array[X] with to_tensor(
 }
 
 pub impl[X] Default for Array[X] with default() -> Array[X] { [] }
+
+pub impl[X] Default for FixedArray[X] with default() -> FixedArray[X] { [] }

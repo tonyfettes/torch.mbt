@@ -1,6 +1,5 @@
 {
   "import": [
-    "moonbitlang/x/fs",
     "tonyfettes/torch",
     {
       "path": "tonyfettes/torch/tensor",
@@ -15,8 +14,7 @@
       "alias": "torch/optim"
     },
     {
-      "path": "tonyfettes/torch/shape",
-      "alias": "torch/shape"
+      "path": "tonyfettes/torch/shape"
     },
     {
       "path": "tonyfettes/torch/transpile",
