@@ -9,7 +9,7 @@ pub fn Tensor::log(self : Tensor) -> Tensor {
     shape: self.shape,
     block: self.block,
     graph: Graph::Log(self),
-    ref: 0,
+    refcnt: 0,
     grad: FixedArray::make(length, (0.0 : Float)),
   }
 }

@@ -3,7 +3,7 @@ pub(all) struct Tensor {
   shape : @unsafe.UnsafeArray[Int]
   block : @unsafe.UnsafeArray[Int]
   mut graph : Graph
-  mut ref : Int
+  mut refcnt : Int
   grad : @unsafe.UnsafeArray[Float]
 }
 
@@ -12,7 +12,7 @@ pub let empty : Tensor = Tensor::{
   shape: [],
   block: [],
   graph: Graph::Val,
-  ref: 0,
+  refcnt: 0,
   grad: [],
 }
 
@@ -110,64 +110,64 @@ test "compute_block_size" {
   inspect!(compute_block_size([2, 3, 4]), content="[12, 4, 1]")
 }
 
-fn Tensor::ref(self : Tensor) -> Unit {
-  if self.ref == -1 {
-    self.ref = 0
+fn Tensor::incref(self : Tensor) -> Unit {
+  if self.refcnt == -1 {
+    self.refcnt = 0
   }
-  self.ref += 1
-  if self.ref > 1 {
+  self.refcnt += 1
+  if self.refcnt > 1 {
     return
   }
   match self.graph {
     Val => ()
     Var => ()
     Add(a, b) => {
-      a.ref()
-      b.ref()
+      a.incref()
+      b.incref()
     }
     Sub(a, b) => {
-      a.ref()
-      b.ref()
+      a.incref()
+      b.incref()
     }
     Mul(a, b) => {
-      a.ref()
-      b.ref()
+      a.incref()
+      b.incref()
     }
     Div(a, b) => {
-      a.ref()
-      b.ref()
+      a.incref()
+      b.incref()
     }
-    Neg(x) => x.ref()
-    Exp(x) => x.ref()
-    Log(x) => x.ref()
-    Sum(x, _) => x.ref()
-    Pow(x, _) => x.ref()
+    Neg(x) => x.incref()
+    Exp(x) => x.incref()
+    Log(x) => x.incref()
+    Sum(x, _) => x.incref()
+    Pow(x, _) => x.incref()
     MatMul(a, b) => {
-      a.ref()
-      b.ref()
+      a.incref()
+      b.incref()
     }
     Cat(xs, _) =>
       for i in 0..<xs.length() {
-        xs[i].ref()
+        xs[i].incref()
       }
-    Get(x, _) => x.ref()
-    Nop(x) => x.ref()
-    ReLU(x) => x.ref()
-    AvgPool2d(x, ..) => x.ref()
-    MaxPool2d(x, _) => x.ref()
+    Get(x, _) => x.incref()
+    Nop(x) => x.incref()
+    ReLU(x) => x.incref()
+    AvgPool2d(x, ..) => x.incref()
+    MaxPool2d(x, _) => x.incref()
     Correlate2d(image~, kernel~, ..) => {
-      image.ref()
-      kernel.ref()
+      image.incref()
+      kernel.incref()
     }
   }
 }
 
 fn Tensor::propagate(self : Tensor) -> Unit {
-  if self.ref == 0 {
+  if self.refcnt == 0 {
     abort("Propagate through a dead tensor: \{self}")
   }
-  self.ref -= 1
-  if self.ref != 0 {
+  self.refcnt -= 1
+  if self.refcnt != 0 {
     return
   }
   let self_grad = self.grad
@@ -378,10 +378,10 @@ fn Tensor::propagate(self : Tensor) -> Unit {
 }
 
 fn Tensor::check(self : Tensor) -> Unit {
-  if self.ref == -1 {
+  if self.refcnt == -1 {
     return
   }
-  if self.ref != 0 {
+  if self.refcnt != 0 {
     abort("ref != 0")
   }
   match self.graph {
@@ -426,11 +426,11 @@ fn Tensor::check(self : Tensor) -> Unit {
       kernel.check()
     }
   }
-  self.ref = -1
+  self.refcnt = -1
 }
 
 pub fn Tensor::backward(self : Tensor) -> Unit {
-  self.ref()
+  self.incref()
   for i in 0..<self.grad.length() {
     self.grad[i] += 1.0
   }
@@ -513,7 +513,7 @@ pub fn Tensor::reLU(self : Tensor) -> Tensor {
     shape: self.shape,
     block: self.block,
     graph: Graph::ReLU(self),
-    ref: 0,
+    refcnt: 0,
     grad: FixedArray::make(self.value.length(), (0.0 : Float)),
   }
 }

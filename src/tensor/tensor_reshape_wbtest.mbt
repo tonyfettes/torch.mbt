@@ -3,8 +3,8 @@ test "Tensor::reshape" {
   let reshaped = tensor.reshape([3, 2])
   inspect!(reshaped, content="[[0, 1], [2, 3], [4, 5]]")
   inspect!(reshaped.graph, content="Nop([[0, 1, 2], [3, 4, 5]])")
-  reshaped.ref()
-  inspect!(tensor.ref, content="1")
+  reshaped.incref()
+  inspect!(tensor.refcnt, content="1")
 }
 
 test "Tensor::reshape - backward" {

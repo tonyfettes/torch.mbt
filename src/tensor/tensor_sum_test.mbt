@@ -5,7 +5,7 @@ test "Tensor::sum - scalar" {
   inspect!(sum.shape, content="[]")
   inspect!(sum.block, content="[]")
   inspect!(sum.graph, content="Sum(1, [[0]])")
-  inspect!(sum.ref, content="0")
+  inspect!(sum.refcnt, content="0")
   inspect!(sum.grad, content="[0]")
   inspect!(sum, content="1")
 }
@@ -17,7 +17,7 @@ test "Tensor::sum - Vector" {
   inspect!(sum.shape, content="[]")
   inspect!(sum.block, content="[]")
   inspect!(sum.graph, content="Sum([0, 1, 2, 3], [[0, 1, 2, 3]])")
-  inspect!(sum.ref, content="0")
+  inspect!(sum.refcnt, content="0")
   inspect!(sum.grad, content="[0]")
   inspect!(sum, content="6")
 }
@@ -32,7 +32,7 @@ test "Tensor::sum - Matrix" {
     sum.graph,
     content="Sum([[0, 1, 2], [3, 4, 5]], [[0, 3], [1, 4], [2, 5]])",
   )
-  inspect!(sum.ref, content="0")
+  inspect!(sum.refcnt, content="0")
   inspect!(sum.grad, content="[0, 0, 0]")
   inspect!(sum, content="[3, 5, 7]")
 }

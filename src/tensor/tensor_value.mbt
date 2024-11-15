@@ -15,7 +15,7 @@ pub impl TensorValue for Float with to_tensor(
     } else {
       Graph::Val
     },
-    ref: 0,
+    refcnt: 0,
     grad: [0.0],
   }
 }
@@ -35,7 +35,7 @@ pub impl TensorValue for Double with to_tensor(
     } else {
       Graph::Val
     },
-    ref: 0,
+    refcnt: 0,
     grad: [0.0],
   }
 }
@@ -73,7 +73,7 @@ pub impl[X : TensorValue + Default] TensorValue for FixedArray[X] with to_tensor
     } else {
       Graph::Val
     },
-    ref: 0,
+    refcnt: 0,
     grad: FixedArray::make(value.length(), (0.0 : Float)),
   }
 }
@@ -109,7 +109,7 @@ pub impl[X : TensorValue + Default] TensorValue for Array[X] with to_tensor(
     } else {
       Graph::Val
     },
-    ref: 0,
+    refcnt: 0,
     grad: FixedArray::make(value.length(), (0.0 : Float)),
   }
 }

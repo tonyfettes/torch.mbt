@@ -8,7 +8,7 @@ pub fn Tensor::reshape[Shape : @shape.Shape](
     value: self.value,
     shape,
     block,
-    ref: 0,
+    refcnt: 0,
     graph: Nop(self),
     grad: self.grad,
   }

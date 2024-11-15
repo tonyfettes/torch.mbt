@@ -1129,7 +1129,10 @@ fn main {
       let output = model.forward(input)
       let lr = 0.01 *
         (@math.cos(step.to_double() / total_step.to_double() * @math.pi) + 1.0)
-      let optimizer = @torch/optim.SGD::new(model.parameters(), learning_rate=lr)
+      let optimizer = @torch/optim.SGD::new(
+        model.parameters(),
+        learning_rate=lr,
+      )
       optimizer.zero_grad()
       loss.forward(output, target).backward()
       optimizer.step()

@@ -50,11 +50,11 @@ pub(open) trait Transpile {
 }
 
 pub fn transpile[Module : Transpile](
-  module : Module,
+  module_ : Module,
   export : String
 ) -> String {
   let transpiler = Transpiler::new()
-  Transpile::transpile(module, transpiler, export)
+  Transpile::transpile(module_, transpiler, export)
   transpiler.exports.push(export)
   transpiler.to_string()
 }

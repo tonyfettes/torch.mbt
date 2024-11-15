@@ -5,7 +5,7 @@ test "Tensor::new - Scalar" {
   inspect!(tensor.shape, content="[]")
   inspect!(tensor.block, content="[]")
   inspect!(tensor.graph, content="Val")
-  inspect!(tensor.ref, content="0")
+  inspect!(tensor.refcnt, content="0")
   inspect!(tensor.grad, content="[0]")
   inspect!(tensor, content="1")
 }
@@ -17,7 +17,7 @@ test "Tensor::new - Vector" {
   inspect!(tensor.shape, content="[4]")
   inspect!(tensor.block, content="[1]")
   inspect!(tensor.graph, content="Val")
-  inspect!(tensor.ref, content="0")
+  inspect!(tensor.refcnt, content="0")
   inspect!(tensor.grad, content="[0, 0, 0, 0]")
   inspect!(tensor, content="[0, 1, 2, 3]")
 }
@@ -29,7 +29,7 @@ test "Tensor::new - Matrix" {
   inspect!(tensor.shape, content="[2, 3]")
   inspect!(tensor.block, content="[3, 1]")
   inspect!(tensor.graph, content="Val")
-  inspect!(tensor.ref, content="0")
+  inspect!(tensor.refcnt, content="0")
   inspect!(tensor.grad, content="[0, 0, 0, 0, 0, 0]")
   inspect!(tensor, content="[[0, 1, 2], [3, 4, 5]]")
 }
@@ -52,7 +52,7 @@ test "Tensor::new - Tensor" {
   inspect!(tensor.shape, content="[2, 3, 4]")
   inspect!(tensor.block, content="[12, 4, 1]")
   inspect!(tensor.graph, content="Val")
-  inspect!(tensor.ref, content="0")
+  inspect!(tensor.refcnt, content="0")
   inspect!(
     tensor.grad,
     content="[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]",

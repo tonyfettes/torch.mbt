@@ -61,7 +61,7 @@ pub fn Tensor::max_pool2d(
     shape,
     block,
     graph: MaxPool2d(self, index),
-    ref: 0,
+    refcnt: 0,
     grad: FixedArray::make(total, (0.0 : Float)),
   }
 }

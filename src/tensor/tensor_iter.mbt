@@ -10,7 +10,7 @@ pub fn Tensor::iter(self : Tensor, dim~ : Int = 0) -> Iter[Tensor] {
     abort("Dimension \{dimension} out of range [0, \{shape_length})")
   }
   Iter::new(
-    fn(yield) {
+    fn(yield_) {
       fn build(d : Int, p : Int) -> IterResult {
         if d == dimension + 1 {
           let shape = FixedArray::makei(
@@ -26,10 +26,10 @@ pub fn Tensor::iter(self : Tensor, dim~ : Int = 0) -> Iter[Tensor] {
             shape,
             block,
             graph: Get(self, index),
-            ref: 0,
+            refcnt: 0,
             grad: FixedArray::make(total, (0.0 : Float)),
           }
-          return yield(tensor)
+          return yield_(tensor)
         }
         for i in 0..<shape[d] {
           match build(d + 1, p + i * block[d]) {

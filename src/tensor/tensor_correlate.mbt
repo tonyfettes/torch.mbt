@@ -61,7 +61,7 @@ pub fn correlate2d(
       stride=(stride_height, stride_width),
       padding=(padding_height, padding_width),
     ),
-    ref: 0,
+    refcnt: 0,
     grad: FixedArray::make(total, (0.0 : Float)),
   }
 }

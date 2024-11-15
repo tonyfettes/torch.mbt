@@ -22,7 +22,7 @@ pub fn update(path~ : String, version~ : String) -> Unit! {
         Object(
           { "name": String(module_name), "version": String(module_version) }
           as
-          module
+          module_
         ) => {
           if module_version == version {
             continue
@@ -34,7 +34,7 @@ pub fn update(path~ : String, version~ : String) -> Unit! {
             "name": String(module_name),
             "version": String(version),
           }
-          for field in module {
+          for field in module_ {
             if field.0 != "name" && field.0 != "version" {
               update[field.0] = field.1
             }
@@ -42,12 +42,12 @@ pub fn update(path~ : String, version~ : String) -> Unit! {
           let content = @json.stringify(Object(update), indent=2)
           @fs.write_string_to_file(path=item_path, content=content + "\n")
         }
-        Object({ "name": String(module_name) } as module) => {
+        Object({ "name": String(module_name) } as module_) => {
           let update : Map[String, Json] = {
             "name": String(module_name),
             "version": String(version),
           }
-          for field in module {
+          for field in module_ {
             if field.0 != "name" && field.0 != "version" {
               update[field.0] = field.1
             }
@@ -67,9 +67,9 @@ pub fn update(path~ : String, version~ : String) -> Unit! {
 
 fn main {
   try {
-    let module = @fs.read_file_to_string!(path="../moon.mod.json")
+    let module_ = @fs.read_file_to_string!(path="../moon.mod.json")
       |> @json.parse!()
-    match module {
+    match module_ {
       { "name": String(name), "version": String(version) } => {
         $|\{name}: \{version}
         |> println

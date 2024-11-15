@@ -29,7 +29,7 @@ pub fn Tensor::matmul(self : Tensor, other : Tensor) -> Tensor {
     shape: [row, col],
     block: [col, 1],
     graph: Graph::MatMul(self, other),
-    ref: 0,
+    refcnt: 0,
     grad: FixedArray::make(total, (0.0 : Float)),
   }
 }

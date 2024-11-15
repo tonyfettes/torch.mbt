@@ -44,9 +44,9 @@ pub(open) trait Loss {
 
 fn forward_[Module : Module](
   tensor : @tensor.Tensor,
-  module : Module
+  module_ : Module
 ) -> @tensor.Tensor {
-  module.forward(tensor)
+  module_.forward(tensor)
 }
 
 // pub fn transpile[Module : Module](

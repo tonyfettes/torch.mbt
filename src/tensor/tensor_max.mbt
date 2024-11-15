@@ -15,7 +15,7 @@ pub fn Tensor::max(self : Tensor) -> Tensor {
     shape: [],
     block: [],
     graph: Graph::Get(self, [max_index]),
-    ref: 0,
+    refcnt: 0,
     grad: [0.0],
   }
 }

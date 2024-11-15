@@ -25,7 +25,7 @@ pub fn Tensor::permute(self : Tensor, permutation : Array[Int]) -> Tensor {
     shape,
     block: compute_block_size(shape),
     graph: Graph::Get(self, FixedArray::from_array(index)),
-    ref: 0,
+    refcnt: 0,
     grad: FixedArray::make(value.length(), (0.0 : Float)),
   }
 }

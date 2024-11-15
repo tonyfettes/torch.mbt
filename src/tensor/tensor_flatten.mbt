@@ -23,7 +23,7 @@ pub fn Tensor::flatten(self : Tensor, start~ : Int = 0, end? : Int) -> Tensor {
     value: self.value,
     shape,
     block,
-    ref: 0,
+    refcnt: 0,
     graph: Nop(self),
     grad: self.grad,
   }

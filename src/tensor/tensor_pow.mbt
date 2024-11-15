@@ -43,7 +43,7 @@ pub fn Tensor::pow(self : Tensor, exponent : Int) -> Tensor {
     shape: self.shape,
     block: self.block,
     graph: Graph::Pow(self, exponent),
-    ref: 0,
+    refcnt: 0,
     grad: FixedArray::make(length, (0.0 : Float)),
   }
 }

@@ -20,9 +20,9 @@ pub impl[Module : @nn.Module + Transpile] Transpile for @nn.Sequential[Module] w
   variable : String
 ) -> Unit {
   let module_variables = []
-  for module in self.modules {
+  for module_ in self.modules {
     let variable = transpiler.allocate()
-    Transpile::transpile(module, transpiler, variable)
+    Transpile::transpile(module_, transpiler, variable)
     module_variables.push(variable)
   }
   transpiler.line("\{variable} = torch.nn.Sequential(")

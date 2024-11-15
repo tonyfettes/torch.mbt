@@ -10,7 +10,7 @@ pub fn Tensor::zeros[Shape : @shape.Shape](
     shape,
     block,
     value,
-    ref: 0,
+    refcnt: 0,
     graph: if requires_grad {
       Graph::Var
     } else {

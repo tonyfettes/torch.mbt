@@ -10,7 +10,7 @@ pub fn Tensor::op_sub(self : Tensor, other : Tensor) -> Tensor {
     shape: self.shape,
     block: self.block,
     graph: Graph::Sub(self, other),
-    ref: 0,
+    refcnt: 0,
     grad: FixedArray::make(length, (0.0 : Float)),
   }
 }

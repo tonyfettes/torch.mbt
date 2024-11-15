@@ -43,7 +43,7 @@ pub impl[X : TensorLike] TensorLike for FixedArray[X] with to_tensor(
     shape,
     block,
     graph: Cat(tensors, index),
-    ref: 0,
+    refcnt: 0,
     grad: FixedArray::make(value.length(), (0.0 : Float)),
   }
 }

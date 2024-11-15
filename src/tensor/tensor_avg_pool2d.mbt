@@ -56,7 +56,7 @@ pub fn Tensor::avg_pool2d(
     shape,
     block,
     graph: AvgPool2d(self, kernel_size~, stride~),
-    ref: 0,
+    refcnt: 0,
     grad: FixedArray::make(total, (0.0 : Float)),
   }
 }

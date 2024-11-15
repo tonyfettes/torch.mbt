@@ -13,7 +13,7 @@ pub fn Sequential::forward(
   input : @tensor.Tensor
 ) -> @tensor.Tensor {
   loop input, self.modules[:] {
-    input, [module, .. as modules] => continue module.forward(input), modules
+    input, [module_, .. as modules] => continue module_.forward(input), modules
     input, [] => input
   }
 }
@@ -21,12 +21,12 @@ pub fn Sequential::forward(
 pub fn Sequential::parameters(
   self : Sequential[Module]
 ) -> Iter[@tensor.Tensor] {
-  self.modules.iter().flat_map(fn { module => module.parameters() })
+  self.modules.iter().flat_map(fn(module_) { module_.parameters() })
 }
 
 pub fn Sequential::output(self : Sequential[Module], logger : Logger) -> Unit {
-  for module in self.modules {
-    Show::output(module, logger)
+  for module_ in self.modules {
+    Show::output(module_, logger)
     logger.write_string(",\n")
   }
 }

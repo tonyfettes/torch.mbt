@@ -18,7 +18,7 @@ test "TensorView::to_tensor" {
   inspect!(tensor.shape, content="[3]")
   inspect!(tensor.block, content="[1]")
   inspect!(tensor.graph, content="Get([[0, 1, 2], [3, 4, 5]], [3, 4, 5])")
-  inspect!(tensor.ref, content="0")
+  inspect!(tensor.refcnt, content="0")
   inspect!(tensor.grad, content="[0, 0, 0]")
   inspect!(tensor, content="[3, 4, 5]")
 }
