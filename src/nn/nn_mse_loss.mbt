@@ -1,4 +1,4 @@
-pub struct MSELoss {}
+pub(all) struct MSELoss {}
 
 pub fn MSELoss::new() -> MSELoss {
   MSELoss::{  }

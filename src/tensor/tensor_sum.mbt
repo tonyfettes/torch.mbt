@@ -1,4 +1,4 @@
-pub fn Tensor::sum(self : Tensor, ~dim : @shape.Shape = ()) -> Tensor {
+pub fn Tensor::sum(self : Tensor, dim~ : @shape.Shape = ()) -> Tensor {
   let dim = dim.to_fixed_array()
   let dim = if dim.length() == 0 {
     FixedArray::makei(self.shape.length(), fn(i) { i })

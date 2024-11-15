@@ -1,10 +1,10 @@
 trait TensorValue: Show {
-  to_tensor(Self, ~requires_grad : Bool) -> Tensor
+  to_tensor(Self, requires_grad~ : Bool) -> Tensor
 }
 
 pub impl TensorValue for Float with to_tensor(
   self : Float,
-  ~requires_grad : Bool
+  requires_grad~ : Bool
 ) -> Tensor {
   Tensor::{
     value: [self],
@@ -24,7 +24,7 @@ pub impl Default for Float with default() -> Float { 0.0 }
 
 pub impl TensorValue for Double with to_tensor(
   self : Double,
-  ~requires_grad : Bool
+  requires_grad~ : Bool
 ) -> Tensor {
   Tensor::{
     value: [self.to_float()],
@@ -44,11 +44,11 @@ pub impl Default for Double with default() -> Double { 0.0 }
 
 pub impl[X : TensorValue + Default] TensorValue for FixedArray[X] with to_tensor(
   self : FixedArray[X],
-  ~requires_grad : Bool
+  requires_grad~ : Bool
 ) -> Tensor {
-  let tensors = self.map(fn { x => x.to_tensor(~requires_grad) })
+  let tensors = self.map(fn { x => x.to_tensor(requires_grad~) })
   let element = if self.length() == 0 {
-    X::default().to_tensor(~requires_grad)
+    X::default().to_tensor(requires_grad~)
   } else {
     tensors[0]
   }
@@ -80,11 +80,11 @@ pub impl[X : TensorValue + Default] TensorValue for FixedArray[X] with to_tensor
 
 pub impl[X : TensorValue + Default] TensorValue for Array[X] with to_tensor(
   self : Array[X],
-  ~requires_grad : Bool
+  requires_grad~ : Bool
 ) -> Tensor {
-  let tensors = self.map(fn { x => x.to_tensor(~requires_grad) })
+  let tensors = self.map(fn { x => x.to_tensor(requires_grad~) })
   let element = if self.length() == 0 {
-    X::default().to_tensor(~requires_grad)
+    X::default().to_tensor(requires_grad~)
   } else {
     tensors[0]
   }

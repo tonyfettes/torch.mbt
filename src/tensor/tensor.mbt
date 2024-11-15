@@ -1,4 +1,4 @@
-pub struct Tensor {
+pub(all) struct Tensor {
   value : @unsafe.UnsafeArray[Float]
   shape : @unsafe.UnsafeArray[Int]
   block : @unsafe.UnsafeArray[Int]
@@ -16,7 +16,7 @@ pub let empty : Tensor = Tensor::{
   grad: [],
 }
 
-pub enum Graph {
+pub(all) enum Graph {
   Val
   Var
   Add(Tensor, Tensor)
@@ -33,13 +33,13 @@ pub enum Graph {
   Cat(@unsafe.UnsafeArray[Tensor], @unsafe.UnsafeArray[(Int, Int)])
   Nop(Tensor)
   ReLU(Tensor)
-  AvgPool2d(Tensor, ~kernel_size : (Int, Int), ~stride : (Int, Int))
+  AvgPool2d(Tensor, kernel_size~ : (Int, Int), stride~ : (Int, Int))
   MaxPool2d(Tensor, @unsafe.UnsafeArray[Int])
   Correlate2d(
-    ~image : Tensor,
-    ~kernel : Tensor,
-    ~stride : (Int, Int),
-    ~padding : (Int, Int)
+    image~ : Tensor,
+    kernel~ : Tensor,
+    stride~ : (Int, Int),
+    padding~ : (Int, Int)
   )
 } derive(Show)
 
@@ -155,7 +155,7 @@ fn Tensor::ref(self : Tensor) -> Unit {
     ReLU(x) => x.ref()
     AvgPool2d(x, ..) => x.ref()
     MaxPool2d(x, _) => x.ref()
-    Correlate2d(~image, ~kernel, ..) => {
+    Correlate2d(image~, kernel~, ..) => {
       image.ref()
       kernel.ref()
     }
@@ -293,7 +293,7 @@ fn Tensor::propagate(self : Tensor) -> Unit {
       }
       a.propagate()
     }
-    AvgPool2d(x, ~kernel_size, ~stride) => {
+    AvgPool2d(x, kernel_size~, stride~) => {
       fn index4d(
         block : @unsafe.UnsafeArray[Int],
         n : Int,
@@ -338,7 +338,7 @@ fn Tensor::propagate(self : Tensor) -> Unit {
       for i = 0; i < self.value.length(); i = i + 1 {
         x.grad[m[i]] += self_grad[i]
       }
-    Correlate2d(~image, ~kernel, ~stride, ~padding) => {
+    Correlate2d(image~, kernel~, stride~, padding~) => {
       for i in 0..<self.shape[0] {
         for j in 0..<self.shape[1] {
           let i_start = i * stride.0 - padding.0
@@ -421,7 +421,7 @@ fn Tensor::check(self : Tensor) -> Unit {
     ReLU(x) => x.check()
     AvgPool2d(x, ..) => x.check()
     MaxPool2d(x, _) => x.check()
-    Correlate2d(~image, ~kernel, ..) => {
+    Correlate2d(image~, kernel~, ..) => {
       image.check()
       kernel.check()
     }

@@ -1,4 +1,4 @@
-pub struct Linear {
+pub(all) struct Linear {
   weight : @tensor.Tensor
   bias : @tensor.Tensor
 } derive(Show, ToJson, FromJson)
@@ -10,8 +10,8 @@ pub fn Linear::of(weight : @tensor.Tensor, bias : @tensor.Tensor) -> Linear {
 pub fn Linear::new(
   in_features : Int,
   out_features : Int,
-  ~weight_distribution? : @distributions.Continuous,
-  ~bias_distribution? : @distributions.Continuous
+  weight_distribution? : @distributions.Continuous,
+  bias_distribution? : @distributions.Continuous
 ) -> Linear {
   let in_features_sqrt = in_features.to_float().sqrt()
   let weight_distribution = match weight_distribution {

@@ -3,7 +3,7 @@ struct Flatten {
   end : Int?
 } derive(Show, ToJson, FromJson)
 
-pub fn Flatten::new(~start : Int = 1, ~end? : Int) -> Flatten {
+pub fn Flatten::new(start~ : Int = 1, end? : Int) -> Flatten {
   Flatten::{ start, end }
 }
 

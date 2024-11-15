@@ -54,7 +54,7 @@ pub fn Uniform::sample_inplace(self : Uniform, tensor : @tensor.Tensor) -> Unit 
 
 let normal_buffer : Array[Double] = []
 
-pub fn normal(~mean : Double = 0.0, ~std : Double = 1.0) -> Double {
+pub fn normal(mean~ : Double = 0.0, std~ : Double = 1.0) -> Double {
   match normal_buffer.pop() {
     None => ()
     Some(z1) => return z1
@@ -68,12 +68,12 @@ pub fn normal(~mean : Double = 0.0, ~std : Double = 1.0) -> Double {
   return z0 * std + mean
 }
 
-pub struct Normal {
+pub(all) struct Normal {
   mean : Double
   std : Double
 }
 
-pub fn Normal::new(~mean : Double = 0.0, ~std : Double = 1.0) -> Normal {
+pub fn Normal::new(mean~ : Double = 0.0, std~ : Double = 1.0) -> Normal {
   Normal::{ mean, std }
 }
 
@@ -81,7 +81,7 @@ fn Normal::_sample(self : Normal) -> Double {
   normal(mean=self.mean, std=self.std)
 }
 
-pub struct Categorical {
+pub(all) struct Categorical {
   logits : @tensor.Tensor
   probs : @tensor.Tensor
 } derive(Show)
@@ -115,5 +115,5 @@ pub fn Categorical::log_prob(
 let rand : Ref[@random.Rand] = @ref.new(@random.Rand::new())
 
 pub fn seed(seed : Bytes) -> Unit {
-  rand.val = @random.Rand::new(~seed)
+  rand.val = @random.Rand::new(seed~)
 }

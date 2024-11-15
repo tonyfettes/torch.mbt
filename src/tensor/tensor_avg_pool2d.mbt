@@ -1,7 +1,7 @@
 pub fn Tensor::avg_pool2d(
   self : Tensor,
-  ~kernel_size : (Int, Int),
-  ~stride : (Int, Int)
+  kernel_size~ : (Int, Int),
+  stride~ : (Int, Int)
 ) -> Tensor {
   if self.shape.length() != 4 {
     abort("Input should be of the shape (N, C, H, W)")
@@ -55,7 +55,7 @@ pub fn Tensor::avg_pool2d(
     value,
     shape,
     block,
-    graph: AvgPool2d(self, ~kernel_size, ~stride),
+    graph: AvgPool2d(self, kernel_size~, stride~),
     ref: 0,
     grad: FixedArray::make(total, (0.0 : Float)),
   }

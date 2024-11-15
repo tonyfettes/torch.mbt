@@ -1,7 +1,7 @@
 pub fn Tensor::op_as_view(
   self : Tensor,
-  ~start : Int,
-  ~end? : Int
+  start~ : Int,
+  end? : Int
 ) -> TensorView {
   if self.shape.length() == 0 {
     abort("Tensor is a scalar")

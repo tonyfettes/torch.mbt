@@ -1,14 +1,14 @@
-pub struct CrossEntropyLoss {
+pub(all) struct CrossEntropyLoss {
   reduction : Reduction
 }
 
-pub enum Reduction {
+pub(all) enum Reduction {
   None
   Mean
   Sum
 }
 
-pub fn CrossEntropyLoss::new(~reduction : Reduction = Mean) -> CrossEntropyLoss {
+pub fn CrossEntropyLoss::new(reduction~ : Reduction = Mean) -> CrossEntropyLoss {
   CrossEntropyLoss::{ reduction, }
 }
 

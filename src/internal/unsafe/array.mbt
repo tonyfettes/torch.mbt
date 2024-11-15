@@ -1,4 +1,4 @@
-pub type UnsafeArray[T] FixedArray[T]
+pub(all) type UnsafeArray[T] FixedArray[T]
 
 pub fn UnsafeArray::make[T](length : Int, init : T) -> UnsafeArray[T] = "%fixedarray.make"
 

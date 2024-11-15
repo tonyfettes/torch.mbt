@@ -1,4 +1,4 @@
-pub fn Tensor::flatten(self : Tensor, ~start : Int = 0, ~end? : Int) -> Tensor {
+pub fn Tensor::flatten(self : Tensor, start~ : Int = 0, end? : Int) -> Tensor {
   let end = match end {
     Some(end) => end
     None => self.shape.length()

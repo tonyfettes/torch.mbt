@@ -1,9 +1,9 @@
-pub enum TensorIndex {
+pub(all) enum TensorIndex {
   Index(Int)
   Slice(Int, Int)
 } derive(Show)
 
-pub struct TensorView {
+pub(all) struct TensorView {
   tensor : Tensor
   index : Array[TensorIndex]
 }
@@ -161,8 +161,8 @@ test "TensorView::op_set" {
 
 pub fn TensorView::op_as_view(
   self : TensorView,
-  ~start : Int,
-  ~end? : Int
+  start~ : Int,
+  end? : Int
 ) -> TensorView {
   let end = match end {
     None => self.tensor.shape[self.index.length()]

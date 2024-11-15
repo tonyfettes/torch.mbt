@@ -1,11 +1,11 @@
-pub struct AvgPool2d {
+pub(all) struct AvgPool2d {
   kernel_size : (Int, Int)
   stride : (Int, Int)
 } derive(Show, ToJson, FromJson)
 
 pub fn AvgPool2d::new[KernelSize : @shape.Shape2d](
   kernel_size : KernelSize,
-  ~stride? : @shape.Shape2d
+  stride? : @shape.Shape2d
 ) -> AvgPool2d {
   let kernel_size = kernel_size.to_tuple()
   let stride = match stride {

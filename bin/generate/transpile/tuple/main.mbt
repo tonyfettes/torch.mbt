@@ -6,15 +6,11 @@ fn build_pytorch_transpile(length : Int) -> String {
   let tuple_type = @generate/nn/tuple.build_tuple_type(length)
   let push_children = []
   for i in 0..<length {
-    push_children.push(
-      "let module_variable = transpiler.allocate()",
-    )
+    push_children.push("let module_variable = transpiler.allocate()")
     push_children.push(
       "Transpile::transpile(self.\{i}, transpiler, module_variable)",
     )
-    push_children.push(
-      "module_variables.push(module_variable)",
-    )
+    push_children.push("module_variables.push(module_variable)")
   }
   let push_children = String::concat(push_children, separator="\n  ")
   $|pub impl[\{type_parameters}] Transpile for \{tuple_type} with transpile(
@@ -43,10 +39,7 @@ fn main {
   }
   let content = String::concat(functions, separator="\n\n")
   try {
-    @generate.write_on_change!(
-      path="../src/transpile/tuple.mbt",
-      ~content,
-    )
+    @generate.write_on_change!(path="../src/transpile/tuple.mbt", content~)
   } catch {
     error =>
       $|Failed to write content to src/transpile/tuple.mbt: \{Show::to_string(error)}

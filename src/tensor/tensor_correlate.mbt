@@ -1,8 +1,8 @@
 pub fn correlate2d(
   image : Tensor,
   kernel : Tensor,
-  ~stride : @shape.Shape2d = 1,
-  ~padding : @shape.Shape2d = 0
+  stride~ : @shape.Shape2d = 1,
+  padding~ : @shape.Shape2d = 0
 ) -> Tensor {
   let image_height = image.shape[0]
   let image_width = image.shape[1]
@@ -56,8 +56,8 @@ pub fn correlate2d(
     shape,
     block,
     graph: Correlate2d(
-      ~image,
-      ~kernel,
+      image~,
+      kernel~,
       stride=(stride_height, stride_width),
       padding=(padding_height, padding_width),
     ),

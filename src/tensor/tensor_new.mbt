@@ -1,12 +1,12 @@
 pub fn Tensor::new[X : TensorValue](
   self : X,
-  ~requires_grad : Bool = false
+  requires_grad~ : Bool = false
 ) -> Tensor {
-  self.to_tensor(~requires_grad)
+  self.to_tensor(requires_grad~)
 }
 
-pub fn tensor[X : TensorValue](x : X, ~requires_grad : Bool = false) -> Tensor {
-  x.to_tensor(~requires_grad)
+pub fn tensor[X : TensorValue](x : X, requires_grad~ : Bool = false) -> Tensor {
+  x.to_tensor(requires_grad~)
 }
 
 test "Tensor::new - Scalar" {

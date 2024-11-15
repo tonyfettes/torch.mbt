@@ -1,11 +1,11 @@
-pub struct SGD {
+pub(all) struct SGD {
   parameters : Array[@tensor.Tensor]
   learning_rate : Float
 }
 
 pub fn SGD::new(
   parameters : Iter[@tensor.Tensor],
-  ~learning_rate : Float
+  learning_rate~ : Float
 ) -> SGD {
   let vars = []
   for parameter in parameters {

@@ -1,4 +1,4 @@
-pub struct Conv2d {
+pub(all) struct Conv2d {
   weight : Array[Array[@tensor.Tensor]]
   bias : Array[@tensor.Tensor]
   padding : (Int, Int)
@@ -7,8 +7,8 @@ pub struct Conv2d {
 pub fn Conv2d::new[KernelSize : @shape.Shape2d](
   in_channels : Int,
   out_channels : Int,
-  ~kernel_size : KernelSize,
-  ~padding : @shape.Shape2d = 0
+  kernel_size~ : KernelSize,
+  padding~ : @shape.Shape2d = 0
 ) -> Conv2d {
   if in_channels == 0 {
     abort("Input channels has zero width")

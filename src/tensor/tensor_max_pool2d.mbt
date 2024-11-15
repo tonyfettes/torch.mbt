@@ -1,7 +1,7 @@
 pub fn Tensor::max_pool2d(
   self : Tensor,
-  ~kernel_size : (Int, Int),
-  ~stride : (Int, Int)
+  kernel_size~ : (Int, Int),
+  stride~ : (Int, Int)
 ) -> Tensor {
   if self.shape.length() != 4 {
     abort("Input should be of the shape (N, C, H, W)")

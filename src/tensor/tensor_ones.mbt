@@ -1,6 +1,6 @@
 fn Tensor::ones[Shape : @shape.Shape](
   shape : Shape,
-  ~requires_grad : Bool = false
+  requires_grad~ : Bool = false
 ) -> Tensor {
   let shape = shape.to_fixed_array()
   let block = compute_block_size(shape)

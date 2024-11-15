@@ -1,4 +1,4 @@
-pub fn Tensor::iter(self : Tensor, ~dim : Int = 0) -> Iter[Tensor] {
+pub fn Tensor::iter(self : Tensor, dim~ : Int = 0) -> Iter[Tensor] {
   let shape = self.shape
   if shape.length() == 0 {
     abort("Iterating over a scalar tensor is not allowed.")

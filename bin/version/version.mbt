@@ -7,14 +7,14 @@ fn should_ignore(item : String) -> Bool {
   ignore_list.contains(item)
 }
 
-pub fn update(~path : String, ~version : String) -> Unit! {
-  for item in @fs.read_dir!(~path) {
+pub fn update(path~ : String, version~ : String) -> Unit! {
+  for item in @fs.read_dir!(path~) {
     if should_ignore(item) {
       continue
     }
     let item_path = "\{path}/\{item}"
     if @fs.is_dir!(path=item_path) {
-      update!(path=item_path, ~version)
+      update!(path=item_path, version~)
     }
     if item == "moon.mod.json" {
       let content = @fs.read_file_to_string!(path=item_path)
@@ -73,7 +73,7 @@ fn main {
       { "name": String(name), "version": String(version) } => {
         $|\{name}: \{version}
         |> println
-        update!(path="..", ~version)
+        update!(path="..", version~)
       }
       _ => println("moon.mod.json has no name/version, or they are not string")
     }

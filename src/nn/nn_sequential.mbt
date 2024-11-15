@@ -1,4 +1,4 @@
-pub struct Sequential[Module] {
+pub(all) struct Sequential[Module] {
   modules : Array[Module]
 }
 
