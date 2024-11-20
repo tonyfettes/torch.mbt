@@ -1,9 +1,9 @@
 {
   "targets": {
-    "tensor_add.mbt": ["not", "wasm"],
-    "tensor_add.wasm.mbt": ["wasm"],
-    "tensor_mul.mbt": ["not", "wasm"],
-    "tensor_mul.wasm.mbt": ["wasm"]
+    "tensor_op_add.mbt": ["wasm-gc", "js", "native"],
+    "tensor_op_add.wasm.mbt": ["wasm"],
+    "tensor_op_mul.mbt": ["wasm-gc", "js", "native"],
+    "tensor_op_mul.wasm.mbt": ["wasm"]
   },
   "import": [
     "tonyfettes/torch/shape",
