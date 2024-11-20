@@ -35,7 +35,7 @@ pub fn CrossEntropyLoss::forward(
     input : @tensor.Tensor,
     target : @tensor.Tensor
   ) -> @tensor.Tensor {
-    let max = input.max()
+    let (max, _) = input.max()
     let sub_max = input - max
     let log_soft_max = sub_max - sub_max.exp().sum().log()
     let nl = -target * log_soft_max
