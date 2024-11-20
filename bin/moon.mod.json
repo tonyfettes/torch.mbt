@@ -2,6 +2,6 @@
   "name": "tonyfettes/torch/bin",
   "version": "0.2.6",
   "deps": {
-    "moonbitlang/x": "0.4.11"
+    "moonbitlang/x": "0.4.12"
   }
 }
