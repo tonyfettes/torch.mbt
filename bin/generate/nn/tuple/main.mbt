@@ -67,7 +67,7 @@ fn main {
   }
   let content = String::concat(functions, separator="\n\n")
   try {
-    @generate.write_on_change!(path="../src/nn/nn_tuple.mbt", content~)
+    @generate.write_on_change!(path="../src/nn/tuple.mbt", content~)
   } catch {
     error =>
       $|Failed to write on change: \{Show::to_string(error)}
