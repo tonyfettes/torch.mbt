@@ -435,7 +435,7 @@ pub fn Tensor::backward(self : Tensor) -> Unit {
     self.grad[i] += 1.0
   }
   self.propagate()
-  if @debug.debug {
+  if @debug.DEBUG {
     self.check()
   }
 }

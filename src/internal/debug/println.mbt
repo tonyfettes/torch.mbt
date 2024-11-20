@@ -1,5 +1,5 @@
 pub fn println(message : String) -> Unit {
-  if debug {
+  if DEBUG {
     println(message)
   }
 }

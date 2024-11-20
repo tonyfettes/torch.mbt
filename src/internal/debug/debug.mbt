@@ -1,1 +1,1 @@
-pub let debug = true
+pub const DEBUG = true
