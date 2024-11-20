@@ -9,11 +9,7 @@ dependencies = ["torch"]
 requires-python = ">= 3.11"
 
 [project.optional-dependencies]
-dev = [
-  "black",
-  "pytest",
-  "syrupy"
-]
+dev = ["black", "pytest", "pytest-cov", "syrupy"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
