@@ -25,5 +25,5 @@ test "silu/consistent" (it : @test.T) {
     $|    assert torch.allclose(b, torch.tensor(\{b.to_json().stringify()}, dtype=torch.float32))
     ,
   )
-  it.snapshot!(filename="test_silu.py")
+  it.snapshot!(filename="tensor_silu_test.py")
 }

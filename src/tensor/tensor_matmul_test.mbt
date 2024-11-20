@@ -86,5 +86,5 @@ test "matmul/consistent" (it : @test.T) {
     $|    assert torch.allclose(g, torch.tensor(\{g.to_json().stringify()}, dtype=torch.float32))
     ,
   )
-  it.snapshot!(filename="test_matmul.py")
+  it.snapshot!(filename="tensor_matmul_test.py")
 }

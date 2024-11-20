@@ -21,6 +21,11 @@ test "avg_pool2d" {
   )
 }
 
+test "panic avg_pool2d" {
+  let input = @tensor.tensor([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+  input.avg_pool2d(kernel_size=(2, 2), stride=(2, 2)) |> ignore()
+}
+
 test "avg_pool2d/consistent" (it : @test.T) {
   @distributions.seed(b"12345678223456783234567842345678")
   let distribution = @distributions.Uniform::new(-1.0, 1.0)
@@ -35,5 +40,5 @@ test "avg_pool2d/consistent" (it : @test.T) {
     $|    assert torch.allclose(c, torch.tensor(\{c.to_json().stringify()}))
     ,
   )
-  it.snapshot!(filename="test_avg_pool2d.py")
+  it.snapshot!(filename="tensor_avg_pool2d_test.py")
 }

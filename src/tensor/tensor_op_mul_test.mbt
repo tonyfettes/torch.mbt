@@ -29,5 +29,5 @@ test "mul/consistent" (it : @test.T) {
     #|
     ,
   )
-  it.snapshot!(filename="test_mul.py")
+  it.snapshot!(filename="tensor_op_mul_test.py")
 }

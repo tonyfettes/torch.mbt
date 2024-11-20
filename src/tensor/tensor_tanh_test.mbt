@@ -26,5 +26,5 @@ test "tanh/consistent" (it : @test.T) {
     $|    assert torch.allclose(b, torch.tensor(\{b.to_json().stringify()}, dtype=torch.float32))
     ,
   )
-  it.snapshot!(filename="test_tanh.py")
+  it.snapshot!(filename="tensor_tanh_test.py")
 }

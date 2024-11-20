@@ -23,5 +23,5 @@ test "sigmoid/consistent" (it : @test.T) {
     #|
     ,
   )
-  it.snapshot!(filename="test_sigmoid.py")
+  it.snapshot!(filename="tensor_sigmoid_test.py")
 }

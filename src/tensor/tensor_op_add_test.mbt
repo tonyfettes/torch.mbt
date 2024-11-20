@@ -42,5 +42,5 @@ test "add/consistent" (it : @test.T) {
     $|    assert (c == torch.tensor(\{c.to_json().stringify()})).all()
     ,
   )
-  it.snapshot!(filename="test_add.py")
+  it.snapshot!(filename="tensor_op_add_test.py")
 }
