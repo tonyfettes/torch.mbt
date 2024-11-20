@@ -10,7 +10,6 @@
     "tonyfettes/torch/internal/debug",
     "tonyfettes/torch/internal/unsafe"
   ],
-  "test-import": [
-    "tonyfettes/torch/distributions"
-  ]
+  "test-import": ["tonyfettes/torch/distributions"],
+  "alert-list": "-unstable"
 }
