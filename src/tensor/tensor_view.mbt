@@ -74,7 +74,7 @@ pub fn TensorView::to_json(self : TensorView) -> Json {
 
 pub fn TensorView::op_get(self : TensorView, index : Int) -> TensorView {
   if self.index.length() == self.tensor.shape.length() {
-    abort("Taking element at the lowerest dimension")
+    abort("Taking element at the lowest dimension")
   }
   if index >= self.tensor.shape[self.index.length()] {
     abort(
