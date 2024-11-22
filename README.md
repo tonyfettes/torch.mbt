@@ -47,6 +47,8 @@ PyTorch-like tensor operations implemented in MoonBit.
   - [x] `Sigmoid`
   - [x] `AvgPool2d`
   - [ ] [`torch.nn.LogSoftmax`](https://pytorch.org/docs/stable/generated/torch.nn.LogSoftmax.html)
+  - [ ] [`torch.nn.RMSNorm`](https://pytorch.org/docs/stable/generated/torch.nn.modules.normalization.RMSNorm.html)
+- [ ] `torch.nn.init`
 - [ ] PyTorch functional module
 - [ ] Module/model saving and loading
   - [x] Static JSON format.
