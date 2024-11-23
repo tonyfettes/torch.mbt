@@ -1,4 +1,4 @@
-pub(all) struct Softmax {} derive(Show, ToJson, FromJson)
+struct Softmax {} derive(Show, ToJson, FromJson)
 
 pub fn Softmax::new() -> Softmax {
   Softmax::{  }

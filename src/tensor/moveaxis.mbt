@@ -7,7 +7,7 @@ pub fn Tensor::moveaxis[Shape : @shape.Shape](
   let destination = destination.to_fixed_array()
   if source.length() != destination.length() {
     abort(
-      "Source axes (\{source}) and destination axes (\{destination}) must have the same length",
+      "Source axis (\{source}) and destination axis (\{destination}) must have the same length",
     )
   }
   let permutation = Array::make(self.shape.length(), -1)
