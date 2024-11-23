@@ -57,25 +57,26 @@ pub fn Conv2d::forward(self : Conv2d, input : @tensor.Tensor) -> @tensor.Tensor 
     )
   }
   let batch_size = input.shape[0]
-  let batch = FixedArray::make(batch_size, @tensor.empty)
-  for n = 0; n < batch_size; n = n + 1 {
-    let channels = FixedArray::make(out_channels, @tensor.empty)
-    for oc = 0; oc < out_channels; oc = oc + 1 {
-      let correlations = FixedArray::make(in_channels, @tensor.empty)
-      for ic = 0; ic < in_channels; ic = ic + 1 {
-        let input = input[n][ic].to_tensor()
-        let weight = self.weight[oc][ic]
-        correlations[ic] = @tensor.correlate2d(
-          input,
-          weight,
-          padding=self.padding.0,
-        )
-      }
-      channels[oc] = @tensor.Tensor::stack(correlations).sum(dim=0) +
-        self.bias[oc]
-    }
-    batch[n] = @tensor.Tensor::stack(channels)
-  }
+  let batch = FixedArray::makei(
+    batch_size,
+    fn(n) {
+      let channels = FixedArray::makei(
+        out_channels,
+        fn(oc) {
+          let correlations = FixedArray::makei(
+            in_channels,
+            fn(ic) {
+              let input = input[n][ic].to_tensor()
+              let weight = self.weight[oc][ic]
+              @tensor.correlate2d(input, weight, padding=self.padding.0)
+            },
+          )
+          @tensor.Tensor::stack(correlations).sum(dim=0) + self.bias[oc]
+        },
+      )
+      @tensor.Tensor::stack(channels)
+    },
+  )
   @tensor.Tensor::stack(batch)
 }
 

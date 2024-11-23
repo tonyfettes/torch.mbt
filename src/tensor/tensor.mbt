@@ -7,15 +7,6 @@ pub(all) struct Tensor {
   grad : @unsafe.UnsafeArray[Float]
 }
 
-pub let empty : Tensor = Tensor::{
-  value: [],
-  shape: [],
-  block: [],
-  graph: Graph::Val,
-  refcnt: 0,
-  grad: [],
-}
-
 pub(all) enum Graph {
   Val
   Var
@@ -454,7 +445,7 @@ test "Tensor::backward - Mul" {
   inspect!(b.grad, content="[3]")
 }
 
-test "Tensor::bacward - MatMul" {
+test "Tensor::backward - MatMul" {
   let a = [
     [Tensor::new(1.0), Tensor::new(2.0), Tensor::new(3.0)],
     [Tensor::new(4.0), Tensor::new(5.0), Tensor::new(6.0)],
