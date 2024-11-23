@@ -17,7 +17,8 @@
     "tonyfettes/torch/shape",
     "tonyfettes/torch/distributions",
     "tonyfettes/torch/optim",
-    "tonyfettes/torch/internal/unsafe"
+    "tonyfettes/torch/internal/unsafe",
+    "tonyfettes/torch/nn/functional"
   ],
   "alert-list": "-unstable"
 }
