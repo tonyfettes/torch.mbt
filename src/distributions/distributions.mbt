@@ -77,8 +77,12 @@ pub fn Normal::new(mean~ : Double = 0.0, std~ : Double = 1.0) -> Normal {
   Normal::{ mean, std }
 }
 
-fn Normal::_sample(self : Normal) -> Double {
-  normal(mean=self.mean, std=self.std)
+pub impl Continuous for Normal with sample_value(self : Normal) -> Float {
+  normal(mean=self.mean, std=self.std).to_float()
+}
+
+pub fn Normal::sample_inplace(self : Normal, tensor : @tensor.Tensor) -> Unit {
+  Continuous::sample_inplace(self, tensor)
 }
 
 struct Categorical {
