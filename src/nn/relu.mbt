@@ -9,7 +9,7 @@ pub fn ReLU::output(_self : ReLU, logger : Logger) -> Unit {
 }
 
 pub fn ReLU::forward(_self : ReLU, input : @tensor.Tensor) -> @tensor.Tensor {
-  input.reLU()
+  @functional.relu(input)
 }
 
 pub fn ReLU::parameters(_self : ReLU) -> Iter[@tensor.Tensor] {

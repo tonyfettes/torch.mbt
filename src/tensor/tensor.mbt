@@ -503,17 +503,6 @@ test "Tensor::bacward - MatMul" {
   inspect!(y.grad, content="[5, 5, 7, 7, 9, 9]")
 }
 
-pub fn Tensor::reLU(self : Tensor) -> Tensor {
-  Tensor::{
-    value: self.value._.map(fn { x => if x > 0.0 { x } else { (0.0 : Float) } }),
-    shape: self.shape,
-    block: self.block,
-    graph: Graph::ReLU(self),
-    refcnt: 0,
-    grad: FixedArray::make(self.value.length(), (0.0 : Float)),
-  }
-}
-
 pub fn Tensor::to_double(self : Tensor) -> Double {
   if self.shape.length() != 0 {
     abort("Tensor is not a scalar")

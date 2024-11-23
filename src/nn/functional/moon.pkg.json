@@ -6,5 +6,6 @@
   ],
   "test-import": [
     "tonyfettes/torch/distributions"
-  ]
+  ],
+  "alert-list": "-unstable"
 }
