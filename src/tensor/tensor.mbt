@@ -73,10 +73,6 @@ pub fn Tensor::length(self : Tensor) -> Int {
   self.shape[0]
 }
 
-pub fn Tensor::mean(self : Tensor) -> Tensor {
-  self.sum() / tensor(self.value.length().to_double())
-}
-
 pub(readonly) trait Default {
   default() -> Self
 }
