@@ -31,25 +31,22 @@ PyTorch-like tensor operations implemented in MoonBit.
 
 ## Roadmap
 
-- [x] Use `Tensor` for everything, remove `Value` type
-- [x] Use `Shape`, `Shape2d`, etc. for passing shape-like object (`kernel_size`, etc.)
+- [ ] Monofy Tensor for every dtype (`bool`, `i8`, `i16`, `i32`, `f32`, `f64`)
 - [ ] PyTorch tensor operations
-  - [x] `torch.stack`
-  - [x] `torch.sum` along any dimension
-  - [x] `torch.cat` along any dimension
   - [ ] `torch.transpose`
-  - [x] `torch.swapaxis` (implemented by `Tensor::permute` and `Tensor::moveaxis`)
-  - [x] `torch.sigmoid`
-  - [x] ~~Broadcast addition, multiplication, etc.~~ `torch.broadcast`
-  - [x] `torch.zeros`
-  - [x] `torch.ones`
+  - [ ] `torch.argmax`
 - [ ] PyTorch module
-  - [x] `Sigmoid`
-  - [x] `AvgPool2d`
   - [ ] [`torch.nn.LogSoftmax`](https://pytorch.org/docs/stable/generated/torch.nn.LogSoftmax.html)
   - [ ] [`torch.nn.RMSNorm`](https://pytorch.org/docs/stable/generated/torch.nn.modules.normalization.RMSNorm.html)
+  - [ ] [`torch.nn.LayerNorm`](https://pytorch.org/docs/stable/generated/torch.nn.LayerNorm.html)
 - [ ] `torch.nn.init`
+  - [x] `torch.nn.init.uniform_`
+  - [x] `torch.nn.init.normal_`
+  - [ ] `torch.nn.init.xavier_uniform_`
+- [ ] Negative index support for view, etc.
 - [ ] PyTorch functional module
+  - [x] `torch.nn.functional.rms_norm`
+  - [x] `torch.nn.functional.silu`
 - [ ] Module/model saving and loading
   - [x] Static JSON format.
   - [ ] Dynamic JSON format. "Dynamic" means saving/loading a trait object (`Module` here)
@@ -61,7 +58,10 @@ PyTorch-like tensor operations implemented in MoonBit.
 - [ ] Loss
   - [ ] KL-divergence
   - [ ] [`torch.nn.NLLLoss`](https://pytorch.org/docs/stable/generated/torch.nn.NLLLoss.html)
-- [ ] Distributions re-parametrization trick
+- [ ] Distributions
+  - [ ] re-parametrization trick
+  - [ ] `entropy`
+  - [ ] `Normal::log_prob`
 - [ ] `Adam*` optimizers
 - [ ] WASM-SIMD `v128`
   - [x] `add`
