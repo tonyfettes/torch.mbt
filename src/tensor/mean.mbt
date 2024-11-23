@@ -3,5 +3,15 @@ pub fn Tensor::mean(
   dim? : @shape.Shape,
   keep_dim~ : Bool = false
 ) -> Tensor {
-  self.sum(dim?, keep_dim~) / tensor(self.value.length().to_double())
+  let len = match dim {
+    None => self.value.length()
+    Some(dim) => {
+      let mut len = 1
+      for d in dim {
+        len *= self.shape[d]
+      }
+      len
+    }
+  }
+  self.sum(dim?, keep_dim~) / tensor(len.to_double())
 }
