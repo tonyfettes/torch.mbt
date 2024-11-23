@@ -1,13 +1,11 @@
 pub fn Tensor::sum(
   self : Tensor,
-  dim~ : @shape.Shape = (),
+  dim? : @shape.Shape,
   keep_dim~ : Bool = false
 ) -> Tensor {
-  let dim = dim.to_fixed_array()
-  let dim = if dim.length() == 0 {
-    FixedArray::makei(self.shape.length(), fn(i) { i })
-  } else {
-    dim
+  let dim = match dim {
+    None => FixedArray::makei(self.shape.length(), fn(i) { i })
+    Some(dim) => dim.to_fixed_array()
   }
   let do_sum = FixedArray::make(self.shape.length(), false)
   for d in dim {
