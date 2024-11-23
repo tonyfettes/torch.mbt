@@ -1,6 +1,6 @@
 test "uniform" {
   let a = @tensor.tensor([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
-  @init.uniform(a, -1.0, 1.0)
+  @init.uniform_(a, -1.0, 1.0)
   @json.inspect!(
     a,
     content=[
