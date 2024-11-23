@@ -1,13 +1,20 @@
-pub(readonly) trait Shape {
+pub(open) trait Shape {
   to_fixed_array(Self) -> FixedArray[Int]
+  iter(Self) -> Iter[Int]
 }
 
 pub impl Shape for Unit with to_fixed_array(_self : Unit) -> FixedArray[Int] {
   FixedArray::make(0, 0)
 }
 
+pub impl Shape for Unit with iter(_self : Unit) -> Iter[Int] { Iter::empty() }
+
 pub impl Shape for Int with to_fixed_array(self : Int) -> FixedArray[Int] {
   [self]
+}
+
+pub impl Shape for Int with iter(self : Int) -> Iter[Int] {
+  Iter::singleton(self)
 }
 
 pub impl Shape for Array[Int] with to_fixed_array(self : Array[Int]) -> FixedArray[
