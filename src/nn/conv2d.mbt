@@ -1,4 +1,4 @@
-pub(all) struct Conv2d {
+pub(readonly) struct Conv2d {
   weight : Array[Array[@tensor.Tensor]]
   bias : Array[@tensor.Tensor]
   padding : (Int, Int)

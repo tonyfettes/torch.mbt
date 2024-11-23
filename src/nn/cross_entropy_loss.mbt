@@ -1,4 +1,4 @@
-pub(all) struct CrossEntropyLoss {
+struct CrossEntropyLoss {
   reduction : Reduction
 }
 

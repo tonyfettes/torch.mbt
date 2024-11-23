@@ -1,4 +1,4 @@
-pub(all) struct SGD {
+pub(readonly) struct SGD {
   parameters : Array[@tensor.Tensor]
   learning_rate : Float
 }

@@ -1,9 +1,9 @@
-pub(all) enum TensorIndex {
+enum TensorIndex {
   Index(Int)
   Slice(Int, Int)
 } derive(Show)
 
-pub(all) struct TensorView {
+struct TensorView {
   tensor : Tensor
   index : Array[TensorIndex]
 }

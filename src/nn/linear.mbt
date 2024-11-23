@@ -1,4 +1,4 @@
-pub(all) struct Linear {
+pub(readonly) struct Linear {
   weight : @tensor.Tensor
   bias : @tensor.Tensor
 } derive(Show, ToJson, FromJson)

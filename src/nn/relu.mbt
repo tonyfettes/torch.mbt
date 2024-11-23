@@ -1,4 +1,4 @@
-pub(all) struct ReLU {} derive(Show, ToJson, FromJson)
+struct ReLU {} derive(Show, ToJson, FromJson)
 
 pub fn ReLU::new() -> ReLU {
   ReLU::{  }
@@ -15,5 +15,3 @@ pub fn ReLU::forward(_self : ReLU, input : @tensor.Tensor) -> @tensor.Tensor {
 pub fn ReLU::parameters(_self : ReLU) -> Iter[@tensor.Tensor] {
   Iter::empty()
 }
-
-pub(all) struct ReLU6 {}

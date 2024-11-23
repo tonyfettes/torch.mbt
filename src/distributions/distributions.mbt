@@ -68,7 +68,7 @@ pub fn normal(mean~ : Double = 0.0, std~ : Double = 1.0) -> Double {
   return z0 * std + mean
 }
 
-pub(all) struct Normal {
+struct Normal {
   mean : Double
   std : Double
 }
@@ -81,7 +81,7 @@ fn Normal::_sample(self : Normal) -> Double {
   normal(mean=self.mean, std=self.std)
 }
 
-pub(all) struct Categorical {
+struct Categorical {
   logits : @tensor.Tensor
   probs : @tensor.Tensor
 } derive(Show)

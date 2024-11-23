@@ -1,4 +1,4 @@
-pub(all) struct AvgPool2d {
+pub(readonly) struct AvgPool2d {
   kernel_size : (Int, Int)
   stride : (Int, Int)
 } derive(Show, ToJson, FromJson)
