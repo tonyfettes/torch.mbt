@@ -1,4 +1,5 @@
 pub fn Tensor::op_mul(self : Tensor, other : Tensor) -> Tensor {
+  let (self, other) = Tensor::broadcast(self, other)
   let length = self.value.length()
   let output : FixedArray[Float] = FixedArray::make(length, (0.0 : Float))
   for i = 0; i < self.value.length(); i = i + 1 {
