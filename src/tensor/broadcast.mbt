@@ -84,19 +84,4 @@ pub fn Tensor::broadcast(self : Tensor, other : Tensor) -> (Tensor, Tensor) {
       grad: FixedArray::make(total, (0.0 : Float)),
     },
   )
-  // if self.shape.length() != 0 {
-  //   abort("Broadcasting a non-scalar value")
-  // }
-  // let shape = shape.to_fixed_array()
-  // let block = compute_block_size(shape)
-  // let total = shape[0] * block[0]
-  // let value = self.value[0]
-  // Tensor::{
-  //   value: FixedArray::make(total, value),
-  //   shape,
-  //   block,
-  //   ref: 0,
-  //   graph: Get(self, FixedArray::make(total, 0)),
-  //   grad: FixedArray::make(total, 0.0),
-  // }
 }
