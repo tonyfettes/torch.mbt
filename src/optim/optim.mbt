@@ -7,11 +7,6 @@ pub fn SGD::new(
   parameters : Iter[@tensor.Tensor],
   learning_rate~ : Float
 ) -> SGD {
-  let vars = []
-  for parameter in parameters {
-    parameter.graph = @tensor.Var
-    vars.push(parameter)
-  }
   SGD::{ parameters: parameters.to_array(), learning_rate }
 }
 

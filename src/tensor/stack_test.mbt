@@ -5,8 +5,4 @@ test "Tensor::stack" {
   ]
   let input = @tensor.stack(input)
   inspect!(input, content="[[[0, 1, 2]], [[3, 4, 5]]]")
-  inspect!(
-    input.graph,
-    content="Cat([[[0, 1, 2]], [[3, 4, 5]]], [(0, 0), (0, 1), (0, 2), (1, 0), (1, 1), (1, 2)])",
-  )
 }

@@ -5,11 +5,6 @@ test "Tensor::matmul - 2x3 * 3x2" {
   inspect!(c.value, content="[58, 64, 139, 154]")
   inspect!(c.shape, content="[2, 2]")
   inspect!(c.block, content="[2, 1]")
-  inspect!(
-    c.graph,
-    content="MatMul([[1, 2, 3], [4, 5, 6]], [[7, 8], [9, 10], [11, 12]])",
-  )
-  inspect!(c.refcnt, content="0")
   inspect!(c.grad, content="[0, 0, 0, 0]")
   inspect!(c, content="[[58, 64], [139, 154]]")
 }

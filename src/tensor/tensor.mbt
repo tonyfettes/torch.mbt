@@ -1,13 +1,13 @@
-pub(all) struct Tensor {
+pub(readonly) struct Tensor {
   value : @unsafe.UnsafeArray[Float]
   shape : @unsafe.UnsafeArray[Int]
   block : @unsafe.UnsafeArray[Int]
-  mut graph : Graph
-  mut refcnt : Int
+  priv graph : Graph
+  priv mut refcnt : Int
   grad : @unsafe.UnsafeArray[Float]
 }
 
-pub(all) enum Graph {
+enum Graph {
   Val
   Var
   Add(Tensor, Tensor)
