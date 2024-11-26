@@ -3,10 +3,11 @@ pub fn Tensor::avg_pool2d(
   kernel_size~ : (Int, Int),
   stride~ : (Int, Int)
 ) -> Tensor {
-  @debug.assert(
-    self.shape.length() == 4,
-    "Input should be of the shape (N, C, H, W)",
-  )
+  if @debug.DEBUG {
+    if self.shape.length() != 4 {
+      abort("Input should be of the shape (N, C, H, W)")
+    }
+  }
   let iN = self.shape[0]
   let iC = self.shape[1]
   let iH = self.shape[2]

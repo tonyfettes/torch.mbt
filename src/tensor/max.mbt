@@ -32,10 +32,11 @@ pub fn Tensor::max(
       (value, index)
     }
   }
-  @debug.assert(
-    dim >= 0 && dim < self.shape.length(),
-    "Invalid dimension \{dim} for max operation.",
-  )
+  if @debug.DEBUG {
+    if dim < 0 || dim >= self.shape.length() {
+      abort("Invalid dimension \{dim} for max operation.")
+    }
+  }
   let shape = FixedArray::makei(
     self.shape.length(),
     fn(i) { if i == dim { 1 } else { self.shape[i] } },
