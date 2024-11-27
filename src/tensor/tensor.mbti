@@ -69,7 +69,7 @@ impl Tensor {
   sigmoid(Self) -> Self
   sqrt(Self) -> Self
   squeeze(Self, dim? : @shape.Shape) -> Self
-  stack[X : TensorLike](FixedArray[X]) -> Self
+  stack[X : ToTensor + Default](FixedArray[X]) -> Self
   sum(Self, dim? : @shape.Shape, keep_dim~ : Bool = ..) -> Self
   tanh(Self) -> Self
   to_double(Self) -> Double
@@ -80,7 +80,7 @@ impl Tensor {
   value(Self) -> FixedArray[Float]
   zeros[Shape : @shape.Shape](Shape, requires_grad~ : Bool = ..) -> Self
 }
-impl TensorLike for Tensor
+impl Default for Tensor
 impl ToTensor for Tensor
 
 type TensorIndex
@@ -114,10 +114,6 @@ impl Default for Float
 impl Default for Double
 impl[X] Default for FixedArray[X]
 impl[X] Default for Array[X]
-
-trait TensorLike
-impl[X : TensorLike] TensorLike for FixedArray[X]
-impl[X : TensorLike] TensorLike for Array[X]
 
 pub(readonly) trait ToTensor : Show {
   to_tensor(Self) -> Tensor

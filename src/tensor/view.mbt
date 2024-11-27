@@ -256,5 +256,5 @@ pub fn TensorView::op_mul(self : TensorView, other : TensorView) -> Tensor {
 }
 
 pub fn TensorView::log(self : TensorView) -> Tensor {
-  TensorLike::to_tensor(self).log()
+  self.to_tensor().log()
 }

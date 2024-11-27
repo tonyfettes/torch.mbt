@@ -1,3 +1,3 @@
-pub fn Tensor::stack[X : TensorLike](tensors : FixedArray[X]) -> Tensor {
-  TensorLike::to_tensor(tensors)
+pub fn Tensor::stack[X : ToTensor + Default](tensors : FixedArray[X]) -> Tensor {
+  ToTensor::to_tensor(tensors)
 }
