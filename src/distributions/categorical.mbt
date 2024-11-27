@@ -35,14 +35,11 @@ pub fn Categorical::sample_(
   sample : @tensor.Tensor
 ) -> Unit {
   let probs = self.probs
-  println("probs.shape: \{probs.shape}")
-  println("sample.shape: \{sample.shape}")
   let width = probs.shape[probs.shape.length() - 1]
   let batch_dim = sample.shape.length() - probs.shape.length() + 1
   fn sample_(b : Int, d : Int, p : Int) -> Unit {
     if d == probs.shape.length() - 1 {
       let mut choice = rand.val.double().to_float()
-      println("choice: \{choice}")
       for i in 0..<width {
         choice = choice - probs.value[p + i]
         if choice <= 0.0 {
@@ -51,6 +48,10 @@ pub fn Categorical::sample_(
         }
       }
       sample.value[b + p] = rand.val.int(limit=width).to_float()
+      return
+    }
+    for i in 0..<probs.shape[d] {
+      sample_(b, d + 1, p + i * probs.block[d] / width)
     }
   }
 
