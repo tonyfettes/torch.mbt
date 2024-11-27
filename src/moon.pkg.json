@@ -1,3 +1,7 @@
 {
-  "import": ["tonyfettes/torch/tensor"]
+  "import": [
+    "tonyfettes/torch/tensor",
+    "tonyfettes/torch/shape",
+    "tonyfettes/torch/distributions"
+  ]
 }

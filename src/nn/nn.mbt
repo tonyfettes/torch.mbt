@@ -38,10 +38,6 @@ test "MLP" {
   )
 }
 
-pub(open) trait Loss {
-  forward(Self, @tensor.Tensor, @tensor.Tensor) -> @tensor.TensorValue
-}
-
 fn forward_[Module : Module](
   tensor : @tensor.Tensor,
   module_ : Module

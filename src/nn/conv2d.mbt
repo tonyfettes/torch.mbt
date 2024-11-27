@@ -1,6 +1,6 @@
 pub(readonly) struct Conv2d {
   weight : Array[Array[@tensor.Tensor]]
-  bias : Array[@tensor.Tensor]
+  bias : @tensor.Tensor
   padding : (Int, Int)
 } derive(Show, ToJson, FromJson)
 
@@ -17,13 +17,13 @@ pub fn Conv2d::new[KernelSize : @shape.Shape2d](
     abort("Output channels has zero width")
   }
   let kernel_size = kernel_size.to_fixed_array()
-  let weight_distribution : @distributions.Continuous = {
+  let weight_distribution = {
     let mut n = in_channels
     for k in kernel_size {
       n *= k
     }
     let stdv = (1.0 : Float) / n.to_float().sqrt()
-    @distributions.Uniform::new(-stdv, stdv)
+    @distributions.Uniform::new(@tensor.tensor(-stdv), @tensor.tensor(stdv))
   }
   let weight = Array::makei(
     out_channels,
@@ -34,10 +34,7 @@ pub fn Conv2d::new[KernelSize : @shape.Shape2d](
       )
     },
   )
-  let bias = Array::makei(
-    out_channels,
-    fn(__) { weight_distribution.sample([]) },
-  )
+  let bias = weight_distribution.sample([out_channels])
   Conv2d::{ weight, bias, padding: padding.to_tuple() }
 }
 
@@ -71,7 +68,8 @@ pub fn Conv2d::forward(self : Conv2d, input : @tensor.Tensor) -> @tensor.Tensor 
               @tensor.correlate2d(input, weight, padding=self.padding.0)
             },
           )
-          @tensor.Tensor::stack(correlations).sum(dim=0) + self.bias[oc]
+          @tensor.Tensor::stack(correlations).sum(dim=0) +
+          self.bias[oc].to_tensor()
         },
       )
       @tensor.Tensor::stack(channels)

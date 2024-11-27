@@ -1,4 +1,3 @@
 pub fn uniform_(tensor : @tensor.Tensor, lower : Float, upper : Float) -> Unit {
-  let distribution = @distributions.Uniform::new(lower, upper)
-  distribution.sample_inplace(tensor)
+  @distributions.Uniform::new(lower, upper).sample_(tensor)
 }

@@ -29,6 +29,12 @@ pub impl Shape for FixedArray[Int] with to_fixed_array(self : FixedArray[Int]) -
   self
 }
 
+pub impl Shape for @unsafe.UnsafeArray[Int] with to_fixed_array(
+  self : @unsafe.UnsafeArray[Int]
+) -> FixedArray[Int] {
+  self._
+}
+
 pub(readonly) trait Shape2d {
   to_fixed_array(Self) -> FixedArray[Int]
   to_tuple(Self) -> (Int, Int)
