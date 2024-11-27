@@ -22,7 +22,8 @@ pub fn Uniform::sample_(self : Uniform, sample : @tensor.Tensor) -> Unit {
   let lower = self.lower.broadcast_to(sample.shape)
   let upper = self.upper.broadcast_to(sample.shape)
   for i = 0; i < sample.value.length(); i = i + 1 {
-    sample.value[i] = rand.val.double().to_float() * (upper.value[i] - lower.value[i]) +
+    sample.value[i] = rand.val.double().to_float() *
+      (upper.value[i] - lower.value[i]) +
       lower.value[i]
   }
 }
@@ -31,7 +32,7 @@ pub fn Uniform::rsample(self : Uniform, shape : @shape.Shape) -> @tensor.Tensor 
   let shape = shape.to_fixed_array()
   let sample = @tensor.zeros([..shape, ..self.lower.shape._])
   for i = 0; i < sample.value.length(); i = i + 1 {
-    sample.value[i] = rand.val.float()
+    sample.value[i] = rand.val.double().to_float()
   }
   sample * (self.upper - self.lower) + self.lower
 }

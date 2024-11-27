@@ -26,7 +26,7 @@ test "Conv2d" {
 
 test "Conv2d - Random" {
   @distributions.seed(b"12345678223456783234567842345678")
-  let image = @distributions.Uniform::new(@tensor.tensor(-1.0), @tensor.tensor(1.0)).sample([1, 1, 4, 4])
+  let image = @distributions.Uniform::new(-1.0, 1.0).sample([1, 1, 4, 4])
   @json.inspect!(
     image[0][0],
     content=[
@@ -321,7 +321,7 @@ test "Conv2d - train average kernel" {
   let optimizer = @optim.SGD::new(model.parameters(), learning_rate=0.001)
   let criterion = @nn.MSELoss::new()
   for i = 0; i < 10; i = i + 1 {
-    let input = @distributions.Uniform::new(@tensor.tensor(-1.0), @tensor.tensor(1.0)).sample([1, 1, 28, 28])
+    let input = @distributions.Uniform::new(-1.0, 1.0).sample([1, 1, 28, 28])
     let output = model.forward(input)
     let target = refer.forward(input)
     let loss = criterion.forward(output, target)
@@ -349,7 +349,7 @@ test "Conv2d - train random kernel" {
   let optimizer = @optim.SGD::new(model.parameters(), learning_rate=0.001)
   @tensor.with_no_grad_error!(
     fn() {
-      let distrib = @distributions.Uniform::new(@tensor.tensor(-8.0), @tensor.tensor(8.0))
+      let distrib = @distributions.Uniform::new(-8.0, 8.0)
       let kernel = distrib.sample([2, 2])
       @json.inspect!(
         kernel,
@@ -363,7 +363,7 @@ test "Conv2d - train random kernel" {
   )
   let loss = @nn.MSELoss::new()
   for i = 0; i < 10; i = i + 1 {
-    let input = @distributions.Uniform::new(@tensor.tensor(-1.0), @tensor.tensor(1.0)).sample([1, 1, 28, 28])
+    let input = @distributions.Uniform::new(-1.0, 1.0).sample([1, 1, 28, 28])
     let output = model.forward(input)
     let target = refer.forward(input)
     let loss = loss.forward(output, target)
@@ -386,7 +386,7 @@ test "Conv2d - train random kernel" {
 
 test "Conv2d - Sigmoid - AvgPool2d" {
   @distributions.seed(b"12345678223456783234567842345678")
-  let image = @distributions.Uniform::new(@tensor.tensor(-1.0), @tensor.tensor(1.0)).sample([1, 1, 4, 4])
+  let image = @distributions.Uniform::new(-1.0, 1.0).sample([1, 1, 4, 4])
   @json.inspect!(
     image[0][0],
     content=[

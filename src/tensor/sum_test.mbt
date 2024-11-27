@@ -46,7 +46,9 @@ test "Tensor::sum/dim=1" {
   let sum = tensor.sum(dim=1)
   @json.inspect!(
     sum,
-    content=[-0.45980000495910645,-0.13819992542266846,1.3708999156951904,-2.621799945831299],
+    content=[
+      -0.45980000495910645, -0.13819992542266846, 1.3708999156951904, -2.621799945831299,
+    ],
   )
   let sum = tensor.sum(dim=1, keep_dim=true)
   @json.inspect!(

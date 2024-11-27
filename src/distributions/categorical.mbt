@@ -17,16 +17,15 @@ pub fn Categorical::of_logits(logits : @tensor.Tensor) -> Categorical {
   Categorical::{ probs, logits }
 }
 
-pub fn Categorical::sample(
+pub fn Categorical::sample[Shape : @shape.Shape](
   self : Categorical,
-  shape : @shape.Shape
+  shape : Shape
 ) -> @tensor.Tensor {
-  let batch_shape = []
+  let shape = [..shape]
   for i in 0..<(self.probs.shape.length() - 1) {
-    batch_shape.push(self.probs.shape[i])
+    shape.push(self.probs.shape[i])
   }
-  let batch_shape = batch_shape.append([..shape])
-  let sample = @tensor.zeros(batch_shape)
+  let sample = @tensor.zeros(shape)
   self.sample_(sample)
   sample
 }
@@ -36,25 +35,36 @@ pub fn Categorical::sample_(
   sample : @tensor.Tensor
 ) -> Unit {
   let probs = self.probs
+  println("probs.shape: \{probs.shape}")
+  println("sample.shape: \{sample.shape}")
   let width = probs.shape[probs.shape.length() - 1]
-  fn sample_(d : Int, p : Int) -> Unit {
+  let batch_dim = sample.shape.length() - probs.shape.length() + 1
+  fn sample_(b : Int, d : Int, p : Int) -> Unit {
     if d == probs.shape.length() - 1 {
-      let mut choice = rand.val.float()
+      let mut choice = rand.val.double().to_float()
+      println("choice: \{choice}")
       for i in 0..<width {
         choice = choice - probs.value[p + i]
         if choice <= 0.0 {
-          sample.value[p] = i.to_float()
+          sample.value[b + p] = i.to_float()
           return
         }
       }
-      sample.value[p] = rand.val.int(limit=width).to_float()
-    }
-    for i in 0..<probs.shape[d] {
-      sample_(d + 1, p + i * probs.block[d])
+      sample.value[b + p] = rand.val.int(limit=width).to_float()
     }
   }
 
-  sample_(0, 0)
+  fn batch_(d : Int, p : Int) -> Unit {
+    if d == batch_dim {
+      sample_(p, 0, 0)
+      return
+    }
+    for i in 0..<sample.shape[d] {
+      batch_(d + 1, p + i * sample.block[d])
+    }
+  }
+
+  batch_(0, 0)
 }
 
 pub fn Categorical::log_prob(

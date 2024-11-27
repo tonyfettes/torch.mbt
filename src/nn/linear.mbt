@@ -7,10 +7,7 @@ pub fn Linear::of(weight : @tensor.Tensor, bias : @tensor.Tensor) -> Linear {
   Linear::{ weight, bias }
 }
 
-pub fn Linear::new(
-  in_features : Int,
-  out_features : Int,
-) -> Linear {
+pub fn Linear::new(in_features : Int, out_features : Int) -> Linear {
   let in_features_sqrt = in_features.to_float().sqrt()
   let in_features_sqrt_inv = (1.0 : Float) / in_features_sqrt
   let weight_distribution = @distributions.Uniform::new(
