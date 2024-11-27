@@ -1,5 +1,7 @@
 pub(all) type UnsafeArray[T] FixedArray[T]
 
+pub fn UnsafeArray::new[T](length : Int) -> UnsafeArray[T] = "%fixedarray.make_uninit"
+
 pub fn UnsafeArray::make[T](length : Int, init : T) -> UnsafeArray[T] = "%fixedarray.make"
 
 pub fn UnsafeArray::length[T](self : UnsafeArray[T]) -> Int = "%fixedarray.length"
