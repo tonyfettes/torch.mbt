@@ -9,16 +9,16 @@ importers:
   .:
     devDependencies:
       '@moonbit/moonbit-lsp':
-        specifier: ^0.1.202411190
-        version: 0.1.202411190
+        specifier: ^0.1.202411250
+        version: 0.1.202411250
       vscode-langservers-extracted:
         specifier: ^4.10.0
         version: 4.10.0
 
 packages:
 
-  '@moonbit/moonbit-lsp@0.1.202411190':
-    resolution: {integrity: sha512-hdXjRjhxHQj7EMkUeveras692EqNIo4hpmACk577GazYSdPgb49qVaWXaQnLMg332KGT/ROYt0kI3aEbvocuuA==}
+  '@moonbit/moonbit-lsp@0.1.202411250':
+    resolution: {integrity: sha512-46XTN/Lv280QDAdzyv9mNXVlXGlz4ClGY2ih6nz9qAvd980SgVi/Uw4OpxTs8CYkZ8MwRT6Lqlyi70TAv/I1FQ==}
     hasBin: true
 
   '@vscode/l10n@0.0.10':
@@ -141,7 +141,7 @@ packages:
 
 snapshots:
 
-  '@moonbit/moonbit-lsp@0.1.202411190': {}
+  '@moonbit/moonbit-lsp@0.1.202411250': {}
 
   '@vscode/l10n@0.0.10': {}
 
