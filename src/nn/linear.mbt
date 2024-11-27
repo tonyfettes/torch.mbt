@@ -10,25 +10,17 @@ pub fn Linear::of(weight : @tensor.Tensor, bias : @tensor.Tensor) -> Linear {
 pub fn Linear::new(
   in_features : Int,
   out_features : Int,
-  weight_distribution? : @distributions.Continuous,
-  bias_distribution? : @distributions.Continuous
 ) -> Linear {
   let in_features_sqrt = in_features.to_float().sqrt()
-  let weight_distribution = match weight_distribution {
-    None => {
-      let in_features_sqrt_inv = (1.0 : Float) / in_features_sqrt
-      @distributions.Uniform::new(-in_features_sqrt_inv, in_features_sqrt_inv)
-      as @distributions.Continuous
-    }
-    Some(distrib) => distrib
-  }
-  let bias_distribution = match bias_distribution {
-    None => {
-      let bound = (1.0 : Float) / in_features_sqrt
-      @distributions.Uniform::new(-bound, bound) as @distributions.Continuous
-    }
-    Some(distrib) => distrib
-  }
+  let in_features_sqrt_inv = (1.0 : Float) / in_features_sqrt
+  let weight_distribution = @distributions.Uniform::new(
+    -@tensor.tensor(in_features_sqrt_inv),
+    @tensor.tensor(in_features_sqrt_inv),
+  )
+  let bias_distribution = @distributions.Uniform::new(
+    -@tensor.tensor(in_features_sqrt_inv),
+    @tensor.tensor(in_features_sqrt_inv),
+  )
   Linear::{
     weight: weight_distribution.sample([in_features, out_features]),
     bias: bias_distribution.sample([out_features]),

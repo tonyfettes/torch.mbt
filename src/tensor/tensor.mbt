@@ -2,9 +2,24 @@ pub(readonly) struct Tensor {
   value : @unsafe.UnsafeArray[Float]
   shape : @unsafe.UnsafeArray[Int]
   block : @unsafe.UnsafeArray[Int]
-  priv graph : Graph
+  priv mut graph : Graph
   priv mut refcnt : Int
   grad : @unsafe.UnsafeArray[Float]
+}
+
+pub fn Tensor::requires_grad(self : Tensor) -> Bool {
+  match self.graph {
+    Var => true
+    _ => false
+  }
+}
+
+pub fn Tensor::requires_grad_(self : Tensor, requires_grad : Bool) -> Unit {
+  if requires_grad {
+    self.graph = Var
+  } else {
+    self.graph = Val
+  }
 }
 
 enum Graph {

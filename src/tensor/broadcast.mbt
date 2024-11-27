@@ -37,7 +37,7 @@ pub fn Tensor::broadcast(self : Tensor, other : Tensor) -> (Tensor, Tensor) {
       return
     }
     if other_shape[d] != 1 && self_shape[d] != other_shape[d] {
-      abort("Shapes \{self_shape} and \{other_shape} are not broadcastable")
+      abort("Shapes \{self_shape} and \{other_shape} are not broadcast-able")
     }
     for i = 0; i < self_shape[d]; i = i + 1 {
       build_self(d + 1, p + i * self_block[d])
@@ -57,7 +57,7 @@ pub fn Tensor::broadcast(self : Tensor, other : Tensor) -> (Tensor, Tensor) {
       return
     }
     if self_shape[d] != 1 && self_shape[d] != other_shape[d] {
-      abort("Shapes \{self_shape} and \{other_shape} are not broadcastable")
+      abort("Shapes \{self_shape} and \{other_shape} are not broadcast-able")
     }
     for i = 0; i < other_shape[d]; i = i + 1 {
       build_other(d + 1, p + i * other_block[d])

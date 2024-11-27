@@ -1,6 +1,6 @@
 test "SiLU" {
   @distributions.seed(b"12345678223456783234567842345678")
-  let input = @distributions.Uniform::new(-1, 1).sample([3, 3])
+  let input = @distributions.Uniform::new(-1.0, 1.0).sample([3, 3])
   let model = @nn.SiLU::new()
   @json.inspect!(
     model.forward(input),

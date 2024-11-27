@@ -87,7 +87,7 @@ pub fn TensorView::op_get(self : TensorView, index : Int) -> TensorView {
 pub fn TensorView::op_set(
   self : TensorView,
   index : Int,
-  other : TensorValue
+  other : ToTensor
 ) -> Unit {
   if not(no_grad.val) {
     match self.tensor.graph {
@@ -98,7 +98,7 @@ pub fn TensorView::op_set(
         )
     }
   }
-  let other = other.to_tensor(requires_grad=false)
+  let other = other.to_tensor()
   let index = [..self.index, Index(index)]
   let shape = self.tensor.shape
   let block = self.tensor.block
