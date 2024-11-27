@@ -50,3 +50,5 @@ pub fn Normal::rsample(self : Normal, shape : @shape.Shape) -> @tensor.Tensor {
   }
   sample * self.scale + self.loc
 }
+
+pub let standard_normal : Normal = Normal::new(0.0, 1.0)
