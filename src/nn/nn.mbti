@@ -1,48 +1,48 @@
 package tonyfettes/torch/nn
 
 alias @moonbitlang/core/json as @json
-alias @tonyfettes/torch/distributions as @distributions
-alias @tonyfettes/torch/nn/internal/transpile as @transpile
 alias @tonyfettes/torch/shape as @shape
 alias @tonyfettes/torch/tensor as @tensor
 
 // Values
 
 // Types and methods
-pub struct AvgPool2d {
-  pub kernel_size : (Int, Int)
-  pub stride : (Int, Int)
+pub(readonly) struct AvgPool2d {
+  kernel_size : (Int, Int)
+  stride : (Int, Int)
 }
 impl AvgPool2d {
   forward(Self, @tensor.Tensor) -> @tensor.Tensor
   from_json(Json, @json.JsonPath) -> Self!@json.JsonDecodeError
-  new[KernelSize : @shape.Shape2d](KernelSize, ~stride? : @shape.Shape2d) -> Self
+  new[KernelSize : @shape.Shape2d](KernelSize, stride? : @shape.Shape2d) -> Self
   parameters(Self) -> Iter[@tensor.Tensor]
   to_json(Self) -> Json
-  to_string(Self) -> String
 }
+impl Show for AvgPool2d
+impl ToJson for AvgPool2d
+impl @json.FromJson for AvgPool2d
 
-pub struct Conv2d {
-  pub weight : Array[Array[@tensor.Tensor]]
-  pub bias : Array[@tensor.Tensor]
-  pub padding : (Int, Int)
+pub(readonly) struct Conv2d {
+  weight : Array[Array[@tensor.Tensor]]
+  bias : @tensor.Tensor
+  padding : (Int, Int)
 }
 impl Conv2d {
   forward(Self, @tensor.Tensor) -> @tensor.Tensor
   from_json(Json, @json.JsonPath) -> Self!@json.JsonDecodeError
-  new[KernelSize : @shape.Shape2d](Int, Int, ~kernel_size : KernelSize, ~padding : @shape.Shape2d = ..) -> Self
+  new[KernelSize : @shape.Shape2d](Int, Int, kernel_size~ : KernelSize, padding~ : @shape.Shape2d = ..) -> Self
   output(Self, Logger) -> Unit
   parameters(Self) -> Iter[@tensor.Tensor]
   to_json(Self) -> Json
-  to_string(Self) -> String
 }
+impl Show for Conv2d
+impl ToJson for Conv2d
+impl @json.FromJson for Conv2d
 
-pub struct CrossEntropyLoss {
-  pub reduction : Reduction
-}
+type CrossEntropyLoss
 impl CrossEntropyLoss {
   forward(Self, @tensor.Tensor, @tensor.Tensor) -> @tensor.Tensor
-  new(~reduction : Reduction = ..) -> Self
+  new(reduction~ : Reduction = ..) -> Self
   output(Self, Logger) -> Unit
 }
 
@@ -50,35 +50,51 @@ type Flatten
 impl Flatten {
   forward(Self, @tensor.Tensor) -> @tensor.Tensor
   from_json(Json, @json.JsonPath) -> Self!@json.JsonDecodeError
-  new(~start : Int = .., ~end? : Int) -> Self
+  new(start~ : Int = .., end? : Int) -> Self
   parameters(Self) -> Iter[@tensor.Tensor]
   to_json(Self) -> Json
-  to_string(Self) -> String
 }
+impl Show for Flatten
+impl ToJson for Flatten
+impl @json.FromJson for Flatten
 
-pub struct Linear {
-  pub weight : @tensor.Tensor
-  pub bias : @tensor.Tensor
+pub(readonly) struct Linear {
+  weight : @tensor.Tensor
+  bias : @tensor.Tensor
 }
 impl Linear {
   forward(Self, @tensor.Tensor) -> @tensor.Tensor
   from_json(Json, @json.JsonPath) -> Self!@json.JsonDecodeError
-  new(Int, Int, ~weight_distribution? : @distributions.Continuous, ~bias_distribution? : @distributions.Continuous) -> Self
+  new(Int, Int) -> Self
   of(@tensor.Tensor, @tensor.Tensor) -> Self
   output(Self, Logger) -> Unit
   parameters(Self) -> Iter[@tensor.Tensor]
   to_json(Self) -> Json
-  to_string(Self) -> String
 }
+impl Show for Linear
+impl ToJson for Linear
+impl @json.FromJson for Linear
 
-pub type MSELoss
+type MSELoss
 impl MSELoss {
   forward(Self, @tensor.Tensor, @tensor.Tensor) -> @tensor.Tensor
   new() -> Self
   output(Self, Logger) -> Unit
 }
 
-pub type ReLU
+type RMSNorm
+impl RMSNorm {
+  forward(Self, @tensor.Tensor) -> @tensor.Tensor
+  from_json(Json, @json.JsonPath) -> Self!@json.JsonDecodeError
+  new[Shape : @shape.Shape](Shape, eps? : Float) -> Self
+  parameters(Self) -> Iter[@tensor.Tensor]
+  to_json(Self) -> Json
+}
+impl Show for RMSNorm
+impl ToJson for RMSNorm
+impl @json.FromJson for RMSNorm
+
+type ReLU
 impl ReLU {
   forward(Self, @tensor.Tensor) -> @tensor.Tensor
   from_json(Json, @json.JsonPath) -> Self!@json.JsonDecodeError
@@ -86,25 +102,40 @@ impl ReLU {
   output(Self, Logger) -> Unit
   parameters(Self) -> Iter[@tensor.Tensor]
   to_json(Self) -> Json
-  to_string(Self) -> String
 }
+impl Show for ReLU
+impl ToJson for ReLU
+impl @json.FromJson for ReLU
 
-pub type ReLU6
-
-pub enum Reduction {
+pub(all) enum Reduction {
   None
   Mean
   Sum
 }
 
-type Sequential
+pub(all) struct Sequential {
+  modules : Array[Module]
+}
 impl Sequential {
   forward(Self[Module], @tensor.Tensor) -> @tensor.Tensor
-  new[Module : Module + Show](Array[Module]) -> Self[Module]
+  new[Module : Module](Array[Module]) -> Self[Module]
   output(Self[Module], Logger) -> Unit
   parameters(Self[Module]) -> Iter[@tensor.Tensor]
   to_string(Self[Module]) -> String
 }
+
+type SiLU
+impl SiLU {
+  forward(Self, @tensor.Tensor) -> @tensor.Tensor
+  from_json(Json, @json.JsonPath) -> Self!@json.JsonDecodeError
+  new() -> Self
+  output(Self, Logger) -> Unit
+  parameters(Self) -> Iter[@tensor.Tensor]
+  to_json(Self) -> Json
+}
+impl Show for SiLU
+impl ToJson for SiLU
+impl @json.FromJson for SiLU
 
 type Sigmoid
 impl Sigmoid {
@@ -113,10 +144,12 @@ impl Sigmoid {
   new() -> Self
   parameters(Self) -> Iter[@tensor.Tensor]
   to_json(Self) -> Json
-  to_string(Self) -> String
 }
+impl Show for Sigmoid
+impl ToJson for Sigmoid
+impl @json.FromJson for Sigmoid
 
-pub type Softmax
+type Softmax
 impl Softmax {
   forward(Self, @tensor.Tensor) -> @tensor.Tensor
   from_json(Json, @json.JsonPath) -> Self!@json.JsonDecodeError
@@ -124,79 +157,42 @@ impl Softmax {
   output(Self, Logger) -> Unit
   parameters(Self) -> Iter[@tensor.Tensor]
   to_json(Self) -> Json
-  to_string(Self) -> String
 }
+impl Show for Softmax
+impl ToJson for Softmax
+impl @json.FromJson for Softmax
+
+type Tanh
+impl Tanh {
+  forward(Self, @tensor.Tensor) -> @tensor.Tensor
+  new() -> Self
+  output(Self, Logger) -> Unit
+  parameters(Self) -> Iter[@tensor.Tensor]
+  to_json(Self) -> Json
+}
+impl Show for Tanh
+impl ToJson for Tanh
 
 // Type aliases
 
 // Traits
-pub trait Loss {
-  forward(Self, @tensor.Tensor, @tensor.Tensor) -> @tensor.TensorValue
-}
-
-pub trait Module : Show {
+pub(open) trait Module : Show {
   forward(Self, @tensor.Tensor) -> @tensor.Tensor
   parameters(Self) -> Iter[@tensor.Tensor]
 }
-
-// Extension Methods
-impl Show for AvgPool2d
-
-impl Show for Conv2d
-
-impl Show for Flatten
-
-impl Show for Linear
-
-impl Show for ReLU
-
-impl Show for Sigmoid
-
-impl Show for Softmax
-
-impl Module for Tuple(2)
-
-impl Module for Tuple(3)
-
-impl Module for Tuple(4)
-
-impl Module for Tuple(5)
-
-impl Module for Tuple(6)
-
-impl Module for Tuple(7)
-
-impl Module for Tuple(8)
-
-impl Module for Tuple(9)
-
-impl Module for Tuple(10)
-
-impl Module for Tuple(11)
-
-impl Module for Tuple(12)
-
-impl Module for Tuple(13)
-
-impl Module for Tuple(14)
-
-impl Module for Tuple(15)
-
-impl Module for Tuple(16)
-
-impl @transpile.ToPyTorchSource for AvgPool2d
-
-impl @transpile.ToPyTorchSource for Conv2d
-
-impl @transpile.ToPyTorchSource for Flatten
-
-impl @transpile.ToPyTorchSource for Linear
-
-impl @transpile.ToPyTorchSource for ReLU
-
-impl @transpile.ToPyTorchSource for Sequential
-
-impl @transpile.ToPyTorchSource for Sigmoid
-
-impl @transpile.ToPyTorchSource for Softmax
+impl[A : Module, B : Module] Module for (A, B)
+impl[A : Module, B : Module, C : Module] Module for (A, B, C)
+impl[A : Module, B : Module, C : Module, D : Module] Module for (A, B, C, D)
+impl[A : Module, B : Module, C : Module, D : Module, E : Module] Module for (A, B, C, D, E)
+impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module] Module for (A, B, C, D, E, F)
+impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module, G : Module] Module for (A, B, C, D, E, F, G)
+impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module, G : Module, H : Module] Module for (A, B, C, D, E, F, G, H)
+impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module, G : Module, H : Module, I : Module] Module for (A, B, C, D, E, F, G, H, I)
+impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module, G : Module, H : Module, I : Module, J : Module] Module for (A, B, C, D, E, F, G, H, I, J)
+impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module, G : Module, H : Module, I : Module, J : Module, K : Module] Module for (A, B, C, D, E, F, G, H, I, J, K)
+impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module, G : Module, H : Module, I : Module, J : Module, K : Module, L : Module] Module for (A, B, C, D, E, F, G, H, I, J, K, L)
+impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module, G : Module, H : Module, I : Module, J : Module, K : Module, L : Module, M : Module] Module for (A, B, C, D, E, F, G, H, I, J, K, L, M)
+impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module, G : Module, H : Module, I : Module, J : Module, K : Module, L : Module, M : Module, N : Module] Module for (A, B, C, D, E, F, G, H, I, J, K, L, M, N)
+impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module, G : Module, H : Module, I : Module, J : Module, K : Module, L : Module, M : Module, N : Module, O : Module] Module for (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)
+impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module, G : Module, H : Module, I : Module, J : Module, K : Module, L : Module, M : Module, N : Module, O : Module, P : Module] Module for (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)
 

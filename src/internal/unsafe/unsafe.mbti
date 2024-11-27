@@ -1,0 +1,24 @@
+package tonyfettes/torch/internal/unsafe
+
+// Values
+
+// Types and methods
+pub(all) type UnsafeArray FixedArray[T]
+impl UnsafeArray {
+  iter[T](Self[T]) -> Iter[T]
+  iter2[T](Self[T]) -> Iter2[Int, T]
+  length[T](Self[T]) -> Int
+  make[T](Int, T) -> Self[T]
+  new[T](Int) -> Self[T]
+  op_equal[T : Eq](Self[T], Self[T]) -> Bool
+  op_get[T](Self[T], Int) -> T
+  op_set[T](Self[T], Int, T) -> Unit
+  to_json[T : ToJson](Self[T]) -> Json
+  to_string[T : Show](Self[T]) -> String
+}
+impl[T : Show] Show for UnsafeArray[T]
+
+// Type aliases
+
+// Traits
+

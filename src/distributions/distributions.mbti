@@ -1,59 +1,48 @@
 package tonyfettes/torch/distributions
 
+alias @tonyfettes/torch/shape as @shape
 alias @tonyfettes/torch/tensor as @tensor
 
 // Values
-fn normal(~mean : Double = .., ~std : Double = ..) -> Double
-
 fn seed(Bytes) -> Unit
 
+let standard_normal : Normal
+
 // Types and methods
-pub struct Categorical {
-  pub logits : @tensor.Tensor
-  pub probs : @tensor.Tensor
-}
+type Categorical
 impl Categorical {
-  log_prob(Self, Int) -> @tensor.Tensor
-  new(@tensor.Tensor) -> Self
-  sample(Self) -> Int
-  to_string(Self) -> String
+  log_prob(Self, @tensor.Tensor) -> @tensor.Tensor
+  of_logits(@tensor.Tensor) -> Self
+  of_probs(@tensor.Tensor) -> Self
+  sample[Shape : @shape.Shape](Self, Shape) -> @tensor.Tensor
+  sample_(Self, @tensor.Tensor) -> Unit
 }
 
-pub struct Normal {
-  pub mean : Double
-  pub std : Double
-}
+type Normal
 impl Normal {
-  new(~mean : Double = .., ~std : Double = ..) -> Self
+  new[Loc : @tensor.ToTensor, Scale : @tensor.ToTensor](Loc, Scale) -> Self
+  rsample(Self, @shape.Shape) -> @tensor.Tensor
+  sample(Self, @shape.Shape) -> @tensor.Tensor
+  sample_(Self, @tensor.Tensor) -> Unit
 }
 
 type Uniform
 impl Uniform {
-  new(Double, Double) -> Self
-  sample(Self, FixedArray[Int]) -> @tensor.Tensor
+  new[Lower : @tensor.ToTensor, Upper : @tensor.ToTensor](Lower, Upper) -> Self
+  rsample(Self, @shape.Shape) -> @tensor.Tensor
+  sample(Self, @shape.Shape) -> @tensor.Tensor
+  sample_(Self, @tensor.Tensor) -> Unit
 }
 
 // Type aliases
 
 // Traits
-pub trait Continuous : IContinuous {
-  sample(Self, FixedArray[Int]) -> @tensor.Tensor
+pub(readonly) trait Continuous : Distribution {
+  rsample(Self, @shape.Shape) -> @tensor.Tensor
 }
 
-pub trait Discrete {
-  sample(Self) -> Int
+pub(readonly) trait Distribution {
+  sample(Self, @shape.Shape) -> @tensor.Tensor
+  sample_(Self, @tensor.Tensor) -> Unit
 }
-
-pub trait IContinuous {
-  _sample(Self) -> Double
-}
-
-// Extension Methods
-impl Show for Categorical
-
-impl Continuous::sample
-
-impl IContinuous for Double
-
-impl IContinuous for Uniform
 

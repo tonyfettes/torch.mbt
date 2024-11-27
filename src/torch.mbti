@@ -1,11 +1,12 @@
 package tonyfettes/torch
 
+alias @tonyfettes/torch/shape as @shape
 alias @tonyfettes/torch/tensor as @tensor
 
 // Values
-fn stack[X : @tensor.TensorLike](FixedArray[X]) -> @tensor.Tensor
+fn randn[Shape : @shape.Shape](Shape, requires_grad~ : Bool = ..) -> @tensor.Tensor //deprecated
 
-fn tensor[X : @tensor.TensorValue + Show](X, ~requires_grad : Bool = ..) -> @tensor.Tensor
+fn tensor[X : @tensor.ToTensor](X, requires_grad~ : Bool = ..) -> @tensor.Tensor
 
 // Types and methods
 
@@ -13,6 +14,4 @@ fn tensor[X : @tensor.TensorValue + Show](X, ~requires_grad : Bool = ..) -> @ten
 pub typealias Tensor = @tensor.Tensor
 
 // Traits
-
-// Extension Methods
 

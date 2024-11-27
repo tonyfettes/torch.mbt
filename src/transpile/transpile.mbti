@@ -1,60 +1,49 @@
-package tonyfettes/torch/nn/internal/transpile
+package tonyfettes/torch/transpile
+
+alias @tonyfettes/torch/nn as @nn
+alias @tonyfettes/torch/tensor as @tensor
 
 // Values
-fn transpile[Module : ToPyTorchSource](Module, String) -> String
+fn transpile[Module : Transpile](Module, String) -> String
 
 // Types and methods
-pub struct PyTorchTranspiler {
-  pub ident : Int
-  pub level : Int
-  pub model : Array[(Int, String)]
-  pub after : Array[(Int, String)]
-  pub exports : Array[(String, String)]
-}
-impl PyTorchTranspiler {
+type Transpiler
+impl Transpiler {
   allocate(Self) -> String
-  export(Self, String, String) -> Unit
+  line(Self, String) -> Unit
   new() -> Self
-  push_after(Self, String) -> Unit
-  push_model(Self, String) -> Unit
+  open(Self, () -> Unit) -> Unit
   to_string(Self) -> String
 }
 
 // Type aliases
 
 // Traits
-pub trait ToPyTorchSource {
-  transpile(Self, PyTorchTranspiler) -> String
+pub(open) trait Transpile {
+  transpile(Self, Transpiler, String) -> Unit
 }
-
-// Extension Methods
-impl ToPyTorchSource for Tuple(2)
-
-impl ToPyTorchSource for Tuple(3)
-
-impl ToPyTorchSource for Tuple(4)
-
-impl ToPyTorchSource for Tuple(5)
-
-impl ToPyTorchSource for Tuple(6)
-
-impl ToPyTorchSource for Tuple(7)
-
-impl ToPyTorchSource for Tuple(8)
-
-impl ToPyTorchSource for Tuple(9)
-
-impl ToPyTorchSource for Tuple(10)
-
-impl ToPyTorchSource for Tuple(11)
-
-impl ToPyTorchSource for Tuple(12)
-
-impl ToPyTorchSource for Tuple(13)
-
-impl ToPyTorchSource for Tuple(14)
-
-impl ToPyTorchSource for Tuple(15)
-
-impl ToPyTorchSource for Tuple(16)
+impl Transpile for @nn.AvgPool2d
+impl Transpile for @nn.Conv2d
+impl Transpile for @nn.Flatten
+impl Transpile for @nn.Linear
+impl Transpile for @nn.ReLU
+impl[Module : @nn.Module + Transpile] Transpile for @nn.Sequential[Module]
+impl Transpile for @nn.Sigmoid
+impl Transpile for @nn.Softmax
+impl Transpile for @tensor.Tensor
+impl[A : Transpile, B : Transpile] Transpile for (A, B)
+impl[A : Transpile, B : Transpile, C : Transpile] Transpile for (A, B, C)
+impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile] Transpile for (A, B, C, D)
+impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpile] Transpile for (A, B, C, D, E)
+impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpile, F : Transpile] Transpile for (A, B, C, D, E, F)
+impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpile, F : Transpile, G : Transpile] Transpile for (A, B, C, D, E, F, G)
+impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpile, F : Transpile, G : Transpile, H : Transpile] Transpile for (A, B, C, D, E, F, G, H)
+impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpile, F : Transpile, G : Transpile, H : Transpile, I : Transpile] Transpile for (A, B, C, D, E, F, G, H, I)
+impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpile, F : Transpile, G : Transpile, H : Transpile, I : Transpile, J : Transpile] Transpile for (A, B, C, D, E, F, G, H, I, J)
+impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpile, F : Transpile, G : Transpile, H : Transpile, I : Transpile, J : Transpile, K : Transpile] Transpile for (A, B, C, D, E, F, G, H, I, J, K)
+impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpile, F : Transpile, G : Transpile, H : Transpile, I : Transpile, J : Transpile, K : Transpile, L : Transpile] Transpile for (A, B, C, D, E, F, G, H, I, J, K, L)
+impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpile, F : Transpile, G : Transpile, H : Transpile, I : Transpile, J : Transpile, K : Transpile, L : Transpile, M : Transpile] Transpile for (A, B, C, D, E, F, G, H, I, J, K, L, M)
+impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpile, F : Transpile, G : Transpile, H : Transpile, I : Transpile, J : Transpile, K : Transpile, L : Transpile, M : Transpile, N : Transpile] Transpile for (A, B, C, D, E, F, G, H, I, J, K, L, M, N)
+impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpile, F : Transpile, G : Transpile, H : Transpile, I : Transpile, J : Transpile, K : Transpile, L : Transpile, M : Transpile, N : Transpile, O : Transpile] Transpile for (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)
+impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpile, F : Transpile, G : Transpile, H : Transpile, I : Transpile, J : Transpile, K : Transpile, L : Transpile, M : Transpile, N : Transpile, O : Transpile, P : Transpile] Transpile for (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)
 

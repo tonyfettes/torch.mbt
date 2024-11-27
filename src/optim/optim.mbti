@@ -5,12 +5,12 @@ alias @tonyfettes/torch/tensor as @tensor
 // Values
 
 // Types and methods
-pub struct SGD {
-  pub parameters : Array[@tensor.Tensor]
-  pub learning_rate : Double
+pub(readonly) struct SGD {
+  parameters : Array[@tensor.Tensor]
+  learning_rate : Float
 }
 impl SGD {
-  new(Iter[@tensor.Tensor], ~learning_rate : Double) -> Self
+  new(Iter[@tensor.Tensor], learning_rate~ : Float) -> Self
   step(Self) -> Unit
   zero_grad(Self) -> Unit
 }
@@ -18,6 +18,4 @@ impl SGD {
 // Type aliases
 
 // Traits
-
-// Extension Methods
 
