@@ -1,6 +1,8 @@
 {
   "import": [
     "tonyfettes/torch/tensor",
-    "tonyfettes/torch/distributions"
+    "tonyfettes/torch/distributions",
+    "tonyfettes/torch/internal/unsafe",
+    "tonyfettes/torch/internal/debug"
   ]
 }
