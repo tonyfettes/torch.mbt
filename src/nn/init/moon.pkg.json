@@ -4,5 +4,8 @@
     "tonyfettes/torch/distributions",
     "tonyfettes/torch/internal/unsafe",
     "tonyfettes/torch/internal/debug"
+  ],
+  "test-import": [
+    "tonyfettes/torch/shape"
   ]
 }
