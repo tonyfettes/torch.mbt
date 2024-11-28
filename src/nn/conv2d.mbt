@@ -10,10 +10,10 @@ pub fn Conv2d::new[KernelSize : @shape.Shape2d](
   kernel_size~ : KernelSize,
   padding~ : @shape.Shape2d = 0
 ) -> Conv2d {
-  if in_channels == 0 {
+  if @debug.DEBUG && in_channels == 0 {
     abort("Input channels has zero width")
   }
-  if out_channels == 0 {
+  if @debug.DEBUG && out_channels == 0 {
     abort("Output channels has zero width")
   }
   let kernel_size = kernel_size.to_fixed_array()
@@ -43,12 +43,12 @@ pub fn Conv2d::output(self : Conv2d, logger : Logger) -> Unit {
 }
 
 pub fn Conv2d::forward(self : Conv2d, input : @tensor.Tensor) -> @tensor.Tensor {
-  if input.shape.length() != 4 {
+  if @debug.DEBUG && input.shape.length() != 4 {
     abort("Input tensor should be of shape (N, C, H, W)")
   }
   let out_channels = self.weight.length()
   let in_channels = self.weight[0].length()
-  if input.shape[1] != in_channels {
+  if @debug.DEBUG && input.shape[1] != in_channels {
     abort(
       "Input tensor has \{input.shape[1]} channels, which is different from \{self.weight.length()}",
     )
