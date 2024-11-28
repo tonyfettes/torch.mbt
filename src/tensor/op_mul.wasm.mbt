@@ -42,6 +42,7 @@ fn fixed_array_simd_mul(
 }
 
 pub fn Tensor::op_mul(self : Tensor, other : Tensor) -> Tensor {
+  let (self, other) = broadcast(self, other)
   let length = self.value.length()
   let output : FixedArray[Float] = FixedArray::make(length, (0.0 : Float))
   fixed_array_simd_mul(self.value, other.value, output, length)
