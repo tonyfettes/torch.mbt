@@ -1,4 +1,4 @@
-name: coverage
+name: test
 
 on:
   push:
@@ -7,7 +7,26 @@ on:
   pull_request:
 
 jobs:
-  stable:
+  pytorch:
+    runs-on: ubuntu-latest
+    continue-on-error: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install -U pip
+          pip install '.[dev]'
+
+      - name: Run tests
+        run: pytest
+
+  coverage:
     runs-on: ubuntu-latest
     continue-on-error: false
     steps:
@@ -22,7 +41,8 @@ jobs:
         run: moon update
 
       - name: Run tests
-        run:
+        run: |
+          moon test --enable-coverage --target=wasm
           moon test --enable-coverage --target=wasm-gc
 
       - name: Generate coverage reports
