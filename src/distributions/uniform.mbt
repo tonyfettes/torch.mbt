@@ -36,3 +36,7 @@ pub fn Uniform::rsample(self : Uniform, shape : @shape.Shape) -> @tensor.Tensor 
   }
   sample * (self.upper - self.lower) + self.lower
 }
+
+pub fn Uniform::entropy(self : Uniform) -> @tensor.Tensor {
+  (self.upper - self.lower).log()
+}

@@ -52,3 +52,7 @@ pub fn Normal::rsample(self : Normal, shape : @shape.Shape) -> @tensor.Tensor {
 }
 
 pub let standard_normal : Normal = Normal::new(0.0, 1.0)
+
+pub fn Normal::entropy(self : Normal) -> @tensor.Tensor {
+  @tensor.tensor((2.0 * @math.PI).ln() * 0.5 + 0.5) + self.scale.log()
+}
