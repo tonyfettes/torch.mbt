@@ -1,3 +1,28 @@
+test "TensorView::op_get" {
+  let tensor = @tensor.Tensor::new([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+  let view = tensor[1]
+  @json.inspect!(view, content=[4, 5, 6])
+  let view = tensor[0]
+  @json.inspect!(view, content=[1, 2, 3])
+}
+
+test "panic TensorView::op_get/out-of-bound" {
+  let tensor = @tensor.Tensor::new([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+  tensor[2] |> ignore()
+}
+
+test "panic TensorView::op_get/scalar" {
+  let tensor = @tensor.Tensor::new(1.0)
+  tensor[0] |> ignore()
+}
+
+test "panic TensorView::op_get/too-deep" {
+  let tensor = @tensor.Tensor::new(
+    [[[1.0, 2.0], [3.0, 4.0]], [[5.0, 6.0], [7.0, 8.0]]],
+  )
+  tensor[1][1][1][1] |> ignore()
+}
+
 test "TensorView::op_set" {
   let tensor = @tensor.Tensor::new([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
   tensor[:][1] = [7.0, 8.0]
