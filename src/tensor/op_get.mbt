@@ -7,5 +7,6 @@ pub fn Tensor::op_get(self : Tensor, index : Int) -> TensorView {
       abort("Tensor element access \{index} out of bounds [0, \{self.shape[0]}")
     }
   }
-  TensorView::{ tensor: self, index: [Index(index)] }
+  let shape = FixedArray::from_iter(self.shape.iter().drop(1))
+  TensorView::{ tensor: self, shape, index: [Index(index)] }
 }

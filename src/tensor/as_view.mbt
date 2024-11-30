@@ -17,6 +17,7 @@ pub fn Tensor::op_as_view(
       end
     }
   }
-  let index = [TensorIndex::Slice(start, end)]
-  TensorView::{ tensor: self, index }
+  let shape = self.shape._.copy()
+  shape[0] = end - start
+  TensorView::{ tensor: self, shape, index: [TensorIndex::Slice(start, end)] }
 }

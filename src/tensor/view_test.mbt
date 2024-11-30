@@ -1,3 +1,28 @@
+test "TensorView::op_get" {
+  let tensor = @tensor.Tensor::new([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+  let view = tensor[1]
+  @json.inspect!(view, content=[4, 5, 6])
+  let view = tensor[0]
+  @json.inspect!(view, content=[1, 2, 3])
+}
+
+test "panic TensorView::op_get/out-of-bound" {
+  let tensor = @tensor.Tensor::new([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+  tensor[2] |> ignore()
+}
+
+test "panic TensorView::op_get/scalar" {
+  let tensor = @tensor.Tensor::new(1.0)
+  tensor[0] |> ignore()
+}
+
+test "panic TensorView::op_get/too-deep" {
+  let tensor = @tensor.Tensor::new(
+    [[[1.0, 2.0], [3.0, 4.0]], [[5.0, 6.0], [7.0, 8.0]]],
+  )
+  tensor[1][1][1][1] |> ignore()
+}
+
 test "TensorView::op_set" {
   let tensor = @tensor.Tensor::new([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
   tensor[:][1] = [7.0, 8.0]
@@ -19,4 +44,37 @@ test "TensorView::to_tensor" {
   inspect!(tensor.block, content="[1]")
   inspect!(tensor.grad, content="[0, 0, 0]")
   inspect!(tensor, content="[3, 4, 5]")
+}
+
+test "TensorView::iter" {
+  let a = @tensor.tensor([[1.0, 2.0], [3.0, 4.0]])
+  @json.inspect!(a[1], content=[3, 4])
+  let bs = FixedArray::from_iter(a[1].iter())
+  @json.inspect!(bs, content=[3, 4])
+}
+
+test "TensorView::iter/shape" {
+  let a = @tensor.tensor([[[1.0, 2.0], [3.0, 4.0]], [[5.0, 6.0], [7.0, 8.0]]])
+  @json.inspect!(a.shape, content=[2, 2, 2])
+  let bs = FixedArray::from_iter(a[1].iter())
+  @json.inspect!(bs[0], content=[5, 6])
+  @json.inspect!(bs[0].shape, content=[2])
+}
+
+test "panic TensorView::iter/scalar" {
+  let a = @tensor.tensor([1.0, 2.0, 3.0, 4.0])
+  for _ in a[0] {
+
+  }
+}
+
+test "TensorView::iter/break" {
+  let a = @tensor.tensor([[1.0, 2.0], [3.0, 4.0]])
+  let bs = []
+  @json.inspect!(a[1], content=[3, 4])
+  for b in a[1].iter() {
+    bs.push(b)
+    break
+  }
+  @json.inspect!(bs, content=[3])
 }

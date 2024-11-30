@@ -3,9 +3,10 @@ enum TensorIndex {
   Slice(Int, Int)
 } derive(Show)
 
-struct TensorView {
+pub(readonly) struct TensorView {
   tensor : Tensor
-  index : Array[TensorIndex]
+  shape : FixedArray[Int]
+  index : FixedArray[TensorIndex]
 }
 
 pub fn TensorView::output(self : TensorView, logger : Logger) -> Unit {
@@ -81,7 +82,9 @@ pub fn TensorView::op_get(self : TensorView, index : Int) -> TensorView {
       "Tensor element access at \{index} out of bounds [0, \{self.tensor.shape[self.index.length()]}",
     )
   }
-  TensorView::{ tensor: self.tensor, index: [..self.index, Index(index)] }
+  let shape = FixedArray::from_iter(self.shape.iter().drop(1))
+  let index = FixedArray::from_iter(self.index.iter().append(Index(index)))
+  TensorView::{ tensor: self.tensor, shape, index }
 }
 
 pub fn TensorView::op_set(
@@ -168,7 +171,10 @@ pub fn TensorView::op_as_view(
     None => self.tensor.shape[self.index.length()]
     Some(end) => end
   }
-  TensorView::{ tensor: self.tensor, index: [..self.index, Slice(start, end)] }
+  let shape = self.shape.copy()
+  shape[0] = end - start
+  let index = FixedArray::from_iter(self.index.iter().append(Slice(start, end)))
+  TensorView::{ tensor: self.tensor, shape, index }
 }
 
 pub fn TensorView::to_tensor(self : TensorView) -> Tensor {
@@ -257,4 +263,37 @@ pub fn TensorView::op_mul(self : TensorView, other : TensorView) -> Tensor {
 
 pub fn TensorView::log(self : TensorView) -> Tensor {
   self.to_tensor().log()
+}
+
+pub fn TensorView::iter(self : TensorView) -> Iter[TensorView] {
+  let shape = self.shape
+  let dimension = self.shape.length()
+  if dimension == 0 {
+    abort("Iterating over a scalar tensor is not allowed.")
+  }
+  Iter::new(
+    fn(yield_) {
+      for i in 0..<shape[0] {
+        let shape = FixedArray::make(dimension - 1, 0)
+        for j in 1..<dimension {
+          shape[j - 1] = self.shape[j]
+        }
+        let index : FixedArray[TensorIndex] = FixedArray::make(
+          self.index.length() + 1,
+          self.index[0],
+        )
+        for j in 0..<self.index.length() {
+          index[j] = self.index[j]
+        }
+        index[self.index.length()] = Index(i)
+        let view = TensorView::{ tensor: self.tensor, shape, index }
+        match yield_(view) {
+          IterContinue => ()
+          IterEnd => break IterEnd
+        }
+      } else {
+        IterEnd
+      }
+    },
+  )
 }
