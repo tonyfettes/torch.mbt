@@ -265,21 +265,27 @@ pub fn TensorView::log(self : TensorView) -> Tensor {
   self.to_tensor().log()
 }
 
-pub fn TensorView::iter(self : TensorView, dim~ : Int = 0) -> Iter[TensorView] {
-  if self.shape.length() == 0 {
+pub fn TensorView::iter(self : TensorView) -> Iter[TensorView] {
+  let shape = self.shape
+  let dimension = self.shape.length()
+  if dimension == 0 {
     abort("Iterating over a scalar tensor is not allowed.")
-  }
-  let shape = self.tensor.shape
-  let shape_length = self.tensor.shape.length()
-  let dimension = if dim < 0 { shape_length + dim } else { dim }
-  if dimension < 0 || dimension >= shape_length {
-    abort("Dimension \{dimension} out of range [0, \{shape_length})")
   }
   Iter::new(
     fn(yield_) {
-      for i in 0..<shape[dimension] {
-        let shape = FixedArray::from_iter(self.shape.iter().drop(1))
-        let index = FixedArray::from_iter(self.index.iter().append(Index(i)))
+      for i in 0..<shape[0] {
+        let shape = FixedArray::make(dimension - 1, 0)
+        for j in 1..<dimension {
+          shape[j - 1] = self.shape[j]
+        }
+        let index : FixedArray[TensorIndex] = FixedArray::make(
+          self.index.length() + 1,
+          self.index[0],
+        )
+        for j in 0..<self.index.length() {
+          index[j] = self.index[j]
+        }
+        index[self.index.length()] = Index(i)
         let view = TensorView::{ tensor: self.tensor, shape, index }
         match yield_(view) {
           IterContinue => ()

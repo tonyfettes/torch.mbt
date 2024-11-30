@@ -39,7 +39,7 @@ test "TensorView::iter/shape" {
 test "panic TensorView::iter/scalar" {
   let a = @tensor.tensor([1.0, 2.0, 3.0, 4.0])
   @json.inspect!(a[0], content=1)
-  for b in a[0].iter() {
-    println(b.to_json().stringify())
+  for _ in a[0] {
+
   }
 }
