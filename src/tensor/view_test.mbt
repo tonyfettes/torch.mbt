@@ -63,8 +63,18 @@ test "TensorView::iter/shape" {
 
 test "panic TensorView::iter/scalar" {
   let a = @tensor.tensor([1.0, 2.0, 3.0, 4.0])
-  @json.inspect!(a[0], content=1)
   for _ in a[0] {
 
   }
+}
+
+test "TensorView::iter/break" {
+  let a = @tensor.tensor([[1.0, 2.0], [3.0, 4.0]])
+  let bs = []
+  @json.inspect!(a[1], content=[3, 4])
+  for b in a[1].iter() {
+    bs.push(b)
+    break
+  }
+  @json.inspect!(bs, content=[3])
 }

@@ -1,6 +1,6 @@
 test "panic Tensor::iter - Scalar" {
   let tensor = @tensor.Tensor::new(1.0)
-  inspect!(tensor.iter().collect())
+  tensor.iter().collect() |> ignore()
 }
 
 test "Tensor::iter - Vector" {
@@ -21,4 +21,14 @@ test "Tensor::iter - Tensor" {
     tensor.iter().collect(),
     content="[[[0, 1], [2, 3]], [[4, 5], [6, 7]]]",
   )
+}
+
+test "Tensor::iter/break" {
+  let a = @tensor.tensor([[1.0, 2.0], [3.0, 4.0]])
+  let bs = []
+  for b in a {
+    bs.push(b)
+    break
+  }
+  @json.inspect!(bs, content=[[1, 2]])
 }
