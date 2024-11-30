@@ -1,4 +1,4 @@
-name: test
+name: coverage
 
 on:
   push:
@@ -7,25 +7,6 @@ on:
   pull_request:
 
 jobs:
-  pytorch:
-    runs-on: ubuntu-latest
-    continue-on-error: false
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.13"
-          cache: 'pip'
-
-      - name: Install dependencies
-        run: |
-          pip install -U pip
-          pip install '.[dev]'
-
-      - name: Run tests
-        run: pytest
-
   coverage:
     runs-on: ubuntu-latest
     continue-on-error: false
