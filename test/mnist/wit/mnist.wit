@@ -3,6 +3,6 @@ package tonyfettes:torch;
 world mnist {
   export load: func(blob: string);
   export save: func() -> string;
-  export infer: func(input: list<f64>) -> list<f64>;
-  export train: func(batch: list<tuple<list<f64>, s32>>, learning-rate: f64) -> f64;
+  export infer: func(input: list<f32>) -> list<f32>;
+  export train: func(batch: list<tuple<list<f32>, s32>>, learning-rate: f32) -> f32;
 }
