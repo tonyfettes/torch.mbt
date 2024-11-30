@@ -32,6 +32,8 @@ enum Graph {
   Neg(Tensor)
   Exp(Tensor)
   Log(Tensor)
+  Abs(Tensor)
+  Sqrt(Tensor)
   Sum(Tensor, @unsafe.UnsafeArray[Array[Int]])
   Pow(Tensor, Int)
   MatMul(Tensor, Tensor)
@@ -128,6 +130,8 @@ fn Tensor::incref(self : Tensor) -> Unit {
     Neg(x) => x.incref()
     Exp(x) => x.incref()
     Log(x) => x.incref()
+    Abs(x) => x.incref()
+    Sqrt(x) => x.incref()
     Sum(x, _) => x.incref()
     Pow(x, _) => x.incref()
     MatMul(a, b) => {
@@ -220,6 +224,21 @@ fn Tensor::propagate(self : Tensor) -> Unit {
       let a_grad = a.grad
       for i in 0..<self_grad.length() {
         a_grad[i] += self_grad[i] / a.value[i]
+      }
+      a.propagate()
+    }
+    Abs(a) => {
+      let a_grad = a.grad
+      for i in 0..<self_grad.length() {
+        a_grad[i] += self_grad[i] *
+          (if a.value[i] < 0.0 { -1.0 } else { 1.0 })
+      }
+      a.propagate()
+    }
+    Sqrt(a) => {
+      let a_grad = a.grad
+      for i in 0..<self_grad.length() {
+        a_grad[i] += self_grad[i] / ((2.0 : Float) * self.value[i])
       }
       a.propagate()
     }
@@ -394,6 +413,8 @@ fn Tensor::check(self : Tensor) -> Unit {
     Neg(x) => x.check()
     Exp(x) => x.check()
     Log(x) => x.check()
+    Abs(x) => x.check()
+    Sqrt(x) => x.check()
     Sum(x, _) => x.check()
     Pow(x, _) => x.check()
     MatMul(x, y) => {
