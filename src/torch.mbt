@@ -4,7 +4,7 @@ pub fn tensor[X : @tensor.ToTensor](
   x : X,
   requires_grad~ : Bool = false
 ) -> Tensor {
-  tensor(x, requires_grad~)
+  @tensor.tensor(x, requires_grad~)
 }
 
 /// TODO: This should be moved into
