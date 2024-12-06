@@ -1,0 +1,31 @@
+///|
+pub fn triu(self : Tensor, diagonal~ : Int = 0) -> Tensor {
+  if @debug.DEBUG {
+    if self.shape.length() != 2 {
+      abort("Triu only supports 2D tensors")
+    }
+  }
+  let shape = self.shape
+  let block = self.block
+  let value = FixedArray::make(self.value.length(), (0.0 : Float))
+  let index = FixedArray::make(self.value.length(), -1)
+  for i in 0..<shape[0] {
+    for j in 0..<shape[1] {
+      let pos = i * block[0] + j
+      if j - i >= diagonal {
+        value[pos] = self.value[pos]
+        index[pos] = pos
+      } else {
+        value[pos] = 0.0
+      }
+    }
+  }
+  Tensor::{
+    value,
+    shape,
+    block,
+    refcnt: 0,
+    graph: Get(self, index),
+    grad: FixedArray::make(value.length(), (0.0 : Float)),
+  }
+}
