@@ -49,6 +49,7 @@ test "Normal/entropy/pytorch" (it : @test.T) {
     $|    entropy.backward()
     $|    assert torch.allclose(lower.grad, torch.tensor(\{lower.grad.to_json().stringify()}))
     $|    assert torch.allclose(upper.grad, torch.tensor(\{upper.grad.to_json().stringify()}))
+    ,
   )
   it.snapshot!(filename="distributions_normal_entropy.py")
 }
