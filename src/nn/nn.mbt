@@ -1,3 +1,4 @@
+///|
 pub(open) trait Module: Show {
   forward(Self, @tensor.Tensor) -> @tensor.Tensor
   parameters(Self) -> Iter[@tensor.Tensor]
@@ -38,6 +39,7 @@ test "MLP" {
   )
 }
 
+///|
 fn forward_[Module : Module](
   tensor : @tensor.Tensor,
   module_ : Module

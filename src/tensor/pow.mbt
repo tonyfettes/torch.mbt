@@ -1,3 +1,4 @@
+///|
 fn power(base : Float, exponent : Int) -> Float {
   if exponent == 0 {
     return 1.0
@@ -32,6 +33,7 @@ test "power" {
   inspect!(power(2.0, 100), content="1.2676506002282294e+30")
 }
 
+///|
 pub fn Tensor::pow(self : Tensor, exponent : Int) -> Tensor {
   let length = self.value.length()
   let output : FixedArray[Float] = FixedArray::make(length, (0.0 : Float))

@@ -1,3 +1,4 @@
+///|
 pub fn Tensor::permute(self : Tensor, permutation : Array[Int]) -> Tensor {
   if permutation.length() != self.shape.length() {
     abort("Permutation length does not match tensor rank")

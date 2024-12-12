@@ -1,3 +1,4 @@
+///|
 pub(readonly) struct Tensor {
   value : @unsafe.UnsafeArray[Float]
   shape : @unsafe.UnsafeArray[Int]
@@ -7,6 +8,7 @@ pub(readonly) struct Tensor {
   grad : @unsafe.UnsafeArray[Float]
 }
 
+///|
 pub fn Tensor::requires_grad(self : Tensor) -> Bool {
   match self.graph {
     Var => true
@@ -14,6 +16,7 @@ pub fn Tensor::requires_grad(self : Tensor) -> Bool {
   }
 }
 
+///|
 pub fn Tensor::requires_grad_(self : Tensor, requires_grad : Bool) -> Unit {
   if requires_grad {
     self.graph = Var
@@ -22,6 +25,7 @@ pub fn Tensor::requires_grad_(self : Tensor, requires_grad : Bool) -> Unit {
   }
 }
 
+///|
 enum Graph {
   Val
   Var
@@ -51,6 +55,7 @@ enum Graph {
   )
 } derive(Show)
 
+///|
 pub fn Tensor::output(self : Tensor, logger : Logger) -> Unit {
   let shape = self.shape
   let dimension = shape.length()
@@ -73,18 +78,22 @@ pub fn Tensor::output(self : Tensor, logger : Logger) -> Unit {
   build(0, 0)
 }
 
+///|
 pub fn Tensor::to_string(self : Tensor) -> String {
   Show::to_string(self.value)
 }
 
+///|
 pub fn Tensor::length(self : Tensor) -> Int {
   self.shape[0]
 }
 
+///|
 pub(readonly) trait Default {
   default() -> Self
 }
 
+///|
 fn compute_block_size(shape : FixedArray[Int]) -> FixedArray[Int] {
   let mut dimension = shape.length()
   let block = FixedArray::make(dimension, 1)
@@ -100,6 +109,7 @@ test "compute_block_size" {
   inspect!(compute_block_size([2, 3, 4]), content="[12, 4, 1]")
 }
 
+///|
 fn Tensor::incref(self : Tensor) -> Unit {
   if self.refcnt == -1 {
     self.refcnt = 0
@@ -154,6 +164,7 @@ fn Tensor::incref(self : Tensor) -> Unit {
   }
 }
 
+///|
 fn Tensor::propagate(self : Tensor) -> Unit {
   if self.refcnt == 0 {
     abort("Propagate through a dead tensor: \{self}")
@@ -230,8 +241,7 @@ fn Tensor::propagate(self : Tensor) -> Unit {
     Abs(a) => {
       let a_grad = a.grad
       for i in 0..<self_grad.length() {
-        a_grad[i] += self_grad[i] *
-          (if a.value[i] < 0.0 { -1.0 } else { 1.0 })
+        a_grad[i] += self_grad[i] * (if a.value[i] < 0.0 { -1.0 } else { 1.0 })
       }
       a.propagate()
     }
@@ -384,6 +394,7 @@ fn Tensor::propagate(self : Tensor) -> Unit {
   }
 }
 
+///|
 fn Tensor::check(self : Tensor) -> Unit {
   if self.refcnt == -1 {
     return
@@ -438,6 +449,7 @@ fn Tensor::check(self : Tensor) -> Unit {
   self.refcnt = -1
 }
 
+///|
 pub fn Tensor::backward(self : Tensor) -> Unit {
   self.incref()
   for i in 0..<self.grad.length() {
@@ -516,6 +528,7 @@ test "Tensor::backward - MatMul" {
   inspect!(y.grad, content="[5, 5, 7, 7, 9, 9]")
 }
 
+///|
 pub fn Tensor::to_double(self : Tensor) -> Double {
   if self.shape.length() != 0 {
     abort("Tensor is not a scalar")
@@ -523,6 +536,7 @@ pub fn Tensor::to_double(self : Tensor) -> Double {
   self.value[0].to_double()
 }
 
+///|
 pub fn Tensor::to_float(self : Tensor) -> Float {
   if self.shape.length() != 0 {
     abort("Tensor is not a scalar")
@@ -530,10 +544,12 @@ pub fn Tensor::to_float(self : Tensor) -> Float {
   self.value[0]
 }
 
+///|
 pub fn Tensor::shape(self : Tensor) -> FixedArray[Int] {
   self.shape._
 }
 
+///|
 pub fn Tensor::value(self : Tensor) -> FixedArray[Float] {
   self.value._
 }

@@ -1,3 +1,4 @@
+///|
 pub fn Tensor::iter(self : Tensor) -> Iter[TensorView] {
   let self_shape = self.shape
   if self_shape.length() == 0 {

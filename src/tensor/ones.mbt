@@ -1,3 +1,4 @@
+///|
 pub fn Tensor::ones[Shape : @shape.Shape](
   shape : Shape,
   requires_grad~ : Bool = false

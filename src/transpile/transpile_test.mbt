@@ -1,3 +1,4 @@
+///|
 trait Module: @nn.Module + @transpile.Transpile {}
 
 test (it : @test.T) {

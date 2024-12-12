@@ -1,3 +1,4 @@
+///|
 pub impl Transpile for @nn.Softmax with transpile(
   _self : @nn.Softmax,
   transpiler : Transpiler,
@@ -6,6 +7,7 @@ pub impl Transpile for @nn.Softmax with transpile(
   transpiler.line("\{variable} = torch.nn.Softmax(dim=-1)")
 }
 
+///|
 pub impl Transpile for @nn.Sigmoid with transpile(
   _self : @nn.Sigmoid,
   transpiler : Transpiler,
@@ -14,6 +16,7 @@ pub impl Transpile for @nn.Sigmoid with transpile(
   transpiler.line("\{variable} = torch.nn.Sigmoid()")
 }
 
+///|
 pub impl[Module : @nn.Module + Transpile] Transpile for @nn.Sequential[Module] with transpile(
   self : @nn.Sequential[Module],
   transpiler : Transpiler,
@@ -36,6 +39,7 @@ pub impl[Module : @nn.Module + Transpile] Transpile for @nn.Sequential[Module] w
   transpiler.line(")")
 }
 
+///|
 pub impl Transpile for @nn.ReLU with transpile(
   _self : @nn.ReLU,
   transpiler : Transpiler,
@@ -44,6 +48,7 @@ pub impl Transpile for @nn.ReLU with transpile(
   transpiler.line("\{variable} = torch.nn.ReLU()")
 }
 
+///|
 pub impl Transpile for @nn.Linear with transpile(
   self : @nn.Linear,
   transpiler : Transpiler,
@@ -65,6 +70,7 @@ pub impl Transpile for @nn.Linear with transpile(
   )
 }
 
+///|
 pub impl Transpile for @nn.Flatten with transpile(
   _self : @nn.Flatten,
   transpiler : Transpiler,
@@ -73,6 +79,7 @@ pub impl Transpile for @nn.Flatten with transpile(
   transpiler.line("\{variable} = torch.nn.Flatten()")
 }
 
+///|
 pub impl Transpile for @nn.Conv2d with transpile(
   self : @nn.Conv2d,
   transpiler : Transpiler,
@@ -96,6 +103,7 @@ pub impl Transpile for @nn.Conv2d with transpile(
   )
 }
 
+///|
 pub impl Transpile for @nn.AvgPool2d with transpile(
   self : @nn.AvgPool2d,
   transpiler : Transpiler,

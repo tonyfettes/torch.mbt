@@ -1,3 +1,4 @@
+///|
 pub fn Tensor::new[X : ToTensor](
   self : X,
   requires_grad~ : Bool = false
@@ -5,6 +6,7 @@ pub fn Tensor::new[X : ToTensor](
   self.to_tensor()..requires_grad_(requires_grad)
 }
 
+///|
 pub fn tensor[X : ToTensor](x : X, requires_grad~ : Bool = false) -> Tensor {
   x.to_tensor()..requires_grad_(requires_grad)
 }

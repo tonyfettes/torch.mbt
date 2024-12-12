@@ -1,3 +1,4 @@
+///|
 pub fn normal_(
   tensor : @tensor.Tensor,
   mean~ : Float = 0.0,

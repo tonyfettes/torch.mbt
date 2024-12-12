@@ -1,17 +1,21 @@
+///|
 struct CrossEntropyLoss {
   reduction : Reduction
 }
 
+///|
 pub(all) enum Reduction {
   None
   Mean
   Sum
 }
 
+///|
 pub fn CrossEntropyLoss::new(reduction~ : Reduction = Mean) -> CrossEntropyLoss {
   CrossEntropyLoss::{ reduction, }
 }
 
+///|
 pub fn CrossEntropyLoss::output(
   _self : CrossEntropyLoss,
   logger : Logger
@@ -19,6 +23,7 @@ pub fn CrossEntropyLoss::output(
   logger.write_string("CrossEntropyLoss()")
 }
 
+///|
 pub fn CrossEntropyLoss::forward(
   self : CrossEntropyLoss,
   input : @tensor.Tensor,

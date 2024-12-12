@@ -1,12 +1,15 @@
+///|
 pub(readonly) struct Linear {
   weight : @tensor.Tensor
   bias : @tensor.Tensor
 } derive(Show, ToJson, FromJson)
 
+///|
 pub fn Linear::of(weight : @tensor.Tensor, bias : @tensor.Tensor) -> Linear {
   Linear::{ weight, bias }
 }
 
+///|
 pub fn Linear::new(in_features : Int, out_features : Int) -> Linear {
   let in_features_sqrt = in_features.to_float().sqrt()
   let in_features_sqrt_inv = (1.0 : Float) / in_features_sqrt
@@ -24,6 +27,7 @@ pub fn Linear::new(in_features : Int, out_features : Int) -> Linear {
   }
 }
 
+///|
 pub fn Linear::forward(self : Linear, input : @tensor.Tensor) -> @tensor.Tensor {
   let input_shape = input.shape
   let dimension = input_shape.length()
@@ -50,10 +54,12 @@ pub fn Linear::forward(self : Linear, input : @tensor.Tensor) -> @tensor.Tensor 
   output.reshape(output_shape)
 }
 
+///|
 pub fn Linear::parameters(self : Linear) -> Iter[@tensor.Tensor] {
   [self.weight, self.bias].iter()
 }
 
+///|
 pub fn Linear::output(self : Linear, logger : Logger) -> Unit {
   logger.write_string("Linear(\n")
   for row = 0; row < self.weight.length(); row = row + 1 {

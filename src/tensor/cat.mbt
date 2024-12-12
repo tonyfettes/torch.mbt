@@ -1,3 +1,4 @@
+///|
 pub fn Tensor::cat(tensors : FixedArray[Tensor], dim~ : Int = 0) -> Tensor {
   if tensors.length() == 0 {
     abort("No tensors to concatenate")

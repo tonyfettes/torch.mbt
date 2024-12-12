@@ -1,5 +1,7 @@
+///|
 let normal_buffer : Array[Float] = []
 
+///|
 fn normal(mean~ : Float = 0.0, std~ : Float = 1.0) -> Float {
   match normal_buffer.pop() {
     None => ()
@@ -14,11 +16,13 @@ fn normal(mean~ : Float = 0.0, std~ : Float = 1.0) -> Float {
   return z0.to_float() * std + mean
 }
 
+///|
 struct Normal {
   loc : @tensor.Tensor
   scale : @tensor.Tensor
 }
 
+///|
 pub fn Normal::new[Loc : @tensor.ToTensor, Scale : @tensor.ToTensor](
   loc : Loc,
   scale : Scale
@@ -27,6 +31,7 @@ pub fn Normal::new[Loc : @tensor.ToTensor, Scale : @tensor.ToTensor](
   Normal::{ loc, scale }
 }
 
+///|
 pub fn Normal::sample(self : Normal, shape : @shape.Shape) -> @tensor.Tensor {
   let shape = shape.to_fixed_array()
   let sample = @tensor.zeros([..shape, ..self.loc.shape._])
@@ -34,6 +39,7 @@ pub fn Normal::sample(self : Normal, shape : @shape.Shape) -> @tensor.Tensor {
   sample
 }
 
+///|
 pub fn Normal::sample_(self : Normal, sample : @tensor.Tensor) -> Unit {
   let loc = self.loc.broadcast_to(sample.shape)
   let scale = self.scale.broadcast_to(sample.shape)
@@ -42,6 +48,7 @@ pub fn Normal::sample_(self : Normal, sample : @tensor.Tensor) -> Unit {
   }
 }
 
+///|
 pub fn Normal::rsample(self : Normal, shape : @shape.Shape) -> @tensor.Tensor {
   let shape = shape.to_fixed_array()
   let sample = @tensor.zeros([..shape, ..self.loc.shape._])
@@ -51,8 +58,10 @@ pub fn Normal::rsample(self : Normal, shape : @shape.Shape) -> @tensor.Tensor {
   sample * self.scale + self.loc
 }
 
+///|
 pub let standard_normal : Normal = Normal::new(0.0, 1.0)
 
+///|
 pub fn Normal::entropy(self : Normal) -> @tensor.Tensor {
   @tensor.tensor((2.0 * @math.PI).ln() * 0.5 + 0.5) + self.scale.log()
 }

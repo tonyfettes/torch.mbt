@@ -1,3 +1,4 @@
+///|
 pub fn Tensor::matmul(self : Tensor, other : Tensor) -> Tensor {
   let self_shape = self.shape
   let other_shape = other.shape

@@ -1,3 +1,4 @@
+///|
 pub fn Tensor::squeeze(self : Tensor, dim? : @shape.Shape) -> Tensor {
   let shape = []
   match dim {

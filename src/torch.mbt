@@ -1,5 +1,7 @@
+///|
 pub(all) typealias Tensor = @tensor.Tensor
 
+///|
 pub fn tensor[X : @tensor.ToTensor](
   x : X,
   requires_grad~ : Bool = false
@@ -7,7 +9,7 @@ pub fn tensor[X : @tensor.ToTensor](
   @tensor.tensor(x, requires_grad~)
 }
 
-/// TODO: This should be moved into
+///| TODO: This should be moved into
 /// @alert deprecated "Use `distributions` package to initialize an random tensor."
 pub fn randn[Shape : @shape.Shape](
   shape : Shape,

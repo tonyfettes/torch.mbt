@@ -1,3 +1,4 @@
+///|
 pub fn eye(n : Int, m? : Int, requires_grad~ : Bool = false) -> Tensor {
   let m = m.or(n)
   let shape : FixedArray[Int] = [n, m]

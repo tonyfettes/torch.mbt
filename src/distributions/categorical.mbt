@@ -1,13 +1,16 @@
+///|
 struct Categorical {
   probs : @tensor.Tensor
   logits : @tensor.Tensor
 }
 
+///|
 pub fn Categorical::of_probs(probs : @tensor.Tensor) -> Categorical {
   let logits = probs.log()
   Categorical::{ probs, logits }
 }
 
+///|
 pub fn Categorical::of_logits(logits : @tensor.Tensor) -> Categorical {
   let probs = {
     let exp = logits.exp()
@@ -17,6 +20,7 @@ pub fn Categorical::of_logits(logits : @tensor.Tensor) -> Categorical {
   Categorical::{ probs, logits }
 }
 
+///|
 pub fn Categorical::sample[Shape : @shape.Shape](
   self : Categorical,
   shape : Shape
@@ -30,6 +34,7 @@ pub fn Categorical::sample[Shape : @shape.Shape](
   sample
 }
 
+///|
 pub fn Categorical::sample_(
   self : Categorical,
   sample : @tensor.Tensor
@@ -68,6 +73,7 @@ pub fn Categorical::sample_(
   batch_(0, 0)
 }
 
+///|
 pub fn Categorical::log_prob(
   self : Categorical,
   value : @tensor.Tensor
