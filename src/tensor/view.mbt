@@ -1,14 +1,17 @@
+///|
 enum TensorIndex {
   Index(Int)
   Slice(Int, Int)
 } derive(Show)
 
+///|
 pub(readonly) struct TensorView {
   tensor : Tensor
   shape : FixedArray[Int]
   index : FixedArray[TensorIndex]
 }
 
+///|
 pub fn TensorView::output(self : TensorView, logger : Logger) -> Unit {
   let shape = self.tensor.shape
   let block = self.tensor.block
@@ -42,10 +45,12 @@ pub fn TensorView::output(self : TensorView, logger : Logger) -> Unit {
   build(0, 0)
 }
 
+///|
 pub fn TensorView::to_string(self : TensorView) -> String {
   Show::to_string(self)
 }
 
+///|
 pub fn TensorView::to_json(self : TensorView) -> Json {
   let shape = self.tensor.shape
   let dimension = shape.length()
@@ -73,6 +78,7 @@ pub fn TensorView::to_json(self : TensorView) -> Json {
   build(0, 0)
 }
 
+///|
 pub fn TensorView::op_get(self : TensorView, index : Int) -> TensorView {
   if self.index.length() == self.tensor.shape.length() {
     abort("Taking element at the lowest dimension")
@@ -87,6 +93,7 @@ pub fn TensorView::op_get(self : TensorView, index : Int) -> TensorView {
   TensorView::{ tensor: self.tensor, shape, index }
 }
 
+///|
 pub fn TensorView::op_set(
   self : TensorView,
   index : Int,
@@ -162,6 +169,7 @@ test "TensorView::op_set" {
   inspect!(tensor, content="[[9, 7, 2], [1, 8, 3]]")
 }
 
+///|
 pub fn TensorView::op_as_view(
   self : TensorView,
   start~ : Int,
@@ -177,6 +185,7 @@ pub fn TensorView::op_as_view(
   TensorView::{ tensor: self.tensor, shape, index }
 }
 
+///|
 pub fn TensorView::to_tensor(self : TensorView) -> Tensor {
   let shape : Array[Int] = Array::new(capacity=self.index.length())
   for part in self.index {
@@ -245,26 +254,32 @@ test "TensorView::to_tensor" {
   inspect!(tensor, content="[3, 4, 5]")
 }
 
+///|
 pub fn TensorView::to_double(self : TensorView) -> Double {
   self.to_tensor().to_double()
 }
 
+///|
 pub fn TensorView::op_add(self : TensorView, other : TensorView) -> Tensor {
   self.to_tensor() + other.to_tensor()
 }
 
+///|
 pub fn TensorView::op_sub(self : TensorView, other : TensorView) -> Tensor {
   self.to_tensor() + other.to_tensor()
 }
 
+///|
 pub fn TensorView::op_mul(self : TensorView, other : TensorView) -> Tensor {
   self.to_tensor() * other.to_tensor()
 }
 
+///|
 pub fn TensorView::log(self : TensorView) -> Tensor {
   self.to_tensor().log()
 }
 
+///|
 pub fn TensorView::iter(self : TensorView) -> Iter[TensorView] {
   let shape = self.shape
   let dimension = self.shape.length()

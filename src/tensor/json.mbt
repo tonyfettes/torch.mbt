@@ -1,3 +1,4 @@
+///|
 pub fn Tensor::to_json(self : Tensor) -> Json {
   fn build(dimension : Int, offset : Int) -> Json {
     if dimension >= self.shape.length() {
@@ -18,6 +19,7 @@ test "Tensor::to_json" {
   inspect!(tensor, content="[[0, 1, 2], [3, 4, 5]]")
 }
 
+///|
 pub fn Tensor::from_json(
   json : Json,
   path : @json.JsonPath

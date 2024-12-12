@@ -1,8 +1,10 @@
+///|
 pub(readonly) struct AvgPool2d {
   kernel_size : (Int, Int)
   stride : (Int, Int)
 } derive(Show, ToJson, FromJson)
 
+///|
 pub fn AvgPool2d::new[KernelSize : @shape.Shape2d](
   kernel_size : KernelSize,
   stride? : @shape.Shape2d
@@ -15,6 +17,7 @@ pub fn AvgPool2d::new[KernelSize : @shape.Shape2d](
   AvgPool2d::{ kernel_size, stride }
 }
 
+///|
 pub fn AvgPool2d::forward(
   self : AvgPool2d,
   input : @tensor.Tensor
@@ -22,6 +25,7 @@ pub fn AvgPool2d::forward(
   @tensor.avg_pool2d(input, kernel_size=self.kernel_size, stride=self.stride)
 }
 
+///|
 pub fn AvgPool2d::parameters(_self : AvgPool2d) -> Iter[@tensor.Tensor] {
   Iter::empty()
 }

@@ -1,3 +1,4 @@
+///|
 pub fn gather(input : Tensor, dim : Int, index : Tensor) -> Tensor {
   if @debug.DEBUG {
     if input.shape.length() != index.shape.length() {

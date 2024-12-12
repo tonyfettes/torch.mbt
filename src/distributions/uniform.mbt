@@ -1,8 +1,10 @@
+///|
 struct Uniform {
   lower : @tensor.Tensor
   upper : @tensor.Tensor
 }
 
+///|
 pub fn Uniform::new[Lower : @tensor.ToTensor, Upper : @tensor.ToTensor](
   lower : Lower,
   upper : Upper
@@ -11,6 +13,7 @@ pub fn Uniform::new[Lower : @tensor.ToTensor, Upper : @tensor.ToTensor](
   Uniform::{ lower, upper }
 }
 
+///|
 pub fn Uniform::sample(self : Uniform, shape : @shape.Shape) -> @tensor.Tensor {
   let shape = shape.to_fixed_array()
   let sample = @tensor.zeros([..shape, ..self.lower.shape._])
@@ -18,6 +21,7 @@ pub fn Uniform::sample(self : Uniform, shape : @shape.Shape) -> @tensor.Tensor {
   sample
 }
 
+///|
 pub fn Uniform::sample_(self : Uniform, sample : @tensor.Tensor) -> Unit {
   let lower = self.lower.broadcast_to(sample.shape)
   let upper = self.upper.broadcast_to(sample.shape)
@@ -28,6 +32,7 @@ pub fn Uniform::sample_(self : Uniform, sample : @tensor.Tensor) -> Unit {
   }
 }
 
+///|
 pub fn Uniform::rsample(self : Uniform, shape : @shape.Shape) -> @tensor.Tensor {
   let shape = shape.to_fixed_array()
   let sample = @tensor.zeros([..shape, ..self.lower.shape._])
@@ -37,6 +42,7 @@ pub fn Uniform::rsample(self : Uniform, shape : @shape.Shape) -> @tensor.Tensor 
   sample * (self.upper - self.lower) + self.lower
 }
 
+///|
 pub fn Uniform::entropy(self : Uniform) -> @tensor.Tensor {
   (self.upper - self.lower).log()
 }

@@ -1,3 +1,4 @@
+///|
 pub impl[A : Transpile, B : Transpile] Transpile for (A, B) with transpile(
   self : (A, B),
   transpiler : Transpiler,
@@ -21,6 +22,7 @@ pub impl[A : Transpile, B : Transpile] Transpile for (A, B) with transpile(
   transpiler.line(")")
 }
 
+///|
 pub impl[A : Transpile, B : Transpile, C : Transpile] Transpile for (A, B, C) with transpile(
   self : (A, B, C),
   transpiler : Transpiler,
@@ -47,6 +49,7 @@ pub impl[A : Transpile, B : Transpile, C : Transpile] Transpile for (A, B, C) wi
   transpiler.line(")")
 }
 
+///|
 pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile] Transpile for (
   A,
   B,
@@ -81,6 +84,7 @@ pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile] Transpile f
   transpiler.line(")")
 }
 
+///|
 pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpile] Transpile for (
   A,
   B,
@@ -119,6 +123,7 @@ pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpi
   transpiler.line(")")
 }
 
+///|
 pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpile, F : Transpile] Transpile for (
   A,
   B,
@@ -161,6 +166,7 @@ pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpi
   transpiler.line(")")
 }
 
+///|
 pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpile, F : Transpile, G : Transpile] Transpile for (
   A,
   B,
@@ -207,6 +213,7 @@ pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpi
   transpiler.line(")")
 }
 
+///|
 pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpile, F : Transpile, G : Transpile, H : Transpile] Transpile for (
   A,
   B,
@@ -257,6 +264,7 @@ pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpi
   transpiler.line(")")
 }
 
+///|
 pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpile, F : Transpile, G : Transpile, H : Transpile, I : Transpile] Transpile for (
   A,
   B,
@@ -311,6 +319,7 @@ pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpi
   transpiler.line(")")
 }
 
+///|
 pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpile, F : Transpile, G : Transpile, H : Transpile, I : Transpile, J : Transpile] Transpile for (
   A,
   B,
@@ -369,6 +378,7 @@ pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpi
   transpiler.line(")")
 }
 
+///|
 pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpile, F : Transpile, G : Transpile, H : Transpile, I : Transpile, J : Transpile, K : Transpile] Transpile for (
   A,
   B,
@@ -431,6 +441,7 @@ pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpi
   transpiler.line(")")
 }
 
+///|
 pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpile, F : Transpile, G : Transpile, H : Transpile, I : Transpile, J : Transpile, K : Transpile, L : Transpile] Transpile for (
   A,
   B,
@@ -497,6 +508,7 @@ pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpi
   transpiler.line(")")
 }
 
+///|
 pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpile, F : Transpile, G : Transpile, H : Transpile, I : Transpile, J : Transpile, K : Transpile, L : Transpile, M : Transpile] Transpile for (
   A,
   B,
@@ -567,6 +579,7 @@ pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpi
   transpiler.line(")")
 }
 
+///|
 pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpile, F : Transpile, G : Transpile, H : Transpile, I : Transpile, J : Transpile, K : Transpile, L : Transpile, M : Transpile, N : Transpile] Transpile for (
   A,
   B,
@@ -641,6 +654,7 @@ pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpi
   transpiler.line(")")
 }
 
+///|
 pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpile, F : Transpile, G : Transpile, H : Transpile, I : Transpile, J : Transpile, K : Transpile, L : Transpile, M : Transpile, N : Transpile, O : Transpile] Transpile for (
   A,
   B,
@@ -719,6 +733,7 @@ pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpi
   transpiler.line(")")
 }
 
+///|
 pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpile, F : Transpile, G : Transpile, H : Transpile, I : Transpile, J : Transpile, K : Transpile, L : Transpile, M : Transpile, N : Transpile, O : Transpile, P : Transpile] Transpile for (
   A,
   B,

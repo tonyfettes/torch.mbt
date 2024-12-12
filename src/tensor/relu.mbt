@@ -1,4 +1,4 @@
-/// @alert unstable "Non-PyTorch API"
+///| @alert unstable "Non-PyTorch API"
 pub fn Tensor::relu(self : Tensor) -> Tensor {
   Tensor::{
     value: self.value._.map(fn { x => if x > 0.0 { x } else { (0.0 : Float) } }),

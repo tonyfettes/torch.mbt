@@ -1,3 +1,4 @@
+///|
 pub fn Tensor::mean(
   self : Tensor,
   dim? : @shape.Shape,

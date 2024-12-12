@@ -1,3 +1,4 @@
+///|
 extern "wasm" fn simd_f32x4_mul(in0 : Int, in1 : Int, out : Int, len : Int) =
   #|(func (param $in0 i32) (param $in1 i32) (param $out i32) (param $len i32)
   #| (local $vec0 v128)
@@ -19,6 +20,7 @@ extern "wasm" fn simd_f32x4_mul(in0 : Int, in1 : Int, out : Int, len : Int) =
   #|
   #|  (br_if $loop (i32.lt_u (local.get $out) (local.get $end)))))
 
+///|
 fn fixed_array_simd_mul(
   this : @unsafe.UnsafeArray[Float],
   that : @unsafe.UnsafeArray[Float],
@@ -41,6 +43,7 @@ fn fixed_array_simd_mul(
   }
 }
 
+///|
 pub fn Tensor::op_mul(self : Tensor, other : Tensor) -> Tensor {
   let (self, other) = broadcast(self, other)
   let length = self.value.length()

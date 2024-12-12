@@ -1,3 +1,4 @@
+///|
 pub fn Tensor::op_set[X : ToTensor](
   self : Tensor,
   index : Int,

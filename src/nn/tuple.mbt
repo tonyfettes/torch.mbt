@@ -1,3 +1,4 @@
+///|
 pub impl[A : Module, B : Module] Module for (A, B) with forward(
   self : (A, B),
   input : @tensor.Tensor
@@ -5,12 +6,14 @@ pub impl[A : Module, B : Module] Module for (A, B) with forward(
   input |> forward_(self.0) |> forward_(self.1)
 }
 
+///|
 pub impl[A : Module, B : Module] Module for (A, B) with parameters(
   self : (A, B)
 ) -> Iter[@tensor.Tensor] {
   self.0.parameters() |> Iter::concat(self.1.parameters())
 }
 
+///|
 pub impl[A : Module, B : Module, C : Module] Module for (A, B, C) with forward(
   self : (A, B, C),
   input : @tensor.Tensor
@@ -18,6 +21,7 @@ pub impl[A : Module, B : Module, C : Module] Module for (A, B, C) with forward(
   input |> forward_(self.0) |> forward_(self.1) |> forward_(self.2)
 }
 
+///|
 pub impl[A : Module, B : Module, C : Module] Module for (A, B, C) with parameters(
   self : (A, B, C)
 ) -> Iter[@tensor.Tensor] {
@@ -26,6 +30,7 @@ pub impl[A : Module, B : Module, C : Module] Module for (A, B, C) with parameter
   |> Iter::concat(self.2.parameters())
 }
 
+///|
 pub impl[A : Module, B : Module, C : Module, D : Module] Module for (A, B, C, D) with forward(
   self : (A, B, C, D),
   input : @tensor.Tensor
@@ -37,6 +42,7 @@ pub impl[A : Module, B : Module, C : Module, D : Module] Module for (A, B, C, D)
   |> forward_(self.3)
 }
 
+///|
 pub impl[A : Module, B : Module, C : Module, D : Module] Module for (A, B, C, D) with parameters(
   self : (A, B, C, D)
 ) -> Iter[@tensor.Tensor] {
@@ -46,6 +52,7 @@ pub impl[A : Module, B : Module, C : Module, D : Module] Module for (A, B, C, D)
   |> Iter::concat(self.3.parameters())
 }
 
+///|
 pub impl[A : Module, B : Module, C : Module, D : Module, E : Module] Module for (
   A,
   B,
@@ -61,6 +68,7 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module] Module for 
   |> forward_(self.4)
 }
 
+///|
 pub impl[A : Module, B : Module, C : Module, D : Module, E : Module] Module for (
   A,
   B,
@@ -75,6 +83,7 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module] Module for 
   |> Iter::concat(self.4.parameters())
 }
 
+///|
 pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module] Module for (
   A,
   B,
@@ -92,6 +101,7 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module]
   |> forward_(self.5)
 }
 
+///|
 pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module] Module for (
   A,
   B,
@@ -108,6 +118,7 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module]
   |> Iter::concat(self.5.parameters())
 }
 
+///|
 pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module, G : Module] Module for (
   A,
   B,
@@ -127,6 +138,7 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module,
   |> forward_(self.6)
 }
 
+///|
 pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module, G : Module] Module for (
   A,
   B,
@@ -145,6 +157,7 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module,
   |> Iter::concat(self.6.parameters())
 }
 
+///|
 pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module, G : Module, H : Module] Module for (
   A,
   B,
@@ -166,6 +179,7 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module,
   |> forward_(self.7)
 }
 
+///|
 pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module, G : Module, H : Module] Module for (
   A,
   B,
@@ -186,6 +200,7 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module,
   |> Iter::concat(self.7.parameters())
 }
 
+///|
 pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module, G : Module, H : Module, I : Module] Module for (
   A,
   B,
@@ -209,6 +224,7 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module,
   |> forward_(self.8)
 }
 
+///|
 pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module, G : Module, H : Module, I : Module] Module for (
   A,
   B,
@@ -231,6 +247,7 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module,
   |> Iter::concat(self.8.parameters())
 }
 
+///|
 pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module, G : Module, H : Module, I : Module, J : Module] Module for (
   A,
   B,
@@ -256,6 +273,7 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module,
   |> forward_(self.9)
 }
 
+///|
 pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module, G : Module, H : Module, I : Module, J : Module] Module for (
   A,
   B,
@@ -280,6 +298,7 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module,
   |> Iter::concat(self.9.parameters())
 }
 
+///|
 pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module, G : Module, H : Module, I : Module, J : Module, K : Module] Module for (
   A,
   B,
@@ -307,6 +326,7 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module,
   |> forward_(self.10)
 }
 
+///|
 pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module, G : Module, H : Module, I : Module, J : Module, K : Module] Module for (
   A,
   B,
@@ -335,6 +355,7 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module,
   |> Iter::concat(self.10.parameters())
 }
 
+///|
 pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module, G : Module, H : Module, I : Module, J : Module, K : Module, L : Module] Module for (
   A,
   B,
@@ -367,6 +388,7 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module,
   |> forward_(self.11)
 }
 
+///|
 pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module, G : Module, H : Module, I : Module, J : Module, K : Module, L : Module] Module for (
   A,
   B,
@@ -397,6 +419,7 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module,
   |> Iter::concat(self.11.parameters())
 }
 
+///|
 pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module, G : Module, H : Module, I : Module, J : Module, K : Module, L : Module, M : Module] Module for (
   A,
   B,
@@ -431,6 +454,7 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module,
   |> forward_(self.12)
 }
 
+///|
 pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module, G : Module, H : Module, I : Module, J : Module, K : Module, L : Module, M : Module] Module for (
   A,
   B,
@@ -463,6 +487,7 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module,
   |> Iter::concat(self.12.parameters())
 }
 
+///|
 pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module, G : Module, H : Module, I : Module, J : Module, K : Module, L : Module, M : Module, N : Module] Module for (
   A,
   B,
@@ -499,6 +524,7 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module,
   |> forward_(self.13)
 }
 
+///|
 pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module, G : Module, H : Module, I : Module, J : Module, K : Module, L : Module, M : Module, N : Module] Module for (
   A,
   B,
@@ -533,6 +559,7 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module,
   |> Iter::concat(self.13.parameters())
 }
 
+///|
 pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module, G : Module, H : Module, I : Module, J : Module, K : Module, L : Module, M : Module, N : Module, O : Module] Module for (
   A,
   B,
@@ -571,6 +598,7 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module,
   |> forward_(self.14)
 }
 
+///|
 pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module, G : Module, H : Module, I : Module, J : Module, K : Module, L : Module, M : Module, N : Module, O : Module] Module for (
   A,
   B,
@@ -607,6 +635,7 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module,
   |> Iter::concat(self.14.parameters())
 }
 
+///|
 pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module, G : Module, H : Module, I : Module, J : Module, K : Module, L : Module, M : Module, N : Module, O : Module, P : Module] Module for (
   A,
   B,
@@ -647,6 +676,7 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module,
   |> forward_(self.15)
 }
 
+///|
 pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module, G : Module, H : Module, I : Module, J : Module, K : Module, L : Module, M : Module, N : Module, O : Module, P : Module] Module for (
   A,
   B,

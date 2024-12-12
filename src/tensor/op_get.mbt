@@ -1,3 +1,4 @@
+///|
 pub fn Tensor::op_get(self : Tensor, index : Int) -> TensorView {
   if @debug.DEBUG {
     if self.shape.length() == 0 {

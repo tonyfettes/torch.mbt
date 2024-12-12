@@ -1,9 +1,11 @@
+///|
 pub(readonly) struct Conv2d {
   weight : Array[Array[@tensor.Tensor]]
   bias : @tensor.Tensor
   padding : (Int, Int)
 } derive(Show, ToJson, FromJson)
 
+///|
 pub fn Conv2d::new[KernelSize : @shape.Shape2d](
   in_channels : Int,
   out_channels : Int,
@@ -38,10 +40,12 @@ pub fn Conv2d::new[KernelSize : @shape.Shape2d](
   Conv2d::{ weight, bias, padding: padding.to_tuple() }
 }
 
+///|
 pub fn Conv2d::output(self : Conv2d, logger : Logger) -> Unit {
   Show::output(self.weight, logger)
 }
 
+///|
 pub fn Conv2d::forward(self : Conv2d, input : @tensor.Tensor) -> @tensor.Tensor {
   if @debug.DEBUG && input.shape.length() != 4 {
     abort("Input tensor should be of shape (N, C, H, W)")
@@ -78,6 +82,7 @@ pub fn Conv2d::forward(self : Conv2d, input : @tensor.Tensor) -> @tensor.Tensor 
   @tensor.Tensor::stack(batch)
 }
 
+///|
 pub fn Conv2d::parameters(self : Conv2d) -> Iter[@tensor.Tensor] {
   self.weight.iter().flat_map(fn { channel => channel.iter() })
 }

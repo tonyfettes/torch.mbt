@@ -1,3 +1,4 @@
+///|
 pub fn Tensor::max(
   self : Tensor,
   dim? : Int,

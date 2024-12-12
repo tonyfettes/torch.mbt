@@ -1,3 +1,4 @@
+///|
 struct Transpiler {
   mut ident : Int
   mut level : Int
@@ -5,26 +6,31 @@ struct Transpiler {
   exports : Array[String]
 }
 
+///|
 pub fn Transpiler::new() -> Transpiler {
   Transpiler::{ ident: 0, level: 0, lines: [], exports: [] }
 }
 
+///|
 pub fn Transpiler::allocate(self : Transpiler) -> String {
   let ident = self.ident
   self.ident = ident + 1
   "_layer\{ident}"
 }
 
+///|
 pub fn Transpiler::line(self : Transpiler, line : String) -> Unit {
   self.lines.push((self.level, line))
 }
 
+///|
 pub fn Transpiler::open(self : Transpiler, f : () -> Unit) -> Unit {
   self.level = self.level + 1
   f()
   self.level = self.level - 1
 }
 
+///|
 pub fn Transpiler::to_string(self : Transpiler) -> String {
   let lines = []
   for line in self.lines {
@@ -45,10 +51,12 @@ pub fn Transpiler::to_string(self : Transpiler) -> String {
   $|__all__ = [\{__all__}]
 }
 
+///|
 pub(open) trait Transpile {
   transpile(Self, Transpiler, String) -> Unit
 }
 
+///|
 pub fn transpile[Module : Transpile](
   module_ : Module,
   export : String

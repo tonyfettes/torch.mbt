@@ -1,7 +1,9 @@
+///|
 pub(readonly) trait ToTensor: Show {
   to_tensor(Self) -> Tensor
 }
 
+///|
 pub impl ToTensor for Bool with to_tensor(self : Bool) -> Tensor {
   Tensor::{
     value: [if self { 1.0 } else { 0.0 }],
@@ -13,8 +15,10 @@ pub impl ToTensor for Bool with to_tensor(self : Bool) -> Tensor {
   }
 }
 
+///|
 pub impl Default for Bool with default() -> Bool { false }
 
+///|
 pub impl ToTensor for Int with to_tensor(self : Int) -> Tensor {
   Tensor::{
     value: [self.to_float()],
@@ -26,8 +30,10 @@ pub impl ToTensor for Int with to_tensor(self : Int) -> Tensor {
   }
 }
 
+///|
 pub impl Default for Int with default() -> Int { 0 }
 
+///|
 pub impl ToTensor for Float with to_tensor(self : Float) -> Tensor {
   Tensor::{
     value: [self],
@@ -39,8 +45,10 @@ pub impl ToTensor for Float with to_tensor(self : Float) -> Tensor {
   }
 }
 
+///|
 pub impl Default for Float with default() -> Float { 0.0 }
 
+///|
 pub impl ToTensor for Double with to_tensor(self : Double) -> Tensor {
   Tensor::{
     value: [self.to_float()],
@@ -52,8 +60,10 @@ pub impl ToTensor for Double with to_tensor(self : Double) -> Tensor {
   }
 }
 
+///|
 pub impl Default for Double with default() -> Double { 0.0 }
 
+///|
 pub impl[T : ToTensor + Default] ToTensor for FixedArray[T] with to_tensor(
   self : FixedArray[T]
 ) -> Tensor {
@@ -97,8 +107,10 @@ pub impl[T : ToTensor + Default] ToTensor for FixedArray[T] with to_tensor(
   }
 }
 
+///|
 pub impl[X] Default for FixedArray[X] with default() -> FixedArray[X] { [] }
 
+///|
 pub impl[X : ToTensor + Default] ToTensor for Array[X] with to_tensor(
   self : Array[X]
 ) -> Tensor {
@@ -133,10 +145,13 @@ pub impl[X : ToTensor + Default] ToTensor for Array[X] with to_tensor(
   }
 }
 
+///|
 pub impl[X] Default for Array[X] with default() -> Array[X] { [] }
 
+///|
 pub impl ToTensor for Tensor with to_tensor(self : Tensor) -> Tensor { self }
 
+///|
 pub impl Default for Tensor with default() -> Tensor {
   let shape : Array[Int] = []
   empty(shape)
