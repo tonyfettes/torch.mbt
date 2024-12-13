@@ -1,8 +1,8 @@
 ///|
-pub fn Tensor::to_json(self : Tensor[Float]) -> Json {
+pub fn Tensor::to_json[Dtype : ToJson](self : Tensor[Dtype]) -> Json {
   fn build(dimension : Int, offset : Int) -> Json {
     if dimension >= self.shape.length() {
-      return Json::Number(self.value[offset].to_double())
+      return self.value[offset].to_json()
     }
     let elements = Array::new(capacity=self.shape[dimension])
     for i = 0; i < self.shape[dimension]; i = i + 1 {
