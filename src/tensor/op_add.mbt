@@ -10,7 +10,7 @@ pub fn Tensor::op_add(self : Tensor, other : Tensor) -> Tensor {
     value,
     shape: self.shape,
     block: self.block,
-    graph: Graph::Add(self, other),
+    graph: Backward(GraphAdd((self, other))),
     refcnt: 0,
     grad: FixedArray::make(length, (0.0 : Float)),
   }

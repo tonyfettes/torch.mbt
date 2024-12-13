@@ -26,10 +26,16 @@ pub fn Tensor::requires_grad_(self : Tensor, requires_grad : Bool) -> Unit {
 }
 
 ///|
+trait Backward: Show {
+  incref(Self) -> Unit
+  propagate(Self, @unsafe.UnsafeArray[Float]) -> Unit
+  check(Self) -> Unit
+}
+
+///|
 enum Graph {
   Val
   Var
-  Add(Tensor, Tensor)
   Sub(Tensor, Tensor)
   Mul(Tensor, Tensor)
   Div(Tensor, Tensor)
@@ -53,6 +59,7 @@ enum Graph {
     stride~ : (Int, Int),
     padding~ : (Int, Int)
   )
+  Backward(Backward)
 } derive(Show)
 
 ///|
@@ -121,10 +128,6 @@ fn Tensor::incref(self : Tensor) -> Unit {
   match self.graph {
     Val => ()
     Var => ()
-    Add(a, b) => {
-      a.incref()
-      b.incref()
-    }
     Sub(a, b) => {
       a.incref()
       b.incref()
@@ -161,6 +164,7 @@ fn Tensor::incref(self : Tensor) -> Unit {
       image.incref()
       kernel.incref()
     }
+    Backward(backward) => backward.incref()
   }
 }
 
@@ -177,16 +181,6 @@ fn Tensor::propagate(self : Tensor) -> Unit {
   match self.graph {
     Val => return
     Var => return
-    Add(a, b) => {
-      let a_grad = a.grad
-      let b_grad = b.grad
-      for i in 0..<self_grad.length() {
-        a_grad[i] += self_grad[i]
-        b_grad[i] += self_grad[i]
-      }
-      a.propagate()
-      b.propagate()
-    }
     Sub(a, b) => {
       let a_grad = a.grad
       let b_grad = b.grad
@@ -391,6 +385,7 @@ fn Tensor::propagate(self : Tensor) -> Unit {
       image.propagate()
       kernel.propagate()
     }
+    Backward(backward) => backward.propagate(self_grad)
   }
 }
 
@@ -405,10 +400,6 @@ fn Tensor::check(self : Tensor) -> Unit {
   match self.graph {
     Val => ()
     Var => ()
-    Add(x, y) => {
-      x.check()
-      y.check()
-    }
     Sub(x, y) => {
       x.check()
       y.check()
@@ -445,6 +436,7 @@ fn Tensor::check(self : Tensor) -> Unit {
       image.check()
       kernel.check()
     }
+    Backward(x) => x.check()
   }
   self.refcnt = -1
 }
