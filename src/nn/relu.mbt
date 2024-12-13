@@ -12,11 +12,11 @@ pub fn ReLU::output(_self : ReLU, logger : Logger) -> Unit {
 }
 
 ///|
-pub fn ReLU::forward(_self : ReLU, input : @tensor.Tensor) -> @tensor.Tensor {
+pub fn ReLU::forward(_self : ReLU, input : @tensor.Tensor[Float]) -> @tensor.Tensor[Float] {
   @functional.relu(input)
 }
 
 ///|
-pub fn ReLU::parameters(_self : ReLU) -> Iter[@tensor.Tensor] {
+pub fn ReLU::parameters(_self : ReLU) -> Iter[@tensor.Tensor[Float]] {
   Iter::empty()
 }

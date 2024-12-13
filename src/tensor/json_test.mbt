@@ -5,6 +5,6 @@ test "Tensor::to_json" {
 
 test "Tensor::from_json" {
   let json : Json = [[0, 1, 2], [3, 4, 5]]
-  let tensor : @tensor.Tensor = json |> @json.from_json!()
+  let tensor : @tensor.Tensor[Float] = json |> @json.from_json!()
   inspect!(tensor, content="[[0, 1, 2], [3, 4, 5]]")
 }

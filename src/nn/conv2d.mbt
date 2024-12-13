@@ -1,7 +1,7 @@
 ///|
 pub(readonly) struct Conv2d {
-  weight : Array[Array[@tensor.Tensor]]
-  bias : @tensor.Tensor
+  weight : Array[Array[@tensor.Tensor[Float]]]
+  bias : @tensor.Tensor[Float]
   padding : (Int, Int)
 } derive(Show, ToJson, FromJson)
 
@@ -46,7 +46,7 @@ pub fn Conv2d::output(self : Conv2d, logger : Logger) -> Unit {
 }
 
 ///|
-pub fn Conv2d::forward(self : Conv2d, input : @tensor.Tensor) -> @tensor.Tensor {
+pub fn Conv2d::forward(self : Conv2d, input : @tensor.Tensor[Float]) -> @tensor.Tensor[Float] {
   if @debug.DEBUG && input.shape.length() != 4 {
     abort("Input tensor should be of shape (N, C, H, W)")
   }
@@ -83,6 +83,6 @@ pub fn Conv2d::forward(self : Conv2d, input : @tensor.Tensor) -> @tensor.Tensor 
 }
 
 ///|
-pub fn Conv2d::parameters(self : Conv2d) -> Iter[@tensor.Tensor] {
+pub fn Conv2d::parameters(self : Conv2d) -> Iter[@tensor.Tensor[Float]] {
   self.weight.iter().flat_map(fn { channel => channel.iter() })
 }

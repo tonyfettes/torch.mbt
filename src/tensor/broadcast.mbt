@@ -1,5 +1,8 @@
 ///|
-pub fn Tensor::broadcast(self : Tensor, other : Tensor) -> (Tensor, Tensor) {
+pub fn Tensor::broadcast[Dtype : Default](
+  self : Tensor[Dtype],
+  other : Tensor[Dtype]
+) -> (Tensor[Dtype], Tensor[Dtype]) {
   let self_dim = self.shape.length()
   let other_dim = other.shape.length()
   let dim = @math.maximum(self_dim, other_dim)

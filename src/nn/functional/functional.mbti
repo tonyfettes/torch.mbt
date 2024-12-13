@@ -4,11 +4,11 @@ alias @tonyfettes/torch/shape as @shape
 alias @tonyfettes/torch/tensor as @tensor
 
 // Values
-fn relu(@tensor.Tensor) -> @tensor.Tensor
+fn relu(@tensor.Tensor[Float]) -> @tensor.Tensor[Float]
 
-fn rms_norm(@tensor.Tensor, @shape.Shape, @tensor.Tensor, eps~ : Float = ..) -> @tensor.Tensor
+fn rms_norm(@tensor.Tensor[Float], @shape.Shape, @tensor.Tensor[Float], eps~ : Float = ..) -> @tensor.Tensor[Float]
 
-fn silu(@tensor.Tensor) -> @tensor.Tensor
+fn silu(@tensor.Tensor[Float]) -> @tensor.Tensor[Float]
 
 // Types and methods
 

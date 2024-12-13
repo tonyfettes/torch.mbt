@@ -1,12 +1,12 @@
 ///|
 pub(readonly) trait Distribution {
-  sample(Self, @shape.Shape) -> @tensor.Tensor
-  sample_(Self, @tensor.Tensor) -> Unit
+  sample(Self, @shape.Shape) -> @tensor.Tensor[Float]
+  sample_(Self, @tensor.Tensor[Float]) -> Unit
 }
 
 ///|
 pub(readonly) trait Continuous: Distribution {
-  rsample(Self, @shape.Shape) -> @tensor.Tensor
+  rsample(Self, @shape.Shape) -> @tensor.Tensor[Float]
 }
 
 ///|

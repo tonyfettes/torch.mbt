@@ -1,12 +1,12 @@
 ///|
 pub(readonly) struct SGD {
-  parameters : Array[@tensor.Tensor]
+  parameters : Array[@tensor.Tensor[Float]]
   learning_rate : Float
 }
 
 ///|
 pub fn SGD::new(
-  parameters : Iter[@tensor.Tensor],
+  parameters : Iter[@tensor.Tensor[Float]],
   learning_rate~ : Float
 ) -> SGD {
   SGD::{ parameters: parameters.to_array(), learning_rate }

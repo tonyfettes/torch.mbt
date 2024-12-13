@@ -14,14 +14,14 @@ pub fn Softmax::output(_self : Softmax, logger : Logger) -> Unit {
 ///|
 pub fn Softmax::forward(
   _self : Softmax,
-  input : @tensor.Tensor
-) -> @tensor.Tensor {
+  input : @tensor.Tensor[Float]
+) -> @tensor.Tensor[Float] {
   let exp = input.exp()
   let sum = exp.sum()
   exp / sum
 }
 
 ///|
-pub fn Softmax::parameters(_self : Softmax) -> Iter[@tensor.Tensor] {
+pub fn Softmax::parameters(_self : Softmax) -> Iter[@tensor.Tensor[Float]] {
   Iter::empty()
 }

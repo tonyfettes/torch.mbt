@@ -30,7 +30,7 @@ impl Transpile for @nn.ReLU
 impl[Module : @nn.Module + Transpile] Transpile for @nn.Sequential[Module]
 impl Transpile for @nn.Sigmoid
 impl Transpile for @nn.Softmax
-impl Transpile for @tensor.Tensor
+impl Transpile for @tensor.Tensor[Float]
 impl[A : Transpile, B : Transpile] Transpile for (A, B)
 impl[A : Transpile, B : Transpile, C : Transpile] Transpile for (A, B, C)
 impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile] Transpile for (A, B, C, D)

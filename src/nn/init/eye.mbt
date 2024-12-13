@@ -1,5 +1,5 @@
 ///|
-pub fn eye_(tensor : @tensor.Tensor) -> Unit {
+pub fn eye_(tensor : @tensor.Tensor[Float]) -> Unit {
   if @debug.DEBUG && tensor.shape.length() != 2 {
     abort("Only tensors with 2 dimensions are supported")
   }

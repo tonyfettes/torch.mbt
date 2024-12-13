@@ -1,5 +1,5 @@
 ///|
-pub fn Tensor::to_json(self : Tensor) -> Json {
+pub fn Tensor::to_json(self : Tensor[Float]) -> Json {
   fn build(dimension : Int, offset : Int) -> Json {
     if dimension >= self.shape.length() {
       return Json::Number(self.value[offset].to_double())
@@ -23,11 +23,11 @@ test "Tensor::to_json" {
 pub fn Tensor::from_json(
   json : Json,
   path : @json.JsonPath
-) -> Tensor!@json.JsonDecodeError {
+) -> Tensor[Float]!@json.JsonDecodeError {
   match json {
     Json::Number(x) => Tensor::new(x)
     Json::Array(xs) => {
-      let value : Array[Tensor] = Array::new(capacity=xs.length())
+      let value : Array[Tensor[Float]] = Array::new(capacity=xs.length())
       for i, x in xs {
         value.push(Tensor::from_json!(x, @json.add_index(path, i)))
       }
@@ -39,6 +39,6 @@ pub fn Tensor::from_json(
 
 test "Tensor::from_json" {
   let json : Json = [[0, 1, 2], [3, 4, 5]]
-  let tensor : Tensor = json |> @json.from_json!()
+  let tensor : Tensor[Float] = json |> @json.from_json!()
   inspect!(tensor, content="[[0, 1, 2], [3, 4, 5]]")
 }

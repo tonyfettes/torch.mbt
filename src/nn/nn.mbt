@@ -1,7 +1,7 @@
 ///|
 pub(open) trait Module: Show {
-  forward(Self, @tensor.Tensor) -> @tensor.Tensor
-  parameters(Self) -> Iter[@tensor.Tensor]
+  forward(Self, @tensor.Tensor[Float]) -> @tensor.Tensor[Float]
+  parameters(Self) -> Iter[@tensor.Tensor[Float]]
 }
 
 test "MLP" {
@@ -41,9 +41,9 @@ test "MLP" {
 
 ///|
 fn forward_[Module : Module](
-  tensor : @tensor.Tensor,
+  tensor : @tensor.Tensor[Float],
   module_ : Module
-) -> @tensor.Tensor {
+) -> @tensor.Tensor[Float] {
   module_.forward(tensor)
 }
 

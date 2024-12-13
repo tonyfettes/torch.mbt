@@ -1,11 +1,11 @@
 ///|
-pub(all) typealias Tensor = @tensor.Tensor
+pub(all) typealias Tensor = @tensor.Tensor[Float]
 
 ///|
 pub fn tensor[X : @tensor.ToTensor](
   x : X,
   requires_grad~ : Bool = false
-) -> Tensor {
+) -> @tensor.Tensor[Float] {
   @tensor.tensor(x, requires_grad~)
 }
 
@@ -14,7 +14,7 @@ pub fn tensor[X : @tensor.ToTensor](
 pub fn randn[Shape : @shape.Shape](
   shape : Shape,
   requires_grad~ : Bool = false
-) -> Tensor {
+) -> @tensor.Tensor[Float] {
   let sample = @distributions.standard_normal.sample(shape)
   if requires_grad {
     sample.requires_grad_(true)

@@ -1,6 +1,6 @@
 ///|
 pub fn normal_(
-  tensor : @tensor.Tensor,
+  tensor : @tensor.Tensor[Float],
   mean~ : Float = 0.0,
   std~ : Float = 1.0
 ) -> Unit {

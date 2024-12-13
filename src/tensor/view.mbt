@@ -6,7 +6,7 @@ enum TensorIndex {
 
 ///|
 pub(readonly) struct TensorView {
-  tensor : Tensor
+  tensor : Tensor[Float]
   shape : FixedArray[Int]
   index : FixedArray[TensorIndex]
 }
@@ -186,7 +186,7 @@ pub fn TensorView::op_as_view(
 }
 
 ///|
-pub fn TensorView::to_tensor(self : TensorView) -> Tensor {
+pub fn TensorView::to_tensor(self : TensorView) -> Tensor[Float] {
   let shape : Array[Int] = Array::new(capacity=self.index.length())
   for part in self.index {
     match part {
@@ -260,22 +260,22 @@ pub fn TensorView::to_double(self : TensorView) -> Double {
 }
 
 ///|
-pub fn TensorView::op_add(self : TensorView, other : TensorView) -> Tensor {
+pub fn TensorView::op_add(self : TensorView, other : TensorView) -> Tensor[Float] {
   self.to_tensor() + other.to_tensor()
 }
 
 ///|
-pub fn TensorView::op_sub(self : TensorView, other : TensorView) -> Tensor {
+pub fn TensorView::op_sub(self : TensorView, other : TensorView) -> Tensor[Float] {
   self.to_tensor() + other.to_tensor()
 }
 
 ///|
-pub fn TensorView::op_mul(self : TensorView, other : TensorView) -> Tensor {
+pub fn TensorView::op_mul(self : TensorView, other : TensorView) -> Tensor[Float] {
   self.to_tensor() * other.to_tensor()
 }
 
 ///|
-pub fn TensorView::log(self : TensorView) -> Tensor {
+pub fn TensorView::log(self : TensorView) -> Tensor[Float] {
   self.to_tensor().log()
 }
 

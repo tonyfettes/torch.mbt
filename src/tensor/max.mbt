@@ -1,9 +1,9 @@
 ///|
 pub fn Tensor::max(
-  self : Tensor,
+  self : Tensor[Float],
   dim? : Int,
   keep_dim~ : Bool = false
-) -> (Tensor, Tensor) {
+) -> (Tensor[Float], Tensor[Float]) {
   guard let Some(dim) = dim else {
     None => {
       let mut max_value = self.value[0]

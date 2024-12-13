@@ -1,5 +1,5 @@
 ///|
-pub fn Tensor::flatten(self : Tensor, start~ : Int = 0, end? : Int) -> Tensor {
+pub fn Tensor::flatten(self : Tensor[Float], start~ : Int = 0, end? : Int) -> Tensor[Float] {
   let end = match end {
     Some(end) => end
     None => self.shape.length()

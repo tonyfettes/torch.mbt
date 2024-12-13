@@ -1,10 +1,10 @@
 ///|
 pub fn rms_norm(
-  input : @tensor.Tensor,
+  input : @tensor.Tensor[Float],
   normalized_shape : @shape.Shape,
-  weight : @tensor.Tensor,
+  weight : @tensor.Tensor[Float],
   eps~ : Float = 1.0e-5
-) -> @tensor.Tensor {
+) -> @tensor.Tensor[Float] {
   let norm_shape = normalized_shape.to_fixed_array()
   let norm_dims = []
   for i in (input.shape.length() - norm_shape.length())..<input.shape.length() {

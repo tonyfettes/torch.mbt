@@ -1,5 +1,5 @@
 ///|
-pub fn Tensor::op_get(self : Tensor, index : Int) -> TensorView {
+pub fn Tensor::op_get(self : Tensor[Float], index : Int) -> TensorView {
   if @debug.DEBUG {
     if self.shape.length() == 0 {
       abort("Tensor is a scalar")

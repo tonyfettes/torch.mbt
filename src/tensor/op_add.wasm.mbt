@@ -44,8 +44,10 @@ fn fixed_array_simd_add(
 }
 
 ///|
-pub fn Tensor::op_add(self : Tensor, other : Tensor) -> Tensor {
-  let (self, other) = Tensor::broadcast(self, other)
+pub impl TensorAdd for Float with op_add(
+  self : Tensor[Float],
+  other : Tensor[Float]
+) -> Tensor[Float] {
   let length = self.value.length()
   let value : FixedArray[Float] = FixedArray::make(length, (0.0 : Float))
   fixed_array_simd_add(self.value, other.value, value, length)

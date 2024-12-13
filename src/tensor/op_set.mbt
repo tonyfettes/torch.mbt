@@ -1,6 +1,6 @@
 ///|
 pub fn Tensor::op_set[X : ToTensor](
-  self : Tensor,
+  self : Tensor[Float],
   index : Int,
   other : X
 ) -> Unit {

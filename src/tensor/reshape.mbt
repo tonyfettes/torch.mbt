@@ -1,8 +1,8 @@
 ///|
 pub fn Tensor::reshape[Shape : @shape.Shape](
-  self : Tensor,
+  self : Tensor[Float],
   shape : Shape
-) -> Tensor {
+) -> Tensor[Float] {
   let shape = shape.to_fixed_array()
   let block = compute_block_size(shape)
   Tensor::{

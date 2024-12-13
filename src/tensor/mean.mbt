@@ -1,9 +1,9 @@
 ///|
 pub fn Tensor::mean(
-  self : Tensor,
+  self : Tensor[Float],
   dim? : @shape.Shape,
   keep_dim~ : Bool = false
-) -> Tensor {
+) -> Tensor[Float] {
   let len = match dim {
     None => self.value.length()
     Some(dim) => {

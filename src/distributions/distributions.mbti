@@ -11,38 +11,38 @@ let standard_normal : Normal
 // Types and methods
 type Categorical
 impl Categorical {
-  log_prob(Self, @tensor.Tensor) -> @tensor.Tensor
-  of_logits(@tensor.Tensor) -> Self
-  of_probs(@tensor.Tensor) -> Self
-  sample[Shape : @shape.Shape](Self, Shape) -> @tensor.Tensor
-  sample_(Self, @tensor.Tensor) -> Unit
+  log_prob(Self, @tensor.Tensor[Float]) -> @tensor.Tensor[Float]
+  of_logits(@tensor.Tensor[Float]) -> Self
+  of_probs(@tensor.Tensor[Float]) -> Self
+  sample[Shape : @shape.Shape](Self, Shape) -> @tensor.Tensor[Float]
+  sample_(Self, @tensor.Tensor[Float]) -> Unit
 }
 
 type Normal
 impl Normal {
   new[Loc : @tensor.ToTensor, Scale : @tensor.ToTensor](Loc, Scale) -> Self
-  rsample(Self, @shape.Shape) -> @tensor.Tensor
-  sample(Self, @shape.Shape) -> @tensor.Tensor
-  sample_(Self, @tensor.Tensor) -> Unit
+  rsample(Self, @shape.Shape) -> @tensor.Tensor[Float]
+  sample(Self, @shape.Shape) -> @tensor.Tensor[Float]
+  sample_(Self, @tensor.Tensor[Float]) -> Unit
 }
 
 type Uniform
 impl Uniform {
   new[Lower : @tensor.ToTensor, Upper : @tensor.ToTensor](Lower, Upper) -> Self
-  rsample(Self, @shape.Shape) -> @tensor.Tensor
-  sample(Self, @shape.Shape) -> @tensor.Tensor
-  sample_(Self, @tensor.Tensor) -> Unit
+  rsample(Self, @shape.Shape) -> @tensor.Tensor[Float]
+  sample(Self, @shape.Shape) -> @tensor.Tensor[Float]
+  sample_(Self, @tensor.Tensor[Float]) -> Unit
 }
 
 // Type aliases
 
 // Traits
 pub(readonly) trait Continuous : Distribution {
-  rsample(Self, @shape.Shape) -> @tensor.Tensor
+  rsample(Self, @shape.Shape) -> @tensor.Tensor[Float]
 }
 
 pub(readonly) trait Distribution {
-  sample(Self, @shape.Shape) -> @tensor.Tensor
-  sample_(Self, @tensor.Tensor) -> Unit
+  sample(Self, @shape.Shape) -> @tensor.Tensor[Float]
+  sample_(Self, @tensor.Tensor[Float]) -> Unit
 }
 

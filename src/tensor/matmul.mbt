@@ -1,5 +1,5 @@
 ///|
-pub fn Tensor::matmul(self : Tensor, other : Tensor) -> Tensor {
+pub fn Tensor::matmul(self : Tensor[Float], other : Tensor[Float]) -> Tensor[Float] {
   let self_shape = self.shape
   let other_shape = other.shape
   let self_value = self.value
