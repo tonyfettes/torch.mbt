@@ -182,3 +182,15 @@ pub impl ValueToTensor for Int with value_to_tensor(value : Value) -> Tensor[
 
   build(0, value)
 }
+
+test {
+  let value = [1.5, 2.5, 3.5, 4.5].to_value()
+  @json.inspect!(Int::value_to_tensor(value), content=[1, 2, 3, 4])
+  @json.inspect!(Float::value_to_tensor(value), content=[1.5, 2.5, 3.5, 4.5])
+  let value = ([1.5, 2.5, 3.5, 4.5] : FixedArray[Float]).to_value()
+  @json.inspect!(Int::value_to_tensor(value), content=[1, 2, 3, 4])
+  @json.inspect!(Float::value_to_tensor(value), content=[1.5, 2.5, 3.5, 4.5])
+  let value = [true, false].to_value()
+  @json.inspect!(Int::value_to_tensor(value), content=[1, 0])
+  @json.inspect!(Float::value_to_tensor(value), content=[1.0, 0.0])
+}
