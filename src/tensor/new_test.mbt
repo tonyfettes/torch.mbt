@@ -1,6 +1,6 @@
 test "Tensor::new - Scalar" {
   let value = 1.0
-  let tensor = @tensor.Tensor::new(value)
+  let tensor : @tensor.Tensor[Float] = @tensor.tensor(value)
   inspect!(tensor.value, content="[1]")
   inspect!(tensor.shape, content="[]")
   inspect!(tensor.block, content="[]")
@@ -10,7 +10,7 @@ test "Tensor::new - Scalar" {
 
 test "Tensor::new - Vector" {
   let value = [0.0, 1.0, 2.0, 3.0]
-  let tensor = @tensor.Tensor::new(value)
+  let tensor : @tensor.Tensor[Float] = @tensor.tensor(value)
   inspect!(tensor.value, content="[0, 1, 2, 3]")
   inspect!(tensor.shape, content="[4]")
   inspect!(tensor.block, content="[1]")
@@ -20,7 +20,7 @@ test "Tensor::new - Vector" {
 
 test "Tensor::new - Matrix" {
   let value = [[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]]
-  let tensor = @tensor.Tensor::new(value)
+  let tensor : @tensor.Tensor[Float] = @tensor.tensor(value)
   inspect!(tensor.value, content="[0, 1, 2, 3, 4, 5]")
   inspect!(tensor.shape, content="[2, 3]")
   inspect!(tensor.block, content="[3, 1]")
@@ -29,7 +29,7 @@ test "Tensor::new - Matrix" {
 }
 
 test "Tensor::new - Tensor" {
-  let tensor = @tensor.Tensor::new(
+  let tensor : @tensor.Tensor[Float] = @tensor.tensor(
     [
       [[0.0, 1.0, 2.0, 3.0], [4.0, 5.0, 6.0, 7.0], [8.0, 9.0, 10.0, 11.0]],
       [

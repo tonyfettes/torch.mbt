@@ -1,5 +1,5 @@
 ///|
-pub fn Tensor::broadcast[Dtype : Default](
+pub fn Tensor::broadcast[Dtype](
   self : Tensor[Dtype],
   other : Tensor[Dtype]
 ) -> (Tensor[Dtype], Tensor[Dtype]) {

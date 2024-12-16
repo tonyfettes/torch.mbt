@@ -54,7 +54,7 @@ pub impl TensorAdd for Int with op_add(self : Tensor[Int], other : Tensor[Int]) 
 }
 
 ///|
-pub fn Tensor::op_add[Dtype : TensorAdd + Default](
+pub fn Tensor::op_add[Dtype : TensorAdd](
   self : Tensor[Dtype],
   other : Tensor[Dtype]
 ) -> Tensor[Dtype] {

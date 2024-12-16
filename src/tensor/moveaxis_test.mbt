@@ -1,5 +1,5 @@
 test "Tensor::moveaxis" {
-  let tensor = @tensor.tensor(
+  let tensor : @tensor.Tensor[Float] = @tensor.tensor(
     [
       [[0.0, 1.0, 2.0], [0.0, 1.0, 2.0]],
       [[0.0, 1.0, 2.0], [0.0, 1.0, 2.0]],

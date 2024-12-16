@@ -6,7 +6,7 @@ alias @tonyfettes/torch/tensor as @tensor
 // Values
 fn randn[Shape : @shape.Shape](Shape, requires_grad~ : Bool = ..) -> @tensor.Tensor[Float] //deprecated
 
-fn tensor[X : @tensor.ToTensor](X, requires_grad~ : Bool = ..) -> @tensor.Tensor[Float]
+fn tensor[X : @tensor.ToValue](X, requires_grad~ : Bool = ..) -> @tensor.Tensor[Float]
 
 // Types and methods
 

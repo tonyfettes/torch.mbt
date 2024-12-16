@@ -1,5 +1,5 @@
 test "Tensor::sum/scalar" {
-  let tensor = @tensor.tensor(1.0)
+  let tensor : @tensor.Tensor[Float] = @tensor.tensor(1.0)
   let sum = tensor.sum()
   inspect!(sum.value, content="[1]")
   inspect!(sum.shape, content="[]")
@@ -9,7 +9,7 @@ test "Tensor::sum/scalar" {
 }
 
 test "Tensor::sum/vector" {
-  let tensor = @tensor.tensor([0.0, 1.0, 2.0, 3.0])
+  let tensor : @tensor.Tensor[Float] = @tensor.tensor([0.0, 1.0, 2.0, 3.0])
   let sum = tensor.sum()
   inspect!(sum.value, content="[6]")
   inspect!(sum.shape, content="[]")
@@ -19,7 +19,9 @@ test "Tensor::sum/vector" {
 }
 
 test "Tensor::sum/matrix" {
-  let tensor = @tensor.tensor([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]])
+  let tensor : @tensor.Tensor[Float] = @tensor.tensor(
+    [[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]],
+  )
   let sum = tensor.sum(dim=0)
   inspect!(sum.value, content="[3, 5, 7]")
   inspect!(sum.shape, content="[3]")
@@ -29,13 +31,15 @@ test "Tensor::sum/matrix" {
 }
 
 test "Tensor::sum/keep_dim" {
-  let tensor = @tensor.tensor([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]])
+  let tensor : @tensor.Tensor[Float] = @tensor.tensor(
+    [[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]],
+  )
   let sum = tensor.sum(dim=0, keep_dim=true)
   @json.inspect!(sum, content=[[3, 5, 7]])
 }
 
 test "Tensor::sum/dim=1" {
-  let tensor = @tensor.tensor(
+  let tensor : @tensor.Tensor[Float] = @tensor.tensor(
     [
       [0.0569, -0.2475, 0.0737, -0.3429],
       [-0.2993, 0.9138, 0.9337, -1.6864],

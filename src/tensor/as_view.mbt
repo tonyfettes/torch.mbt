@@ -1,9 +1,9 @@
 ///|
-pub fn Tensor::op_as_view(
-  self : Tensor[Float],
+pub fn Tensor::op_as_view[Dtype](
+  self : Tensor[Dtype],
   start~ : Int,
   end? : Int
-) -> TensorView {
+) -> TensorView[Dtype] {
   if self.shape.length() == 0 {
     abort("Tensor is a scalar")
   }

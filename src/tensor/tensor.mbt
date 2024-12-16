@@ -17,8 +17,8 @@ pub fn Tensor::requires_grad(self : Tensor[Float]) -> Bool {
 }
 
 ///|
-pub fn Tensor::requires_grad_(
-  self : Tensor[Float],
+pub fn Tensor::requires_grad_[Dtype](
+  self : Tensor[Dtype],
   requires_grad : Bool
 ) -> Unit {
   if requires_grad {
@@ -524,22 +524,6 @@ test "Tensor::backward - MatMul" {
   z.backward()
   inspect!(x.grad, content="[15, 19, 23, 15, 19, 23]")
   inspect!(y.grad, content="[5, 5, 7, 7, 9, 9]")
-}
-
-///|
-pub fn Tensor::to_double(self : Tensor[Float]) -> Double {
-  if self.shape.length() != 0 {
-    abort("Tensor is not a scalar")
-  }
-  self.value[0].to_double()
-}
-
-///|
-pub fn Tensor::to_float(self : Tensor[Float]) -> Float {
-  if self.shape.length() != 0 {
-    abort("Tensor is not a scalar")
-  }
-  self.value[0]
 }
 
 ///|

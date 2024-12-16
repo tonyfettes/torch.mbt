@@ -1,5 +1,9 @@
 ///|
-pub fn gather(input : Tensor[Float], dim : Int, index : Tensor[Float]) -> Tensor[Float] {
+pub fn gather(
+  input : Tensor[Float],
+  dim : Int,
+  index : Tensor[Float]
+) -> Tensor[Float] {
   if @debug.DEBUG {
     if input.shape.length() != index.shape.length() {
       abort("`input` and `index` must have the same number of dimensions")

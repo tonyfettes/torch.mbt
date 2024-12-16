@@ -23,16 +23,22 @@ struct Normal {
 }
 
 ///|
-pub fn Normal::new[Loc : @tensor.ToTensor, Scale : @tensor.ToTensor](
+pub fn Normal::new[Loc : @tensor.ToValue, Scale : @tensor.ToValue](
   loc : Loc,
   scale : Scale
 ) -> Normal {
-  let (loc, scale) = @tensor.broadcast(loc.to_tensor(), scale.to_tensor())
+  let (loc, scale) = @tensor.broadcast(
+    @tensor.tensor(loc),
+    @tensor.tensor(scale),
+  )
   Normal::{ loc, scale }
 }
 
 ///|
-pub fn Normal::sample(self : Normal, shape : @shape.Shape) -> @tensor.Tensor[Float] {
+pub fn Normal::sample(
+  self : Normal,
+  shape : @shape.Shape
+) -> @tensor.Tensor[Float] {
   let shape = shape.to_fixed_array()
   let sample = @tensor.zeros([..shape, ..self.loc.shape._])
   self.sample_(sample)
@@ -49,7 +55,10 @@ pub fn Normal::sample_(self : Normal, sample : @tensor.Tensor[Float]) -> Unit {
 }
 
 ///|
-pub fn Normal::rsample(self : Normal, shape : @shape.Shape) -> @tensor.Tensor[Float] {
+pub fn Normal::rsample(
+  self : Normal,
+  shape : @shape.Shape
+) -> @tensor.Tensor[Float] {
   let shape = shape.to_fixed_array()
   let sample = @tensor.zeros([..shape, ..self.loc.shape._])
   for i = 0; i < sample.value.length(); i = i + 1 {

@@ -1,5 +1,5 @@
 test "Tensor::correlate2d" {
-  let image = @tensor.tensor(
+  let image : @tensor.Tensor[Float] = @tensor.tensor(
     [
       [0.0, 1.0, 2.0, 3.0],
       [4.0, 5.0, 6.0, 7.0],
@@ -7,7 +7,7 @@ test "Tensor::correlate2d" {
       [12.0, 13.0, 14.0, 15.0],
     ],
   )
-  let kernel = @tensor.tensor(
+  let kernel : @tensor.Tensor[Float] = @tensor.tensor(
     [[0.0, 1.0, -1.0], [1.0, -1.0, 0.0], [1.0, 1.0, 0.0]],
   )
   inspect!(@tensor.correlate2d(image, kernel), content="[[15, 17], [23, 25]]")
@@ -52,7 +52,7 @@ test "Tensor::correlate2d - random" {
 }
 
 test "Tensor::correlate2d - Padding" {
-  let image = @tensor.tensor(
+  let image : @tensor.Tensor[Float] = @tensor.tensor(
     [
       [0.0, 1.0, 2.0, 3.0],
       [4.0, 5.0, 6.0, 7.0],
@@ -60,7 +60,7 @@ test "Tensor::correlate2d - Padding" {
       [12.0, 13.0, 14.0, 15.0],
     ],
   )
-  let kernel = @tensor.tensor(
+  let kernel : @tensor.Tensor[Float] = @tensor.tensor(
     [[0.0, 1.0, -1.0], [1.0, -1.0, 0.0], [1.0, 1.0, 0.0]],
   )
   @json.inspect!(

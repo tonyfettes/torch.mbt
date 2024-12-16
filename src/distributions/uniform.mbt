@@ -5,16 +5,22 @@ struct Uniform {
 }
 
 ///|
-pub fn Uniform::new[Lower : @tensor.ToTensor, Upper : @tensor.ToTensor](
+pub fn Uniform::new[Lower : @tensor.ToValue, Upper : @tensor.ToValue](
   lower : Lower,
   upper : Upper
 ) -> Uniform {
-  let (lower, upper) = @tensor.broadcast(lower.to_tensor(), upper.to_tensor())
+  let (lower, upper) = @tensor.broadcast(
+    @tensor.tensor(lower),
+    @tensor.tensor(upper),
+  )
   Uniform::{ lower, upper }
 }
 
 ///|
-pub fn Uniform::sample(self : Uniform, shape : @shape.Shape) -> @tensor.Tensor[Float] {
+pub fn Uniform::sample(
+  self : Uniform,
+  shape : @shape.Shape
+) -> @tensor.Tensor[Float] {
   let shape = shape.to_fixed_array()
   let sample = @tensor.zeros([..shape, ..self.lower.shape._])
   self.sample_(sample)
@@ -33,7 +39,10 @@ pub fn Uniform::sample_(self : Uniform, sample : @tensor.Tensor[Float]) -> Unit 
 }
 
 ///|
-pub fn Uniform::rsample(self : Uniform, shape : @shape.Shape) -> @tensor.Tensor[Float] {
+pub fn Uniform::rsample(
+  self : Uniform,
+  shape : @shape.Shape
+) -> @tensor.Tensor[Float] {
   let shape = shape.to_fixed_array()
   let sample = @tensor.zeros([..shape, ..self.lower.shape._])
   for i = 0; i < sample.value.length(); i = i + 1 {

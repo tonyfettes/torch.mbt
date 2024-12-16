@@ -12,7 +12,10 @@ pub fn Tanh::output(_self : Tanh, logger : Logger) -> Unit {
 }
 
 ///|
-pub fn Tanh::forward(_self : Tanh, input : @tensor.Tensor[Float]) -> @tensor.Tensor[Float] {
+pub fn Tanh::forward(
+  _self : Tanh,
+  input : @tensor.Tensor[Float]
+) -> @tensor.Tensor[Float] {
   input.tanh()
 }
 

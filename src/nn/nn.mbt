@@ -16,14 +16,14 @@ test "MLP" {
       Softmax::new(),
     ],
   )
-  let input = @tensor.tensor([1.0, 1.0, 1.0, 1.0])
+  let input : @tensor.Tensor[Float] = @tensor.tensor([1.0, 1.0, 1.0, 1.0])
   let output = layers.forward(input)
   inspect!(
     output,
     content="[0.20922499895095825, 0.2580592930316925, 0.25516802072525024, 0.2775477170944214]",
   )
-  let target = @tensor.tensor([1.0, 0.0, 0.0, 0.0])
-  let mut loss = @tensor.tensor(0.0)
+  let target : @tensor.Tensor[Float] = @tensor.tensor([1.0, 0.0, 0.0, 0.0])
+  let mut loss : @tensor.Tensor[Float] = @tensor.tensor(0.0)
   for i = 0; i < output.length(); i = i + 1 {
     loss = loss - target[i].to_tensor() * output[i].log()
   }

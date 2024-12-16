@@ -1,6 +1,8 @@
 test "Conv2d" {
   @distributions.seed(b"12345678223456783234567842345678")
-  let image = @tensor.tensor(FixedArray::makei(4 * 4, fn(i) { i.to_double() }))
+  let image : @tensor.Tensor[Float] = @tensor.tensor(
+    FixedArray::makei(4 * 4, fn(i) { i.to_double() }),
+  )
   @json.inspect!(
     image.reshape([4, 4]),
     content=[[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11], [12, 13, 14, 15]],
@@ -70,7 +72,9 @@ test "Conv2d - Random" {
 
 test "Conv2d - Multiple output channels" {
   @distributions.seed(b"12345678223456783234567842345678")
-  let image = @tensor.tensor(FixedArray::makei(4 * 4, fn(i) { i.to_double() }))
+  let image : @tensor.Tensor[Float] = @tensor.tensor(
+    FixedArray::makei(4 * 4, fn(i) { i.to_double() }),
+  )
   inspect!(
     image.reshape([4, 4]),
     content="[[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11], [12, 13, 14, 15]]",
@@ -118,7 +122,7 @@ test "Conv2d - Multiple output channels" {
 
 test "Conv2d - Multiple input channels" {
   @distributions.seed(b"12345678223456783234567842345678")
-  let image = @tensor.tensor(
+  let image : @tensor.Tensor[Float] = @tensor.tensor(
     FixedArray::makei(3 * 4 * 4, fn(i) { i.to_double() }),
   )
   let image = image.reshape([1, 3, 4, 4])
@@ -179,9 +183,9 @@ test "Conv2d - Multiple input channels" {
 }
 
 test "Conv2d - Padding" {
-  let image = @tensor.tensor(FixedArray::makei(4 * 4, fn(i) { i.to_double() })).reshape(
-    [1, 1, 4, 4],
-  )
+  let image : @tensor.Tensor[Float] = @tensor.tensor(
+    FixedArray::makei(4 * 4, fn(i) { i.to_double() }),
+  ).reshape([1, 1, 4, 4])
   let layer = @nn.Conv2d::new(1, 1, kernel_size=(2, 2), padding=(1, 1))
   @tensor.with_no_grad(
     fn() {
@@ -210,7 +214,7 @@ test "Conv2d - Padding" {
 
 test "Conv2d - Backward" {
   @distributions.seed(b"12345678223456783234567842345678")
-  let image = @tensor.tensor(
+  let image : @tensor.Tensor[Float] = @tensor.tensor(
     FixedArray::makei(2 * 4 * 4, fn(i) { i.to_double() }),
   ).reshape([1, 2, 4, 4])
   @json.inspect!(
@@ -449,9 +453,9 @@ test "Conv2d - Sigmoid - AvgPool2d" {
       ],
     ],
   )
-  let target = @tensor.tensor([0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0]).reshape(
-    [1, 2, 2, 2],
-  )
+  let target : @tensor.Tensor[Float] = @tensor.tensor(
+    [0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0],
+  ).reshape([1, 2, 2, 2])
   let criterion = @nn.CrossEntropyLoss::new()
   let loss = criterion.forward(output, target)
   @json.inspect!(loss, content=0.18322280049324036)
@@ -483,7 +487,7 @@ test "Conv2d - Sigmoid - AvgPool2d" {
 test "MNIST" {
   @distributions.seed(b"12345678223456783234567842345678")
   let label = 5
-  let image = @tensor.tensor(
+  let image : @tensor.Tensor[Float] = @tensor.tensor(
     [
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,

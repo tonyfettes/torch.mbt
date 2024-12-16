@@ -5,14 +5,17 @@ enum TensorIndex {
 } derive(Show)
 
 ///|
-pub(readonly) struct TensorView {
+pub(readonly) struct TensorView[Float] {
   tensor : Tensor[Float]
   shape : FixedArray[Int]
   index : FixedArray[TensorIndex]
 }
 
 ///|
-pub fn TensorView::output(self : TensorView, logger : Logger) -> Unit {
+pub fn TensorView::output[Dtype : Show](
+  self : TensorView[Dtype],
+  logger : Logger
+) -> Unit {
   let shape = self.tensor.shape
   let block = self.tensor.block
   let value = self.tensor.value
@@ -46,19 +49,19 @@ pub fn TensorView::output(self : TensorView, logger : Logger) -> Unit {
 }
 
 ///|
-pub fn TensorView::to_string(self : TensorView) -> String {
+pub fn TensorView::to_string[Dtype : Show](self : TensorView[Dtype]) -> String {
   Show::to_string(self)
 }
 
 ///|
-pub fn TensorView::to_json(self : TensorView) -> Json {
+pub fn TensorView::to_json[Dtype : ToJson](self : TensorView[Dtype]) -> Json {
   let shape = self.tensor.shape
   let dimension = shape.length()
   let block = self.tensor.block
   let value = self.tensor.value
   fn build(d : Int, p : Int) {
     if d == dimension {
-      return Json::Number(value[p].to_double())
+      return value[p].to_json()
     }
     let (start, end) = if d < self.index.length() {
       match self.index[d] {
@@ -79,7 +82,10 @@ pub fn TensorView::to_json(self : TensorView) -> Json {
 }
 
 ///|
-pub fn TensorView::op_get(self : TensorView, index : Int) -> TensorView {
+pub fn TensorView::op_get[Dtype](
+  self : TensorView[Dtype],
+  index : Int
+) -> TensorView[Dtype] {
   if self.index.length() == self.tensor.shape.length() {
     abort("Taking element at the lowest dimension")
   }
@@ -94,10 +100,10 @@ pub fn TensorView::op_get(self : TensorView, index : Int) -> TensorView {
 }
 
 ///|
-pub fn TensorView::op_set(
-  self : TensorView,
+pub fn TensorView::op_set[Dtype : ValueToTensor, Other : ToValue](
+  self : TensorView[Dtype],
   index : Int,
-  other : ToTensor
+  other : Other
 ) -> Unit {
   if not(no_grad.val) {
     match self.tensor.graph {
@@ -108,7 +114,7 @@ pub fn TensorView::op_set(
         )
     }
   }
-  let other = other.to_tensor()
+  let other : Tensor[Dtype] = tensor(other)
   let index = [..self.index, Index(index)]
   let shape = self.tensor.shape
   let block = self.tensor.block
@@ -158,7 +164,7 @@ pub fn TensorView::op_set(
 }
 
 test "TensorView::op_set" {
-  let tensor = Tensor::new([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+  let tensor : Tensor[Float] = Tensor::new([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
   tensor[:][1] = [7.0, 8.0]
   inspect!(tensor, content="[[1, 7, 3], [4, 8, 6]]")
   tensor[:][0] = [0.0, 1.0]
@@ -171,10 +177,10 @@ test "TensorView::op_set" {
 
 ///|
 pub fn TensorView::op_as_view(
-  self : TensorView,
+  self : TensorView[Float],
   start~ : Int,
   end? : Int
-) -> TensorView {
+) -> TensorView[Float] {
   let end = match end {
     None => self.tensor.shape[self.index.length()]
     Some(end) => end
@@ -186,7 +192,7 @@ pub fn TensorView::op_as_view(
 }
 
 ///|
-pub fn TensorView::to_tensor(self : TensorView) -> Tensor[Float] {
+pub fn TensorView::to_tensor(self : TensorView[Float]) -> Tensor[Float] {
   let shape : Array[Int] = Array::new(capacity=self.index.length())
   for part in self.index {
     match part {
@@ -255,32 +261,38 @@ test "TensorView::to_tensor" {
 }
 
 ///|
-pub fn TensorView::to_double(self : TensorView) -> Double {
-  self.to_tensor().to_double()
-}
-
-///|
-pub fn TensorView::op_add(self : TensorView, other : TensorView) -> Tensor[Float] {
+pub fn TensorView::op_add(
+  self : TensorView[Float],
+  other : TensorView[Float]
+) -> Tensor[Float] {
   self.to_tensor() + other.to_tensor()
 }
 
 ///|
-pub fn TensorView::op_sub(self : TensorView, other : TensorView) -> Tensor[Float] {
+pub fn TensorView::op_sub(
+  self : TensorView[Float],
+  other : TensorView[Float]
+) -> Tensor[Float] {
   self.to_tensor() + other.to_tensor()
 }
 
 ///|
-pub fn TensorView::op_mul(self : TensorView, other : TensorView) -> Tensor[Float] {
+pub fn TensorView::op_mul(
+  self : TensorView[Float],
+  other : TensorView[Float]
+) -> Tensor[Float] {
   self.to_tensor() * other.to_tensor()
 }
 
 ///|
-pub fn TensorView::log(self : TensorView) -> Tensor[Float] {
+pub fn TensorView::log(self : TensorView[Float]) -> Tensor[Float] {
   self.to_tensor().log()
 }
 
 ///|
-pub fn TensorView::iter(self : TensorView) -> Iter[TensorView] {
+pub fn TensorView::iter[Dtype](
+  self : TensorView[Dtype]
+) -> Iter[TensorView[Dtype]] {
   let shape = self.shape
   let dimension = self.shape.length()
   if dimension == 0 {

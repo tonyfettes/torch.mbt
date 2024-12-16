@@ -1,6 +1,8 @@
 /// See: https://pytorch.org/docs/stable/generated/torch.tanh.html
 test "tanh" {
-  let a = @tensor.tensor([0.8986, -0.7279, 1.1745, 0.2611])
+  let a : @tensor.Tensor[Float] = @tensor.tensor(
+    [0.8986, -0.7279, 1.1745, 0.2611],
+  )
   @json.inspect!(
     a.tanh(),
     content=[

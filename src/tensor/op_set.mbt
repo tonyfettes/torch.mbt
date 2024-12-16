@@ -1,8 +1,8 @@
 ///|
-pub fn Tensor::op_set[X : ToTensor](
+pub fn Tensor::op_set[Value : ToValue](
   self : Tensor[Float],
   index : Int,
-  other : X
+  other : Value
 ) -> Unit {
   if @debug.DEBUG && not(no_grad.val) {
     match self.graph {
@@ -13,7 +13,7 @@ pub fn Tensor::op_set[X : ToTensor](
         )
     }
   }
-  let other = other.to_tensor()
+  let other = ValueToTensor::value_to_tensor(other.to_value())
   let offset = index * self.block[0]
   for i = 0; i < self.block[0]; i = i + 1 {
     self.value[offset + i] = other.value[i]

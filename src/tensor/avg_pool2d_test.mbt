@@ -1,5 +1,5 @@
 test "avg_pool2d" {
-  let input = @tensor.tensor(
+  let input : @tensor.Tensor[Float] = @tensor.tensor(
     [
       [
         [
@@ -22,7 +22,9 @@ test "avg_pool2d" {
 }
 
 test "panic avg_pool2d" {
-  let input = @tensor.tensor([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+  let input : @tensor.Tensor[Float] = @tensor.tensor(
+    [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]],
+  )
   input.avg_pool2d(kernel_size=(2, 2), stride=(2, 2)) |> ignore()
 }
 

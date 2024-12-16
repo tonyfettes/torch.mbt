@@ -15,7 +15,7 @@ pub fn Tensor::to_json[Dtype : ToJson](self : Tensor[Dtype]) -> Json {
 }
 
 test "Tensor::to_json" {
-  let tensor = tensor([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]])
+  let tensor : Tensor[Float] = tensor([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]])
   inspect!(tensor, content="[[0, 1, 2], [3, 4, 5]]")
 }
 

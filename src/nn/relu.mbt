@@ -12,7 +12,10 @@ pub fn ReLU::output(_self : ReLU, logger : Logger) -> Unit {
 }
 
 ///|
-pub fn ReLU::forward(_self : ReLU, input : @tensor.Tensor[Float]) -> @tensor.Tensor[Float] {
+pub fn ReLU::forward(
+  _self : ReLU,
+  input : @tensor.Tensor[Float]
+) -> @tensor.Tensor[Float] {
   @functional.relu(input)
 }
 

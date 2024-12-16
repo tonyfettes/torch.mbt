@@ -1,5 +1,8 @@
 ///|
-pub fn Tensor::squeeze(self : Tensor[Float], dim? : @shape.Shape) -> Tensor[Float] {
+pub fn Tensor::squeeze(
+  self : Tensor[Float],
+  dim? : @shape.Shape
+) -> Tensor[Float] {
   let shape = []
   match dim {
     None =>

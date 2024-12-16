@@ -1,5 +1,7 @@
 test "sqrt" {
-  let a = @tensor.tensor([-2.0755, 1.0226, 0.0831, 0.4806])
+  let a : @tensor.Tensor[Float] = @tensor.tensor(
+    [-2.0755, 1.0226, 0.0831, 0.4806],
+  )
   inspect!(
     a.sqrt(),
     content="[NaN, 1.0112369060516357, 0.2882707118988037, 0.693253219127655]",
@@ -7,7 +9,9 @@ test "sqrt" {
 }
 
 test "sqrt/backward" {
-  let a = @tensor.tensor([-2.0755, 1.0226, 0.0831, 0.4806])
+  let a : @tensor.Tensor[Float] = @tensor.tensor(
+    [-2.0755, 1.0226, 0.0831, 0.4806],
+  )
   let b = a.sqrt()
   b.backward()
   inspect!(
@@ -17,7 +21,7 @@ test "sqrt/backward" {
 }
 
 test "sqrt/backward/torch" (it : @test.T) {
-  let a = @tensor.tensor([1.0226, 0.0831, 0.4806])
+  let a : @tensor.Tensor[Float] = @tensor.tensor([1.0226, 0.0831, 0.4806])
   let b = a.sqrt()
   b.backward()
   it.writeln(

@@ -20,7 +20,8 @@ impl Categorical {
 
 type Normal
 impl Normal {
-  new[Loc : @tensor.ToTensor, Scale : @tensor.ToTensor](Loc, Scale) -> Self
+  entropy(Self) -> @tensor.Tensor[Float]
+  new[Loc : @tensor.ToValue, Scale : @tensor.ToValue](Loc, Scale) -> Self
   rsample(Self, @shape.Shape) -> @tensor.Tensor[Float]
   sample(Self, @shape.Shape) -> @tensor.Tensor[Float]
   sample_(Self, @tensor.Tensor[Float]) -> Unit
@@ -28,7 +29,8 @@ impl Normal {
 
 type Uniform
 impl Uniform {
-  new[Lower : @tensor.ToTensor, Upper : @tensor.ToTensor](Lower, Upper) -> Self
+  entropy(Self) -> @tensor.Tensor[Float]
+  new[Lower : @tensor.ToValue, Upper : @tensor.ToValue](Lower, Upper) -> Self
   rsample(Self, @shape.Shape) -> @tensor.Tensor[Float]
   sample(Self, @shape.Shape) -> @tensor.Tensor[Float]
   sample_(Self, @tensor.Tensor[Float]) -> Unit

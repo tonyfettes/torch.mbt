@@ -25,7 +25,7 @@ pub fn Conv2d::new[KernelSize : @shape.Shape2d](
       n *= k
     }
     let stdv = (1.0 : Float) / n.to_float().sqrt()
-    @distributions.Uniform::new(@tensor.tensor(-stdv), @tensor.tensor(stdv))
+    @distributions.Uniform::new(-stdv, stdv)
   }
   let weight = Array::makei(
     out_channels,
@@ -46,7 +46,10 @@ pub fn Conv2d::output(self : Conv2d, logger : Logger) -> Unit {
 }
 
 ///|
-pub fn Conv2d::forward(self : Conv2d, input : @tensor.Tensor[Float]) -> @tensor.Tensor[Float] {
+pub fn Conv2d::forward(
+  self : Conv2d,
+  input : @tensor.Tensor[Float]
+) -> @tensor.Tensor[Float] {
   if @debug.DEBUG && input.shape.length() != 4 {
     abort("Input tensor should be of shape (N, C, H, W)")
   }

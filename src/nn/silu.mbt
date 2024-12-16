@@ -12,7 +12,10 @@ pub fn SiLU::output(_self : SiLU, logger : Logger) -> Unit {
 }
 
 ///|
-pub fn SiLU::forward(_self : SiLU, input : @tensor.Tensor[Float]) -> @tensor.Tensor[Float] {
+pub fn SiLU::forward(
+  _self : SiLU,
+  input : @tensor.Tensor[Float]
+) -> @tensor.Tensor[Float] {
   @functional.silu(input)
 }
 

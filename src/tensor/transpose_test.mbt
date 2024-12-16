@@ -1,5 +1,7 @@
 test "transpose" {
-  let x = @tensor.tensor([[1.0028, -0.9893, 0.5809], [-0.1669, 0.7299, 0.4942]])
+  let x : @tensor.Tensor[Float] = @tensor.tensor(
+    [[1.0028, -0.9893, 0.5809], [-0.1669, 0.7299, 0.4942]],
+  )
   @json.inspect!(
     x.transpose(0, 1),
     content=[

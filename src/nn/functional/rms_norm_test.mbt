@@ -1,5 +1,5 @@
 test "rms_norm" {
-  let input = @tensor.tensor(
+  let input : @tensor.Tensor[Float] = @tensor.tensor(
     [
       [[-0.3294, -0.7515, 0.5518], [-0.3660, -0.7684, -0.2903]],
       [[0.7146, 0.2702, 1.5094], [-0.8617, 1.2990, -0.1938]],

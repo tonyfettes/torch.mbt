@@ -2,7 +2,7 @@
 pub(all) typealias Tensor = @tensor.Tensor[Float]
 
 ///|
-pub fn tensor[X : @tensor.ToTensor](
+pub fn tensor[X : @tensor.ToValue](
   x : X,
   requires_grad~ : Bool = false
 ) -> @tensor.Tensor[Float] {
