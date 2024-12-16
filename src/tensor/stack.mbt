@@ -14,7 +14,7 @@ pub fn Tensor::stack[Dtype](
     shape[i + 1] = element.shape[i]
   }
   let block = compute_block_size(shape._)
-  let total = if shape.length() == 0 { 1 } else { shape[0] * block[0] }
+  let total = shape[0] * block[0]
   let value = @unsafe.UnsafeArray::new(total)
   let index = FixedArray::make(total, (-1, -1))
   for i in 0..<tensors.length() {
