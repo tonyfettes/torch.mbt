@@ -72,9 +72,7 @@ pub impl[T : ToValue] ToValue for FixedArray[T] with to_value(
 pub impl[X] Default for FixedArray[X] with default() -> FixedArray[X] { [] }
 
 ///|
-pub impl[T : ToValue] ToValue for Array[T] with to_value(
-  self : Array[T]
-) -> Value {
+pub impl[T : ToValue] ToValue for Array[T] with to_value(self : Array[T]) -> Value {
   Value::Array(FixedArray::from_iter(self.iter().map(fn { x => x.to_value() })))
 }
 
@@ -91,7 +89,10 @@ pub impl TensorToValue for Float with tensor_to_value(self : Tensor[Float]) -> V
   Value::Float(self)
 }
 
-pub impl[T: TensorToValue] ToValue for Tensor[T] with to_value(self: Tensor[T]) -> Value {
+///|
+pub impl[T : TensorToValue] ToValue for Tensor[T] with to_value(
+  self : Tensor[T]
+) -> Value {
   T::tensor_to_value(self)
 }
 
@@ -122,6 +123,27 @@ pub fn Tensor::to_float[Dtype : ToFloat](self : Tensor[Dtype]) -> Tensor[Float] 
 }
 
 ///|
+trait ToInt {
+  to_int(Self) -> Int
+}
+
+///|
+pub fn Tensor::to_int[Dtype : ToInt](self : Tensor[Dtype]) -> Tensor[Int] {
+  let value = @unsafe.UnsafeArray::new(self.value.length())
+  for i in 0..<self.value.length() {
+    value[i] = self.value[i].to_int()
+  }
+  Tensor::{
+    shape: self.shape,
+    block: self.block,
+    value,
+    graph: Val,
+    refcnt: 0,
+    grad: @unsafe.UnsafeArray::make(self.value.length(), (0.0 : Float)),
+  }
+}
+
+///|
 pub impl ValueToTensor for Float with value_to_tensor(value : Value) -> Tensor[
   Float,
 ] {
@@ -135,6 +157,26 @@ pub impl ValueToTensor for Float with value_to_tensor(value : Value) -> Tensor[
       Value::Int(int) => int.to_float()
       Value::Float(float) => float
       Value::Double(double) => double.to_float()
+    }
+  }
+
+  build(0, value)
+}
+
+///|
+pub impl ValueToTensor for Int with value_to_tensor(value : Value) -> Tensor[
+  Int,
+] {
+  fn build(dim : Int, val : Value) -> Tensor[Int] {
+    match val {
+      Value::Array(array) => {
+        let tensors = array.map(fn { value => build(dim + 1, value) })
+        Tensor::stack(tensors)
+      }
+      Value::Bool(bool) => bool.to_int()
+      Value::Int(int) => int
+      Value::Float(float) => float.to_int()
+      Value::Double(double) => double.to_int()
     }
   }
 
