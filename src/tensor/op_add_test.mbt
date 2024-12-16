@@ -30,6 +30,13 @@ test "Tensor::op_add/not-aligned" {
   inspect!(c, content="[7, 9, 11, 13, 15]")
 }
 
+test "Tensor::op_add/int" {
+  let a : @tensor.Tensor[Int] = @tensor.tensor([1, 2, 3, 4])
+  let b : @tensor.Tensor[Int] = @tensor.tensor([6, 7, 8, 9])
+  let c = a + b
+  @json.inspect!(c, content=[7, 9, 11, 13])
+}
+
 test "add/consistent" (it : @test.T) {
   @distributions.seed(b"12345678223456783234567842345678")
   let distribution = @distributions.Uniform::new(-1.0, 1.0)
