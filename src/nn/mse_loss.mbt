@@ -14,9 +14,9 @@ pub fn MSELoss::output(_self : MSELoss, logger : Logger) -> Unit {
 ///|
 pub fn MSELoss::forward(
   _self : MSELoss,
-  input : @tensor.Tensor,
-  target : @tensor.Tensor
-) -> @tensor.Tensor {
+  input : @tensor.Tensor[Float],
+  target : @tensor.Tensor[Float]
+) -> @tensor.Tensor[Float] {
   if input.length() != target.length() {
     abort("Input and target tensors should have the same length")
   }

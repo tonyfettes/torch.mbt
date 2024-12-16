@@ -26,9 +26,9 @@ pub fn CrossEntropyLoss::output(
 ///|
 pub fn CrossEntropyLoss::forward(
   self : CrossEntropyLoss,
-  input : @tensor.Tensor,
-  target : @tensor.Tensor
-) -> @tensor.Tensor {
+  input : @tensor.Tensor[Float],
+  target : @tensor.Tensor[Float]
+) -> @tensor.Tensor[Float] {
   let input_shape = input.shape
   if input_shape != target.shape {
     abort(
@@ -37,9 +37,9 @@ pub fn CrossEntropyLoss::forward(
   }
   let dimension = input_shape.length()
   fn compute1d(
-    input : @tensor.Tensor,
-    target : @tensor.Tensor
-  ) -> @tensor.Tensor {
+    input : @tensor.Tensor[Float],
+    target : @tensor.Tensor[Float]
+  ) -> @tensor.Tensor[Float] {
     let (max, _) = input.max()
     let sub_max = input - max
     let log_soft_max = sub_max - sub_max.exp().sum().log()

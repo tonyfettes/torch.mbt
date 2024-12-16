@@ -1,5 +1,5 @@
 test "AvgPool2d/Stride" {
-  let input = @tensor.tensor(
+  let input : @tensor.Tensor[Float] = @tensor.tensor(
     [[[[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]]]],
   )
   let avg_pool2d = @nn.AvgPool2d::new(2, stride=(1, 1))
@@ -7,7 +7,7 @@ test "AvgPool2d/Stride" {
 }
 
 test "AvgPool2d/Backward" {
-  let input = @tensor.tensor(
+  let input : @tensor.Tensor[Float] = @tensor.tensor(
     [[[[0.0, 1.0, 2.0], [3.0, 4.0, 5.0], [6.0, 7.0, 8.0]]]],
   )
   let model = @nn.AvgPool2d::new(2, stride=(1, 1))

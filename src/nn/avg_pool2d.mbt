@@ -20,12 +20,12 @@ pub fn AvgPool2d::new[KernelSize : @shape.Shape2d](
 ///|
 pub fn AvgPool2d::forward(
   self : AvgPool2d,
-  input : @tensor.Tensor
-) -> @tensor.Tensor {
+  input : @tensor.Tensor[Float]
+) -> @tensor.Tensor[Float] {
   @tensor.avg_pool2d(input, kernel_size=self.kernel_size, stride=self.stride)
 }
 
 ///|
-pub fn AvgPool2d::parameters(_self : AvgPool2d) -> Iter[@tensor.Tensor] {
+pub fn AvgPool2d::parameters(_self : AvgPool2d) -> Iter[@tensor.Tensor[Float]] {
   Iter::empty()
 }

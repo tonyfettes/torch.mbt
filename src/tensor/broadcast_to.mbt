@@ -1,8 +1,8 @@
 ///|
 pub fn Tensor::broadcast_to[Shape : @shape.Shape](
-  self : Tensor,
+  self : Tensor[Float],
   shape : Shape
-) -> Tensor {
+) -> Tensor[Float] {
   let shape = shape.to_fixed_array()
   let self_dim = self.shape.length()
   let dimension = shape.length()

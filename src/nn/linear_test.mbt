@@ -10,12 +10,12 @@ test "Linear" {
       linear.bias[1] = 6.0
     },
   )
-  let input = @tensor.tensor([1.0, 2.0])
+  let input : @tensor.Tensor[Float] = @tensor.tensor([1.0, 2.0])
   let optimizer = @optim.SGD::new(linear.parameters(), learning_rate=0.1)
   let output = linear.forward(input)
   inspect!(output, content="[10, 17]")
-  let target = @tensor.tensor([16.0, 16.0])
-  let mut loss = @tensor.tensor(0.0)
+  let target : @tensor.Tensor[Float] = @tensor.tensor([16.0, 16.0])
+  let mut loss : @tensor.Tensor[Float] = @tensor.tensor(0.0)
   for i = 0; i < output.length(); i = i + 1 {
     loss += output[i] - target[i]
   }
@@ -48,11 +48,11 @@ test "Linear with ReLU" {
     [linear, @nn.ReLU::new()],
   )
   let optimizer = @optim.SGD::new(linear.parameters(), learning_rate=1)
-  let input = @tensor.tensor([2.0, 2.0])
+  let input : @tensor.Tensor[Float] = @tensor.tensor([2.0, 2.0])
   let output = layers.forward(input)
   inspect!(output, content="[11, 20]")
-  let target = @tensor.tensor([1.0, 0.0])
-  let mut loss = @tensor.tensor(0.0)
+  let target : @tensor.Tensor[Float] = @tensor.tensor([1.0, 0.0])
+  let mut loss : @tensor.Tensor[Float] = @tensor.tensor(0.0)
   for i = 0; i < output.length(); i = i + 1 {
     loss = loss - target[i].to_tensor() * output[i].log()
   }
@@ -84,11 +84,11 @@ test "Linear with Softmax" {
     [linear, @nn.Softmax::new()],
   )
   let optimizer = @optim.SGD::new(linear.parameters(), learning_rate=1)
-  let input = @tensor.tensor([2.0, 2.0])
+  let input : @tensor.Tensor[Float] = @tensor.tensor([2.0, 2.0])
   let output = layers.forward(input)
   inspect!(output, content="[0.2689414322376251, 0.7310585975646973]")
-  let target = @tensor.tensor([1.0, 0.0])
-  let mut loss = @tensor.tensor(0.0)
+  let target : @tensor.Tensor[Float] = @tensor.tensor([1.0, 0.0])
+  let mut loss : @tensor.Tensor[Float] = @tensor.tensor(0.0)
   for i = 0; i < output.length(); i = i + 1 {
     loss = loss - target[i].to_tensor() * output[i].log()
   }

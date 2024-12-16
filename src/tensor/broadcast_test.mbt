@@ -7,7 +7,7 @@ test "Tensor::broadcast - same shape" {
 }
 
 test "Tensor::broadcast - scalar" {
-  let x = @tensor.tensor(1.0)
+  let x : @tensor.Tensor[Float] = @tensor.tensor(1.0)
   let y = @tensor.zeros([3, 1, 7])
   let (bx, _) = @tensor.broadcast(x, y)
   @json.inspect!(bx.shape, content=[3, 1, 7])
@@ -22,7 +22,7 @@ test "Tensor::broadcast - scalar" {
 }
 
 test "Tensor::broadcast - vector" {
-  let x = @tensor.tensor([1.0, 2.0, 3.0])
+  let x : @tensor.Tensor[Float] = @tensor.tensor([1.0, 2.0, 3.0])
   let y = @tensor.zeros([7, 1, 3])
   let (bx, _) = @tensor.broadcast(x, y)
   @json.inspect!(bx.shape, content=[7, 1, 3])
@@ -41,7 +41,9 @@ test "Tensor::broadcast - vector" {
 }
 
 test "Tensor::broadcast - matrix" {
-  let x = @tensor.tensor([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+  let x : @tensor.Tensor[Float] = @tensor.tensor(
+    [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]],
+  )
   let y = @tensor.zeros([7, 2, 3])
   let (bx, _) = @tensor.broadcast(x, y)
   @json.inspect!(bx.shape, content=[7, 2, 3])

@@ -1,6 +1,8 @@
 test "uniform" {
   @distributions.seed(b"12345678223456783234567842345678")
-  let a = @tensor.tensor([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+  let a : @tensor.Tensor[Float] = @tensor.tensor(
+    [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]],
+  )
   @init.uniform_(a, -1.0, 1.0)
   @json.inspect!(
     a,

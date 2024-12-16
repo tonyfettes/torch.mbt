@@ -1,4 +1,4 @@
 ///|
-pub fn relu(input : @tensor.Tensor) -> @tensor.Tensor {
+pub fn relu(input : @tensor.Tensor[Float]) -> @tensor.Tensor[Float] {
   input.relu()
 }

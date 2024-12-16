@@ -1,15 +1,15 @@
 ///|
-pub(readonly) struct Tensor {
-  value : @unsafe.UnsafeArray[Float]
+pub(readonly) struct Tensor[Dtype] {
+  value : @unsafe.UnsafeArray[Dtype]
   shape : @unsafe.UnsafeArray[Int]
   block : @unsafe.UnsafeArray[Int]
-  priv mut graph : Graph
+  priv mut graph : Graph[Dtype]
   priv mut refcnt : Int
   grad : @unsafe.UnsafeArray[Float]
 }
 
 ///|
-pub fn Tensor::requires_grad(self : Tensor) -> Bool {
+pub fn Tensor::requires_grad(self : Tensor[Float]) -> Bool {
   match self.graph {
     Var => true
     _ => false
@@ -17,7 +17,10 @@ pub fn Tensor::requires_grad(self : Tensor) -> Bool {
 }
 
 ///|
-pub fn Tensor::requires_grad_(self : Tensor, requires_grad : Bool) -> Unit {
+pub fn Tensor::requires_grad_[Dtype](
+  self : Tensor[Dtype],
+  requires_grad : Bool
+) -> Unit {
   if requires_grad {
     self.graph = Var
   } else {
@@ -26,37 +29,47 @@ pub fn Tensor::requires_grad_(self : Tensor, requires_grad : Bool) -> Unit {
 }
 
 ///|
-enum Graph {
+trait Backward: Show {
+  incref(Self) -> Unit
+  propagate(Self, @unsafe.UnsafeArray[Float]) -> Unit
+  check(Self) -> Unit
+}
+
+///|
+enum Graph[Dtype] {
   Val
   Var
-  Add(Tensor, Tensor)
-  Sub(Tensor, Tensor)
-  Mul(Tensor, Tensor)
-  Div(Tensor, Tensor)
-  Neg(Tensor)
-  Exp(Tensor)
-  Log(Tensor)
-  Abs(Tensor)
-  Sqrt(Tensor)
-  Sum(Tensor, @unsafe.UnsafeArray[Array[Int]])
-  Pow(Tensor, Int)
-  MatMul(Tensor, Tensor)
-  Get(Tensor, @unsafe.UnsafeArray[Int])
-  Cat(@unsafe.UnsafeArray[Tensor], @unsafe.UnsafeArray[(Int, Int)])
-  Nop(Tensor)
-  ReLU(Tensor)
-  AvgPool2d(Tensor, kernel_size~ : (Int, Int), stride~ : (Int, Int))
-  MaxPool2d(Tensor, @unsafe.UnsafeArray[Int])
+  Sub(Tensor[Dtype], Tensor[Dtype])
+  Mul(Tensor[Dtype], Tensor[Dtype])
+  Div(Tensor[Dtype], Tensor[Dtype])
+  Neg(Tensor[Dtype])
+  Exp(Tensor[Dtype])
+  Log(Tensor[Dtype])
+  Abs(Tensor[Dtype])
+  Sqrt(Tensor[Dtype])
+  Sum(Tensor[Dtype], @unsafe.UnsafeArray[Array[Int]])
+  Pow(Tensor[Dtype], Int)
+  MatMul(Tensor[Dtype], Tensor[Dtype])
+  Get(Tensor[Dtype], @unsafe.UnsafeArray[Int])
+  Cat(@unsafe.UnsafeArray[Tensor[Dtype]], @unsafe.UnsafeArray[(Int, Int)])
+  Nop(Tensor[Dtype])
+  ReLU(Tensor[Dtype])
+  AvgPool2d(Tensor[Dtype], kernel_size~ : (Int, Int), stride~ : (Int, Int))
+  MaxPool2d(Tensor[Dtype], @unsafe.UnsafeArray[Int])
   Correlate2d(
-    image~ : Tensor,
-    kernel~ : Tensor,
+    image~ : Tensor[Dtype],
+    kernel~ : Tensor[Dtype],
     stride~ : (Int, Int),
     padding~ : (Int, Int)
   )
+  Backward(Backward)
 } derive(Show)
 
 ///|
-pub fn Tensor::output(self : Tensor, logger : Logger) -> Unit {
+pub fn Tensor::output[Float : Show](
+  self : Tensor[Float],
+  logger : Logger
+) -> Unit {
   let shape = self.shape
   let dimension = shape.length()
   let value = self.value
@@ -79,12 +92,12 @@ pub fn Tensor::output(self : Tensor, logger : Logger) -> Unit {
 }
 
 ///|
-pub fn Tensor::to_string(self : Tensor) -> String {
+pub fn Tensor::to_string[Float : Show](self : Tensor[Float]) -> String {
   Show::to_string(self.value)
 }
 
 ///|
-pub fn Tensor::length(self : Tensor) -> Int {
+pub fn Tensor::length(self : Tensor[Float]) -> Int {
   self.shape[0]
 }
 
@@ -110,7 +123,7 @@ test "compute_block_size" {
 }
 
 ///|
-fn Tensor::incref(self : Tensor) -> Unit {
+fn Tensor::incref[Float](self : Tensor[Float]) -> Unit {
   if self.refcnt == -1 {
     self.refcnt = 0
   }
@@ -121,10 +134,6 @@ fn Tensor::incref(self : Tensor) -> Unit {
   match self.graph {
     Val => ()
     Var => ()
-    Add(a, b) => {
-      a.incref()
-      b.incref()
-    }
     Sub(a, b) => {
       a.incref()
       b.incref()
@@ -161,11 +170,12 @@ fn Tensor::incref(self : Tensor) -> Unit {
       image.incref()
       kernel.incref()
     }
+    Backward(backward) => backward.incref()
   }
 }
 
 ///|
-fn Tensor::propagate(self : Tensor) -> Unit {
+fn Tensor::propagate(self : Tensor[Float]) -> Unit {
   if self.refcnt == 0 {
     abort("Propagate through a dead tensor: \{self}")
   }
@@ -177,16 +187,6 @@ fn Tensor::propagate(self : Tensor) -> Unit {
   match self.graph {
     Val => return
     Var => return
-    Add(a, b) => {
-      let a_grad = a.grad
-      let b_grad = b.grad
-      for i in 0..<self_grad.length() {
-        a_grad[i] += self_grad[i]
-        b_grad[i] += self_grad[i]
-      }
-      a.propagate()
-      b.propagate()
-    }
     Sub(a, b) => {
       let a_grad = a.grad
       let b_grad = b.grad
@@ -391,11 +391,12 @@ fn Tensor::propagate(self : Tensor) -> Unit {
       image.propagate()
       kernel.propagate()
     }
+    Backward(backward) => backward.propagate(self_grad)
   }
 }
 
 ///|
-fn Tensor::check(self : Tensor) -> Unit {
+fn Tensor::check(self : Tensor[Float]) -> Unit {
   if self.refcnt == -1 {
     return
   }
@@ -405,10 +406,6 @@ fn Tensor::check(self : Tensor) -> Unit {
   match self.graph {
     Val => ()
     Var => ()
-    Add(x, y) => {
-      x.check()
-      y.check()
-    }
     Sub(x, y) => {
       x.check()
       y.check()
@@ -445,12 +442,13 @@ fn Tensor::check(self : Tensor) -> Unit {
       image.check()
       kernel.check()
     }
+    Backward(x) => x.check()
   }
   self.refcnt = -1
 }
 
 ///|
-pub fn Tensor::backward(self : Tensor) -> Unit {
+pub fn Tensor::backward(self : Tensor[Float]) -> Unit {
   self.incref()
   for i in 0..<self.grad.length() {
     self.grad[i] += 1.0
@@ -529,27 +527,11 @@ test "Tensor::backward - MatMul" {
 }
 
 ///|
-pub fn Tensor::to_double(self : Tensor) -> Double {
-  if self.shape.length() != 0 {
-    abort("Tensor is not a scalar")
-  }
-  self.value[0].to_double()
-}
-
-///|
-pub fn Tensor::to_float(self : Tensor) -> Float {
-  if self.shape.length() != 0 {
-    abort("Tensor is not a scalar")
-  }
-  self.value[0]
-}
-
-///|
-pub fn Tensor::shape(self : Tensor) -> FixedArray[Int] {
+pub fn Tensor::shape(self : Tensor[Float]) -> FixedArray[Int] {
   self.shape._
 }
 
 ///|
-pub fn Tensor::value(self : Tensor) -> FixedArray[Float] {
+pub fn Tensor::value(self : Tensor[Float]) -> FixedArray[Float] {
   self.value._
 }

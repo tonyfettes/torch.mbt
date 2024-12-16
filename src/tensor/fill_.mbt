@@ -1,5 +1,8 @@
 ///|
-pub fn Tensor::fill_[Value : ToTensor](self : Tensor, value : Value) -> Unit {
+pub fn Tensor::fill_[Value : ToValue](
+  self : Tensor[Float],
+  value : Value
+) -> Unit {
   if @debug.DEBUG && not(no_grad.val) {
     match self.graph {
       Val => ()
@@ -9,7 +12,7 @@ pub fn Tensor::fill_[Value : ToTensor](self : Tensor, value : Value) -> Unit {
         )
     }
   }
-  let other = value.to_tensor()
+  let other : Tensor[Float] = ValueToTensor::value_to_tensor(value.to_value())
   if @debug.DEBUG {
     if self.shape != other.shape {
       abort("Inconsistent shape")

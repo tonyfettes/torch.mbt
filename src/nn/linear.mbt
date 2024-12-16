@@ -1,11 +1,14 @@
 ///|
 pub(readonly) struct Linear {
-  weight : @tensor.Tensor
-  bias : @tensor.Tensor
+  weight : @tensor.Tensor[Float]
+  bias : @tensor.Tensor[Float]
 } derive(Show, ToJson, FromJson)
 
 ///|
-pub fn Linear::of(weight : @tensor.Tensor, bias : @tensor.Tensor) -> Linear {
+pub fn Linear::of(
+  weight : @tensor.Tensor[Float],
+  bias : @tensor.Tensor[Float]
+) -> Linear {
   Linear::{ weight, bias }
 }
 
@@ -14,12 +17,12 @@ pub fn Linear::new(in_features : Int, out_features : Int) -> Linear {
   let in_features_sqrt = in_features.to_float().sqrt()
   let in_features_sqrt_inv = (1.0 : Float) / in_features_sqrt
   let weight_distribution = @distributions.Uniform::new(
-    -@tensor.tensor(in_features_sqrt_inv),
-    @tensor.tensor(in_features_sqrt_inv),
+    -in_features_sqrt_inv,
+    in_features_sqrt_inv,
   )
   let bias_distribution = @distributions.Uniform::new(
-    -@tensor.tensor(in_features_sqrt_inv),
-    @tensor.tensor(in_features_sqrt_inv),
+    -in_features_sqrt_inv,
+    in_features_sqrt_inv,
   )
   Linear::{
     weight: weight_distribution.sample([in_features, out_features]),
@@ -28,7 +31,10 @@ pub fn Linear::new(in_features : Int, out_features : Int) -> Linear {
 }
 
 ///|
-pub fn Linear::forward(self : Linear, input : @tensor.Tensor) -> @tensor.Tensor {
+pub fn Linear::forward(
+  self : Linear,
+  input : @tensor.Tensor[Float]
+) -> @tensor.Tensor[Float] {
   let input_shape = input.shape
   let dimension = input_shape.length()
   if dimension == 0 {
@@ -55,7 +61,7 @@ pub fn Linear::forward(self : Linear, input : @tensor.Tensor) -> @tensor.Tensor 
 }
 
 ///|
-pub fn Linear::parameters(self : Linear) -> Iter[@tensor.Tensor] {
+pub fn Linear::parameters(self : Linear) -> Iter[@tensor.Tensor[Float]] {
   [self.weight, self.bias].iter()
 }
 

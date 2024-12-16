@@ -3,17 +3,17 @@ package tonyfettes/torch/nn/init
 alias @tonyfettes/torch/tensor as @tensor
 
 // Values
-fn constant_(@tensor.Tensor, Float) -> Unit
+fn constant_(@tensor.Tensor[Float], Float) -> Unit
 
-fn eye_(@tensor.Tensor) -> Unit
+fn eye_(@tensor.Tensor[Float]) -> Unit
 
-fn normal_(@tensor.Tensor, mean~ : Float = .., std~ : Float = ..) -> Unit
+fn normal_(@tensor.Tensor[Float], mean~ : Float = .., std~ : Float = ..) -> Unit
 
-fn ones_(@tensor.Tensor) -> Unit
+fn ones_(@tensor.Tensor[Float]) -> Unit
 
-fn uniform_(@tensor.Tensor, Float, Float) -> Unit
+fn uniform_(@tensor.Tensor[Float], Float, Float) -> Unit
 
-fn zeros_(@tensor.Tensor) -> Unit
+fn zeros_(@tensor.Tensor[Float]) -> Unit
 
 // Types and methods
 

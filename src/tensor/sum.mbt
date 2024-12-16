@@ -1,9 +1,9 @@
 ///|
 pub fn Tensor::sum(
-  self : Tensor,
+  self : Tensor[Float],
   dim? : @shape.Shape,
   keep_dim~ : Bool = false
-) -> Tensor {
+) -> Tensor[Float] {
   let dim = match dim {
     None => FixedArray::makei(self.shape.length(), fn(i) { i })
     Some(dim) => dim.to_fixed_array()

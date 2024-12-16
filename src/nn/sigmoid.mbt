@@ -9,12 +9,12 @@ pub fn Sigmoid::new() -> Sigmoid {
 ///|
 pub fn Sigmoid::forward(
   _self : Sigmoid,
-  input : @tensor.Tensor
-) -> @tensor.Tensor {
+  input : @tensor.Tensor[Float]
+) -> @tensor.Tensor[Float] {
   input.sigmoid()
 }
 
 ///|
-pub fn Sigmoid::parameters(_self : Sigmoid) -> Iter[@tensor.Tensor] {
+pub fn Sigmoid::parameters(_self : Sigmoid) -> Iter[@tensor.Tensor[Float]] {
   return Iter::empty()
 }

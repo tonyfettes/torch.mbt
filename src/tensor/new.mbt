@@ -1,19 +1,29 @@
 ///|
-pub fn Tensor::new[X : ToTensor](
-  self : X,
+pub let float : Float = Float::default()
+
+///|
+pub let double : Double = Double::default()
+
+///|
+pub fn Tensor::new[Value : ToValue, T : ValueToTensor + Default](
+  self : Value,
+  dtype~ : T = T::default(),
   requires_grad~ : Bool = false
-) -> Tensor {
-  self.to_tensor()..requires_grad_(requires_grad)
+) -> Tensor[T] {
+  dtype |> ignore
+  T::value_to_tensor(self.to_value())..requires_grad_(requires_grad)
 }
 
 ///|
-pub fn tensor[X : ToTensor](x : X, requires_grad~ : Bool = false) -> Tensor {
-  x.to_tensor()..requires_grad_(requires_grad)
+pub fn tensor[Value : ToValue, T : ValueToTensor](
+  value : Value,
+  requires_grad~ : Bool = false
+) -> Tensor[T] {
+  T::value_to_tensor(value.to_value())..requires_grad_(requires_grad)
 }
 
 test "Tensor::new - Scalar" {
-  let value = 1.0
-  let tensor = Tensor::new(value)
+  let tensor : Tensor[Float] = Tensor::new(1.0)
   inspect!(tensor.value, content="[1]")
   inspect!(tensor.shape, content="[]")
   inspect!(tensor.block, content="[]")
@@ -24,8 +34,7 @@ test "Tensor::new - Scalar" {
 }
 
 test "Tensor::new - Vector" {
-  let value = [0.0, 1.0, 2.0, 3.0]
-  let tensor = Tensor::new(value)
+  let tensor : Tensor[Float] = Tensor::new([0.0, 1.0, 2.0, 3.0])
   inspect!(tensor.value, content="[0, 1, 2, 3]")
   inspect!(tensor.shape, content="[4]")
   inspect!(tensor.block, content="[1]")
@@ -36,8 +45,7 @@ test "Tensor::new - Vector" {
 }
 
 test "Tensor::new - Matrix" {
-  let value = [[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]]
-  let tensor = Tensor::new(value)
+  let tensor : Tensor[Float] = Tensor::new([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]])
   inspect!(tensor.value, content="[0, 1, 2, 3, 4, 5]")
   inspect!(tensor.shape, content="[2, 3]")
   inspect!(tensor.block, content="[3, 1]")
@@ -48,7 +56,7 @@ test "Tensor::new - Matrix" {
 }
 
 test "Tensor::new - Tensor" {
-  let tensor = Tensor::new(
+  let tensor : Tensor[Float] = Tensor::new(
     [
       [[0.0, 1.0, 2.0, 3.0], [4.0, 5.0, 6.0, 7.0], [8.0, 9.0, 10.0, 11.0]],
       [

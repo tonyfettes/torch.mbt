@@ -1,5 +1,5 @@
 test "mean" {
-  let a = @tensor.tensor(
+  let a : @tensor.Tensor[Float] = @tensor.tensor(
     [
       [
         [-0.7347, 1.0305, 1.1518, 0.1960],

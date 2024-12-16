@@ -4,14 +4,14 @@ alias @tonyfettes/torch/shape as @shape
 alias @tonyfettes/torch/tensor as @tensor
 
 // Values
-fn randn[Shape : @shape.Shape](Shape, requires_grad~ : Bool = ..) -> @tensor.Tensor //deprecated
+fn randn[Shape : @shape.Shape](Shape, requires_grad~ : Bool = ..) -> @tensor.Tensor[Float] //deprecated
 
-fn tensor[X : @tensor.ToTensor](X, requires_grad~ : Bool = ..) -> @tensor.Tensor
+fn tensor[X : @tensor.ToValue](X, requires_grad~ : Bool = ..) -> @tensor.Tensor[Float]
 
 // Types and methods
 
 // Type aliases
-pub typealias Tensor = @tensor.Tensor
+pub typealias Tensor = @tensor.Tensor[Float]
 
 // Traits
 

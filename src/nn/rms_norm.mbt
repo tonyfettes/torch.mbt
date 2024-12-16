@@ -1,7 +1,7 @@
 ///|
 struct RMSNorm {
   normalized_shape : FixedArray[Int]
-  weight : @tensor.Tensor
+  weight : @tensor.Tensor[Float]
   eps : Double?
 } derive(Show, ToJson, FromJson)
 
@@ -22,8 +22,8 @@ pub fn RMSNorm::new[Shape : @shape.Shape](
 ///|
 pub fn RMSNorm::forward(
   self : RMSNorm,
-  input : @tensor.Tensor
-) -> @tensor.Tensor {
+  input : @tensor.Tensor[Float]
+) -> @tensor.Tensor[Float] {
   match self.eps {
     Some(eps) =>
       @functional.rms_norm(
@@ -37,6 +37,6 @@ pub fn RMSNorm::forward(
 }
 
 ///|
-pub fn RMSNorm::parameters(self : RMSNorm) -> Iter[@tensor.Tensor] {
+pub fn RMSNorm::parameters(self : RMSNorm) -> Iter[@tensor.Tensor[Float]] {
   Iter::singleton(self.weight)
 }

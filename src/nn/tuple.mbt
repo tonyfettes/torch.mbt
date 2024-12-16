@@ -1,30 +1,30 @@
 ///|
 pub impl[A : Module, B : Module] Module for (A, B) with forward(
   self : (A, B),
-  input : @tensor.Tensor
-) -> @tensor.Tensor {
+  input : @tensor.Tensor[Float]
+) -> @tensor.Tensor[Float] {
   input |> forward_(self.0) |> forward_(self.1)
 }
 
 ///|
 pub impl[A : Module, B : Module] Module for (A, B) with parameters(
   self : (A, B)
-) -> Iter[@tensor.Tensor] {
+) -> Iter[@tensor.Tensor[Float]] {
   self.0.parameters() |> Iter::concat(self.1.parameters())
 }
 
 ///|
 pub impl[A : Module, B : Module, C : Module] Module for (A, B, C) with forward(
   self : (A, B, C),
-  input : @tensor.Tensor
-) -> @tensor.Tensor {
+  input : @tensor.Tensor[Float]
+) -> @tensor.Tensor[Float] {
   input |> forward_(self.0) |> forward_(self.1) |> forward_(self.2)
 }
 
 ///|
 pub impl[A : Module, B : Module, C : Module] Module for (A, B, C) with parameters(
   self : (A, B, C)
-) -> Iter[@tensor.Tensor] {
+) -> Iter[@tensor.Tensor[Float]] {
   self.0.parameters()
   |> Iter::concat(self.1.parameters())
   |> Iter::concat(self.2.parameters())
@@ -33,8 +33,8 @@ pub impl[A : Module, B : Module, C : Module] Module for (A, B, C) with parameter
 ///|
 pub impl[A : Module, B : Module, C : Module, D : Module] Module for (A, B, C, D) with forward(
   self : (A, B, C, D),
-  input : @tensor.Tensor
-) -> @tensor.Tensor {
+  input : @tensor.Tensor[Float]
+) -> @tensor.Tensor[Float] {
   input
   |> forward_(self.0)
   |> forward_(self.1)
@@ -45,7 +45,7 @@ pub impl[A : Module, B : Module, C : Module, D : Module] Module for (A, B, C, D)
 ///|
 pub impl[A : Module, B : Module, C : Module, D : Module] Module for (A, B, C, D) with parameters(
   self : (A, B, C, D)
-) -> Iter[@tensor.Tensor] {
+) -> Iter[@tensor.Tensor[Float]] {
   self.0.parameters()
   |> Iter::concat(self.1.parameters())
   |> Iter::concat(self.2.parameters())
@@ -59,7 +59,9 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module] Module for 
   C,
   D,
   E,
-) with forward(self : (A, B, C, D, E), input : @tensor.Tensor) -> @tensor.Tensor {
+) with forward(self : (A, B, C, D, E), input : @tensor.Tensor[Float]) -> @tensor.Tensor[
+  Float,
+] {
   input
   |> forward_(self.0)
   |> forward_(self.1)
@@ -75,7 +77,7 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module] Module for 
   C,
   D,
   E,
-) with parameters(self : (A, B, C, D, E)) -> Iter[@tensor.Tensor] {
+) with parameters(self : (A, B, C, D, E)) -> Iter[@tensor.Tensor[Float]] {
   self.0.parameters()
   |> Iter::concat(self.1.parameters())
   |> Iter::concat(self.2.parameters())
@@ -91,7 +93,9 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module]
   D,
   E,
   F,
-) with forward(self : (A, B, C, D, E, F), input : @tensor.Tensor) -> @tensor.Tensor {
+) with forward(self : (A, B, C, D, E, F), input : @tensor.Tensor[Float]) -> @tensor.Tensor[
+  Float,
+] {
   input
   |> forward_(self.0)
   |> forward_(self.1)
@@ -109,7 +113,7 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module]
   D,
   E,
   F,
-) with parameters(self : (A, B, C, D, E, F)) -> Iter[@tensor.Tensor] {
+) with parameters(self : (A, B, C, D, E, F)) -> Iter[@tensor.Tensor[Float]] {
   self.0.parameters()
   |> Iter::concat(self.1.parameters())
   |> Iter::concat(self.2.parameters())
@@ -127,7 +131,9 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module,
   E,
   F,
   G,
-) with forward(self : (A, B, C, D, E, F, G), input : @tensor.Tensor) -> @tensor.Tensor {
+) with forward(self : (A, B, C, D, E, F, G), input : @tensor.Tensor[Float]) -> @tensor.Tensor[
+  Float,
+] {
   input
   |> forward_(self.0)
   |> forward_(self.1)
@@ -147,7 +153,7 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module,
   E,
   F,
   G,
-) with parameters(self : (A, B, C, D, E, F, G)) -> Iter[@tensor.Tensor] {
+) with parameters(self : (A, B, C, D, E, F, G)) -> Iter[@tensor.Tensor[Float]] {
   self.0.parameters()
   |> Iter::concat(self.1.parameters())
   |> Iter::concat(self.2.parameters())
@@ -167,7 +173,9 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module,
   F,
   G,
   H,
-) with forward(self : (A, B, C, D, E, F, G, H), input : @tensor.Tensor) -> @tensor.Tensor {
+) with forward(self : (A, B, C, D, E, F, G, H), input : @tensor.Tensor[Float]) -> @tensor.Tensor[
+  Float,
+] {
   input
   |> forward_(self.0)
   |> forward_(self.1)
@@ -189,7 +197,9 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module,
   F,
   G,
   H,
-) with parameters(self : (A, B, C, D, E, F, G, H)) -> Iter[@tensor.Tensor] {
+) with parameters(self : (A, B, C, D, E, F, G, H)) -> Iter[
+  @tensor.Tensor[Float],
+] {
   self.0.parameters()
   |> Iter::concat(self.1.parameters())
   |> Iter::concat(self.2.parameters())
@@ -211,7 +221,10 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module,
   G,
   H,
   I,
-) with forward(self : (A, B, C, D, E, F, G, H, I), input : @tensor.Tensor) -> @tensor.Tensor {
+) with forward(
+  self : (A, B, C, D, E, F, G, H, I),
+  input : @tensor.Tensor[Float]
+) -> @tensor.Tensor[Float] {
   input
   |> forward_(self.0)
   |> forward_(self.1)
@@ -235,7 +248,9 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module,
   G,
   H,
   I,
-) with parameters(self : (A, B, C, D, E, F, G, H, I)) -> Iter[@tensor.Tensor] {
+) with parameters(self : (A, B, C, D, E, F, G, H, I)) -> Iter[
+  @tensor.Tensor[Float],
+] {
   self.0.parameters()
   |> Iter::concat(self.1.parameters())
   |> Iter::concat(self.2.parameters())
@@ -259,7 +274,10 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module,
   H,
   I,
   J,
-) with forward(self : (A, B, C, D, E, F, G, H, I, J), input : @tensor.Tensor) -> @tensor.Tensor {
+) with forward(
+  self : (A, B, C, D, E, F, G, H, I, J),
+  input : @tensor.Tensor[Float]
+) -> @tensor.Tensor[Float] {
   input
   |> forward_(self.0)
   |> forward_(self.1)
@@ -285,7 +303,9 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module,
   H,
   I,
   J,
-) with parameters(self : (A, B, C, D, E, F, G, H, I, J)) -> Iter[@tensor.Tensor] {
+) with parameters(self : (A, B, C, D, E, F, G, H, I, J)) -> Iter[
+  @tensor.Tensor[Float],
+] {
   self.0.parameters()
   |> Iter::concat(self.1.parameters())
   |> Iter::concat(self.2.parameters())
@@ -311,7 +331,10 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module,
   I,
   J,
   K,
-) with forward(self : (A, B, C, D, E, F, G, H, I, J, K), input : @tensor.Tensor) -> @tensor.Tensor {
+) with forward(
+  self : (A, B, C, D, E, F, G, H, I, J, K),
+  input : @tensor.Tensor[Float]
+) -> @tensor.Tensor[Float] {
   input
   |> forward_(self.0)
   |> forward_(self.1)
@@ -340,7 +363,7 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module,
   J,
   K,
 ) with parameters(self : (A, B, C, D, E, F, G, H, I, J, K)) -> Iter[
-  @tensor.Tensor,
+  @tensor.Tensor[Float],
 ] {
   self.0.parameters()
   |> Iter::concat(self.1.parameters())
@@ -371,8 +394,8 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module,
   L,
 ) with forward(
   self : (A, B, C, D, E, F, G, H, I, J, K, L),
-  input : @tensor.Tensor
-) -> @tensor.Tensor {
+  input : @tensor.Tensor[Float]
+) -> @tensor.Tensor[Float] {
   input
   |> forward_(self.0)
   |> forward_(self.1)
@@ -403,7 +426,7 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module,
   K,
   L,
 ) with parameters(self : (A, B, C, D, E, F, G, H, I, J, K, L)) -> Iter[
-  @tensor.Tensor,
+  @tensor.Tensor[Float],
 ] {
   self.0.parameters()
   |> Iter::concat(self.1.parameters())
@@ -436,8 +459,8 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module,
   M,
 ) with forward(
   self : (A, B, C, D, E, F, G, H, I, J, K, L, M),
-  input : @tensor.Tensor
-) -> @tensor.Tensor {
+  input : @tensor.Tensor[Float]
+) -> @tensor.Tensor[Float] {
   input
   |> forward_(self.0)
   |> forward_(self.1)
@@ -470,7 +493,7 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module,
   L,
   M,
 ) with parameters(self : (A, B, C, D, E, F, G, H, I, J, K, L, M)) -> Iter[
-  @tensor.Tensor,
+  @tensor.Tensor[Float],
 ] {
   self.0.parameters()
   |> Iter::concat(self.1.parameters())
@@ -505,8 +528,8 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module,
   N,
 ) with forward(
   self : (A, B, C, D, E, F, G, H, I, J, K, L, M, N),
-  input : @tensor.Tensor
-) -> @tensor.Tensor {
+  input : @tensor.Tensor[Float]
+) -> @tensor.Tensor[Float] {
   input
   |> forward_(self.0)
   |> forward_(self.1)
@@ -541,7 +564,7 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module,
   M,
   N,
 ) with parameters(self : (A, B, C, D, E, F, G, H, I, J, K, L, M, N)) -> Iter[
-  @tensor.Tensor,
+  @tensor.Tensor[Float],
 ] {
   self.0.parameters()
   |> Iter::concat(self.1.parameters())
@@ -578,8 +601,8 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module,
   O,
 ) with forward(
   self : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O),
-  input : @tensor.Tensor
-) -> @tensor.Tensor {
+  input : @tensor.Tensor[Float]
+) -> @tensor.Tensor[Float] {
   input
   |> forward_(self.0)
   |> forward_(self.1)
@@ -616,7 +639,7 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module,
   N,
   O,
 ) with parameters(self : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)) -> Iter[
-  @tensor.Tensor,
+  @tensor.Tensor[Float],
 ] {
   self.0.parameters()
   |> Iter::concat(self.1.parameters())
@@ -655,8 +678,8 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module,
   P,
 ) with forward(
   self : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P),
-  input : @tensor.Tensor
-) -> @tensor.Tensor {
+  input : @tensor.Tensor[Float]
+) -> @tensor.Tensor[Float] {
   input
   |> forward_(self.0)
   |> forward_(self.1)
@@ -695,7 +718,7 @@ pub impl[A : Module, B : Module, C : Module, D : Module, E : Module, F : Module,
   O,
   P,
 ) with parameters(self : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)) -> Iter[
-  @tensor.Tensor,
+  @tensor.Tensor[Float],
 ] {
   self.0.parameters()
   |> Iter::concat(self.1.parameters())

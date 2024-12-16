@@ -1,9 +1,9 @@
 ///|
 pub fn Tensor::moveaxis[Shape : @shape.Shape](
-  self : Tensor,
+  self : Tensor[Float],
   source : Shape,
   destination : Shape
-) -> Tensor {
+) -> Tensor[Float] {
   let source = source.to_fixed_array()
   let destination = destination.to_fixed_array()
   if source.length() != destination.length() {

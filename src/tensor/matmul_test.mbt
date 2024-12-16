@@ -1,6 +1,10 @@
 test "Tensor::matmul - 2x3 * 3x2" {
-  let a = @tensor.Tensor::new([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
-  let b = @tensor.Tensor::new([[7.0, 8.0], [9.0, 10.0], [11.0, 12.0]])
+  let a : @tensor.Tensor[Float] = @tensor.tensor(
+    [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]],
+  )
+  let b : @tensor.Tensor[Float] = @tensor.tensor(
+    [[7.0, 8.0], [9.0, 10.0], [11.0, 12.0]],
+  )
   let c = a.matmul(b)
   inspect!(c.value, content="[58, 64, 139, 154]")
   inspect!(c.shape, content="[2, 2]")
@@ -10,14 +14,14 @@ test "Tensor::matmul - 2x3 * 3x2" {
 }
 
 test "Tensor::matmul - 1x2 * 2x2" {
-  let x = @tensor.Tensor::new([[1.0, 2.0]])
-  let w = @tensor.Tensor::new([[1.0, 2.0], [3.0, 4.0]])
+  let x : @tensor.Tensor[Float] = @tensor.tensor([[1.0, 2.0]])
+  let w : @tensor.Tensor[Float] = @tensor.tensor([[1.0, 2.0], [3.0, 4.0]])
   inspect!(x.matmul(w), content="[[7, 10]]")
 }
 
 test "Tensor::matmul - 1x2 * 2x2" {
-  let x = @tensor.Tensor::new([[2.0, 2.0]])
-  let w = @tensor.Tensor::new([[2.0, 2.0], [2.0, 2.0]])
+  let x : @tensor.Tensor[Float] = @tensor.tensor([[2.0, 2.0]])
+  let w : @tensor.Tensor[Float] = @tensor.tensor([[2.0, 2.0], [2.0, 2.0]])
   inspect!(x.matmul(w), content="[[8, 8]]")
 }
 

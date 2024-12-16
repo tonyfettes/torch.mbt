@@ -1,6 +1,6 @@
 ///|
-pub impl Transpile for @tensor.Tensor with transpile(
-  self : @tensor.Tensor,
+pub impl Transpile for @tensor.Tensor[Float] with transpile(
+  self : @tensor.Tensor[Float],
   transpiler : Transpiler,
   variable : String
 ) {

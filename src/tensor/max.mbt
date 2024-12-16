@@ -1,9 +1,9 @@
 ///|
 pub fn Tensor::max(
-  self : Tensor,
+  self : Tensor[Float],
   dim? : Int,
   keep_dim~ : Bool = false
-) -> (Tensor, Tensor) {
+) -> (Tensor[Float], Tensor[Int]) {
   guard let Some(dim) = dim else {
     None => {
       let mut max_value = self.value[0]
@@ -23,12 +23,12 @@ pub fn Tensor::max(
         grad: [0.0],
       }
       let index = Tensor::{
-        value: [max_index.to_float()],
+        value: [max_index],
         shape: [],
         block: [],
         graph: Graph::Val,
         refcnt: 0,
-        grad: [0.0],
+        grad: [],
       }
       (value, index)
     }
@@ -46,13 +46,13 @@ pub fn Tensor::max(
   let total = shape[0] * block[0]
   let value = FixedArray::make(total, @float.min_value)
   let value_index = FixedArray::make(total, -1)
-  let index = FixedArray::make(total, (0.0 : Float))
+  let index = FixedArray::make(total, 0)
   fn build(d : Int, max_pos : Int, val_pos : Int, i : Int) {
     if d == self.shape.length() {
       if self.value[val_pos] > value[max_pos] {
         value[max_pos] = self.value[val_pos]
         value_index[max_pos] = val_pos
-        index[max_pos] = i.to_float()
+        index[max_pos] = i
       }
       return
     }
@@ -91,7 +91,7 @@ pub fn Tensor::max(
     block,
     graph: Val,
     refcnt: 0,
-    grad: FixedArray::make(index.length(), (0.0 : Float)),
+    grad: [],
   }
   (value, index)
 }

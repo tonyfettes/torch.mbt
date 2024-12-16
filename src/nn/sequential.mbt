@@ -13,8 +13,8 @@ pub fn Sequential::new[Module : Module](
 ///|
 pub fn Sequential::forward(
   self : Sequential[Module],
-  input : @tensor.Tensor
-) -> @tensor.Tensor {
+  input : @tensor.Tensor[Float]
+) -> @tensor.Tensor[Float] {
   loop input, self.modules[:] {
     input, [module_, .. as modules] => continue module_.forward(input), modules
     input, [] => input
@@ -24,7 +24,7 @@ pub fn Sequential::forward(
 ///|
 pub fn Sequential::parameters(
   self : Sequential[Module]
-) -> Iter[@tensor.Tensor] {
+) -> Iter[@tensor.Tensor[Float]] {
   self.modules.iter().flat_map(fn(module_) { module_.parameters() })
 }
 

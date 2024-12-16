@@ -1,5 +1,5 @@
 ///|
-pub fn eye(n : Int, m? : Int, requires_grad~ : Bool = false) -> Tensor {
+pub fn eye(n : Int, m? : Int, requires_grad~ : Bool = false) -> Tensor[Float] {
   let m = m.or(n)
   let shape : FixedArray[Int] = [n, m]
   let block = compute_block_size(shape)

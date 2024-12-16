@@ -1,158 +1,196 @@
 ///|
-pub(readonly) trait ToTensor: Show {
-  to_tensor(Self) -> Tensor
+enum Value {
+  Bool(Tensor[Bool])
+  Int(Tensor[Int])
+  Float(Tensor[Float])
+  Double(Tensor[Double])
+  Array(FixedArray[Value])
 }
 
 ///|
-pub impl ToTensor for Bool with to_tensor(self : Bool) -> Tensor {
+trait ToValue {
+  to_value(Self) -> Value
+}
+
+///|
+trait ValueToTensor {
+  value_to_tensor(Value) -> Tensor[Self]
+}
+
+///|
+fn Tensor::scalar[T](value : T) -> Tensor[T] {
   Tensor::{
-    value: [if self { 1.0 } else { 0.0 }],
+    value: [value],
     shape: [],
     block: [],
-    graph: Graph::Val,
+    graph: Val,
     refcnt: 0,
     grad: [0.0],
   }
+}
+
+///|
+pub impl ToValue for Bool with to_value(self : Bool) -> Value {
+  Value::Bool(scalar(self))
 }
 
 ///|
 pub impl Default for Bool with default() -> Bool { false }
 
 ///|
-pub impl ToTensor for Int with to_tensor(self : Int) -> Tensor {
-  Tensor::{
-    value: [self.to_float()],
-    shape: [],
-    block: [],
-    graph: Graph::Val,
-    refcnt: 0,
-    grad: [0.0],
-  }
+pub impl ToValue for Int with to_value(self : Int) -> Value {
+  Value::Int(scalar(self))
 }
 
 ///|
 pub impl Default for Int with default() -> Int { 0 }
 
 ///|
-pub impl ToTensor for Float with to_tensor(self : Float) -> Tensor {
-  Tensor::{
-    value: [self],
-    shape: [],
-    block: [],
-    graph: Graph::Val,
-    refcnt: 0,
-    grad: [0.0],
-  }
+pub impl ToValue for Float with to_value(self : Float) -> Value {
+  Value::Float(scalar(self))
 }
 
 ///|
 pub impl Default for Float with default() -> Float { 0.0 }
 
 ///|
-pub impl ToTensor for Double with to_tensor(self : Double) -> Tensor {
-  Tensor::{
-    value: [self.to_float()],
-    shape: [],
-    block: [],
-    graph: Graph::Val,
-    refcnt: 0,
-    grad: [0.0],
-  }
+pub impl ToValue for Double with to_value(self : Double) -> Value {
+  Value::Double(scalar(self))
 }
 
 ///|
 pub impl Default for Double with default() -> Double { 0.0 }
 
 ///|
-pub impl[T : ToTensor + Default] ToTensor for FixedArray[T] with to_tensor(
+pub impl[T : ToValue] ToValue for FixedArray[T] with to_value(
   self : FixedArray[T]
-) -> Tensor {
-  let tensors = self.map(fn { x => x.to_tensor() })
-  let element = if self.length() == 0 {
-    T::default().to_tensor()
-  } else {
-    tensors[0]
-  }
-  if @debug.DEBUG {
-    for i in 1..<tensors.length() {
-      if tensors[i].shape != element.shape {
-        abort(
-          "Tensor at \{i} has shape \{tensors[i].shape}, which is not the same as \{tensors[0].shape}",
-        )
-      }
-    }
-  }
-  let shape = FixedArray::make(element.shape.length() + 1, 0)
-  shape[0] = self.length()
-  for i, s in element.shape {
-    shape[i + 1] = s
-  }
-  let block = compute_block_size(shape)
-  let total = if shape.length() == 0 { 1 } else { shape[0] * block[0] }
-  let value : FixedArray[Float] = FixedArray::make(total, 0.0)
-  let index = FixedArray::make(total, (-1, -1))
-  for i = 0; i < tensors.length(); i = i + 1 {
-    for j = 0; j < tensors[i].value.length(); j = j + 1 {
-      value[i * block[0] + j] = tensors[i].value[j]
-      index[i * block[0] + j] = (i, j)
-    }
-  }
-  Tensor::{
-    value,
-    shape,
-    block,
-    graph: Cat(tensors, index),
-    refcnt: 0,
-    grad: FixedArray::make(value.length(), (0.0 : Float)),
-  }
+) -> Value {
+  Value::Array(self.map(fn { x => x.to_value() }))
 }
 
 ///|
 pub impl[X] Default for FixedArray[X] with default() -> FixedArray[X] { [] }
 
 ///|
-pub impl[X : ToTensor + Default] ToTensor for Array[X] with to_tensor(
-  self : Array[X]
-) -> Tensor {
-  let tensors = FixedArray::makei(self.length(), fn(i) { self[i].to_tensor() })
-  let element = if self.length() == 0 {
-    X::default().to_tensor()
-  } else {
-    tensors[0]
-  }
-  let shape = FixedArray::make(element.shape.length() + 1, 0)
-  shape[0] = self.length()
-  for i, s in element.shape {
-    shape[i + 1] = s
-  }
-  let block = compute_block_size(shape)
-  let total = if shape.length() == 0 { 1 } else { shape[0] * block[0] }
-  let value : FixedArray[Float] = FixedArray::make(total, 0.0)
-  let index = FixedArray::make(total, (-1, -1))
-  for i = 0; i < tensors.length(); i = i + 1 {
-    for j = 0; j < tensors[i].value.length(); j = j + 1 {
-      value[i * block[0] + j] = tensors[i].value[j]
-      index[i * block[0] + j] = (i, j)
-    }
-  }
-  Tensor::{
-    value,
-    shape,
-    block,
-    graph: Cat(tensors, index),
-    refcnt: 0,
-    grad: FixedArray::make(value.length(), (0.0 : Float)),
-  }
+pub impl[T : ToValue] ToValue for Array[T] with to_value(self : Array[T]) -> Value {
+  Value::Array(FixedArray::from_iter(self.iter().map(fn { x => x.to_value() })))
 }
 
 ///|
 pub impl[X] Default for Array[X] with default() -> Array[X] { [] }
 
 ///|
-pub impl ToTensor for Tensor with to_tensor(self : Tensor) -> Tensor { self }
+trait TensorToValue {
+  tensor_to_value(Tensor[Self]) -> Value
+}
 
 ///|
-pub impl Default for Tensor with default() -> Tensor {
-  let shape : Array[Int] = []
-  empty(shape)
+pub impl TensorToValue for Float with tensor_to_value(self : Tensor[Float]) -> Value {
+  Value::Float(self)
+}
+
+///|
+pub impl[T : TensorToValue] ToValue for Tensor[T] with to_value(
+  self : Tensor[T]
+) -> Value {
+  T::tensor_to_value(self)
+}
+
+///|
+trait ToFloat {
+  to_float(Self) -> Float
+}
+
+///|
+impl ToFloat for Bool with to_float(self : Bool) -> Float {
+  self.to_int().to_float()
+}
+
+///|
+pub fn Tensor::to_float[Dtype : ToFloat](self : Tensor[Dtype]) -> Tensor[Float] {
+  let value = @unsafe.UnsafeArray::new(self.value.length())
+  for i in 0..<self.value.length() {
+    value[i] = self.value[i].to_float()
+  }
+  Tensor::{
+    shape: self.shape,
+    block: self.block,
+    value,
+    graph: Val,
+    refcnt: 0,
+    grad: @unsafe.UnsafeArray::make(self.value.length(), (0.0 : Float)),
+  }
+}
+
+///|
+trait ToInt {
+  to_int(Self) -> Int
+}
+
+///|
+pub fn Tensor::to_int[Dtype : ToInt](self : Tensor[Dtype]) -> Tensor[Int] {
+  let value = @unsafe.UnsafeArray::new(self.value.length())
+  for i in 0..<self.value.length() {
+    value[i] = self.value[i].to_int()
+  }
+  Tensor::{
+    shape: self.shape,
+    block: self.block,
+    value,
+    graph: Val,
+    refcnt: 0,
+    grad: @unsafe.UnsafeArray::make(self.value.length(), (0.0 : Float)),
+  }
+}
+
+///|
+pub impl ValueToTensor for Float with value_to_tensor(value : Value) -> Tensor[
+  Float,
+] {
+  fn build(dim : Int, val : Value) -> Tensor[Float] {
+    match val {
+      Value::Array(array) => {
+        let tensors = array.map(fn { value => build(dim + 1, value) })
+        Tensor::stack(tensors)
+      }
+      Value::Bool(bool) => bool.to_float()
+      Value::Int(int) => int.to_float()
+      Value::Float(float) => float
+      Value::Double(double) => double.to_float()
+    }
+  }
+
+  build(0, value)
+}
+
+///|
+pub impl ValueToTensor for Int with value_to_tensor(value : Value) -> Tensor[
+  Int,
+] {
+  fn build(dim : Int, val : Value) -> Tensor[Int] {
+    match val {
+      Value::Array(array) => {
+        let tensors = array.map(fn { value => build(dim + 1, value) })
+        Tensor::stack(tensors)
+      }
+      Value::Bool(bool) => bool.to_int()
+      Value::Int(int) => int
+      Value::Float(float) => float.to_int()
+      Value::Double(double) => double.to_int()
+    }
+  }
+
+  build(0, value)
+}
+
+test {
+  let value = [1.5, 2.5, 3.5, 4.5].to_value()
+  @json.inspect!(Int::value_to_tensor(value), content=[1, 2, 3, 4])
+  @json.inspect!(Float::value_to_tensor(value), content=[1.5, 2.5, 3.5, 4.5])
+  let value = ([1.5, 2.5, 3.5, 4.5] : FixedArray[Float]).to_value()
+  @json.inspect!(Int::value_to_tensor(value), content=[1, 2, 3, 4])
+  @json.inspect!(Float::value_to_tensor(value), content=[1.5, 2.5, 3.5, 4.5])
+  let value = [true, false].to_value()
+  @json.inspect!(Int::value_to_tensor(value), content=[1, 0])
+  @json.inspect!(Float::value_to_tensor(value), content=[1.0, 0.0])
 }

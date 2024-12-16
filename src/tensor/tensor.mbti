@@ -5,15 +5,21 @@ alias @tonyfettes/torch/internal/unsafe as @unsafe
 alias @tonyfettes/torch/shape as @shape
 
 // Values
-fn correlate2d(Tensor, Tensor, stride~ : @shape.Shape2d = .., padding~ : @shape.Shape2d = ..) -> Tensor
+fn argmax(Tensor[Float], dim? : Int, keep_dim~ : Bool = ..) -> Tensor[Int]
 
-fn empty[Shape : @shape.Shape](Shape, requires_grad~ : Bool = ..) -> Tensor
+fn correlate2d(Tensor[Float], Tensor[Float], stride~ : @shape.Shape2d = .., padding~ : @shape.Shape2d = ..) -> Tensor[Float]
 
-fn eye(Int, m? : Int, requires_grad~ : Bool = ..) -> Tensor
+let double : Double
 
-fn gather(Tensor, Int, Tensor) -> Tensor
+fn empty[Shape : @shape.Shape](Shape, requires_grad~ : Bool = ..) -> Tensor[Float]
 
-fn tensor[X : ToTensor](X, requires_grad~ : Bool = ..) -> Tensor
+fn eye(Int, m? : Int, requires_grad~ : Bool = ..) -> Tensor[Float]
+
+let float : Float
+
+fn gather(Tensor[Float], Int, Tensor[Float]) -> Tensor[Float]
+
+fn tensor[Value : ToValue, T : ValueToTensor](Value, requires_grad~ : Bool = ..) -> Tensor[T]
 
 fn with_no_grad[X](() -> X) -> X
 
@@ -21,90 +27,100 @@ fn with_no_grad_error[X](() -> X!) -> X!
 
 // Types and methods
 type Graph
-impl Show for Graph
+impl[Dtype : Show] Show for Graph[Dtype]
+
+type GraphAdd
+impl Show for GraphAdd
 
 pub(readonly) struct Tensor {
-  value : @unsafe.UnsafeArray[Float]
+  value : @unsafe.UnsafeArray[Dtype]
   shape : @unsafe.UnsafeArray[Int]
   block : @unsafe.UnsafeArray[Int]
   grad : @unsafe.UnsafeArray[Float]
   // private fields
 }
 impl Tensor {
-  avg_pool2d(Self, kernel_size~ : (Int, Int), stride~ : (Int, Int)) -> Self
-  backward(Self) -> Unit
-  broadcast(Self, Self) -> (Self, Self)
-  broadcast_to[Shape : @shape.Shape](Self, Shape) -> Self
-  cat(FixedArray[Self], dim~ : Int = ..) -> Self
-  exp(Self) -> Self
-  fill_[Value : ToTensor](Self, Value) -> Unit
-  flatten(Self, start~ : Int = .., end? : Int) -> Self
-  from_json(Json, @json.JsonPath) -> Self!@json.JsonDecodeError
-  iter(Self, dim~ : Int = ..) -> Iter[Self]
-  length(Self) -> Int
-  log(Self) -> Self
-  matmul(Self, Self) -> Self
-  max(Self, dim? : Int, keep_dim~ : Bool = ..) -> (Self, Self)
-  max_pool2d(Self, kernel_size~ : (Int, Int), stride~ : (Int, Int)) -> Self
-  mean(Self, dim? : @shape.Shape, keep_dim~ : Bool = ..) -> Self
-  moveaxis[Shape : @shape.Shape](Self, Shape, Shape) -> Self
-  new[X : ToTensor](X, requires_grad~ : Bool = ..) -> Self
-  ones[Shape : @shape.Shape](Shape, requires_grad~ : Bool = ..) -> Self
-  op_add(Self, Self) -> Self
-  op_as_view(Self, start~ : Int, end? : Int) -> TensorView
-  op_div(Self, Self) -> Self
-  op_get(Self, Int) -> TensorView
-  op_mul(Self, Self) -> Self
-  op_neg(Self) -> Self
-  op_set[X : ToTensor](Self, Int, X) -> Unit
-  op_sub(Self, Self) -> Self
-  output(Self, Logger) -> Unit
-  permute(Self, Array[Int]) -> Self
-  pow(Self, Int) -> Self
-  relu(Self) -> Self
-  requires_grad(Self) -> Bool
-  requires_grad_(Self, Bool) -> Unit
-  reshape[Shape : @shape.Shape](Self, Shape) -> Self
-  shape(Self) -> FixedArray[Int]
-  sigmoid(Self) -> Self
-  sqrt(Self) -> Self
-  squeeze(Self, dim? : @shape.Shape) -> Self
-  stack[X : ToTensor + Default](FixedArray[X]) -> Self
-  sum(Self, dim? : @shape.Shape, keep_dim~ : Bool = ..) -> Self
-  tanh(Self) -> Self
-  to_double(Self) -> Double
-  to_float(Self) -> Float
-  to_json(Self) -> Json
-  to_string(Self) -> String
-  transpose(Self, Int, Int) -> Self
-  value(Self) -> FixedArray[Float]
-  zeros[Shape : @shape.Shape](Shape, requires_grad~ : Bool = ..) -> Self
+  abs(Self[Float]) -> Self[Float]
+  avg_pool2d(Self[Float], kernel_size~ : (Int, Int), stride~ : (Int, Int)) -> Self[Float]
+  backward(Self[Float]) -> Unit
+  broadcast[Dtype](Self[Dtype], Self[Dtype]) -> (Self[Dtype], Self[Dtype])
+  broadcast_to[Shape : @shape.Shape](Self[Float], Shape) -> Self[Float]
+  cat(FixedArray[Self[Float]], dim~ : Int = ..) -> Self[Float]
+  exp(Self[Float]) -> Self[Float]
+  fill_[Value : ToValue](Self[Float], Value) -> Unit
+  flatten(Self[Float], start~ : Int = .., end? : Int) -> Self[Float]
+  from_json(Json, @json.JsonPath) -> Self[Float]!@json.JsonDecodeError
+  iter(Self[Float]) -> Iter[TensorView[Float]]
+  length(Self[Float]) -> Int
+  log(Self[Float]) -> Self[Float]
+  matmul(Self[Float], Self[Float]) -> Self[Float]
+  max(Self[Float], dim? : Int, keep_dim~ : Bool = ..) -> (Self[Float], Self[Int])
+  max_pool2d(Self[Float], kernel_size~ : (Int, Int), stride~ : (Int, Int)) -> Self[Float]
+  mean(Self[Float], dim? : @shape.Shape, keep_dim~ : Bool = ..) -> Self[Float]
+  moveaxis[Shape : @shape.Shape](Self[Float], Shape, Shape) -> Self[Float]
+  new[Value : ToValue, T : ValueToTensor + Default](Value, dtype~ : T = .., requires_grad~ : Bool = ..) -> Self[T]
+  ones[Shape : @shape.Shape](Shape, requires_grad~ : Bool = ..) -> Self[Float]
+  op_add[Dtype : TensorAdd](Self[Dtype], Self[Dtype]) -> Self[Dtype]
+  op_as_view[Dtype](Self[Dtype], start~ : Int, end? : Int) -> TensorView[Dtype]
+  op_div(Self[Float], Self[Float]) -> Self[Float]
+  op_get[Dtype](Self[Dtype], Int) -> TensorView[Dtype]
+  op_mul(Self[Float], Self[Float]) -> Self[Float]
+  op_neg(Self[Float]) -> Self[Float]
+  op_set[Value : ToValue](Self[Float], Int, Value) -> Unit
+  op_sub(Self[Float], Self[Float]) -> Self[Float]
+  output[Float : Show](Self[Float], Logger) -> Unit
+  permute(Self[Float], Array[Int]) -> Self[Float]
+  pow(Self[Float], Int) -> Self[Float]
+  relu(Self[Float]) -> Self[Float]
+  requires_grad(Self[Float]) -> Bool
+  requires_grad_[Dtype](Self[Dtype], Bool) -> Unit
+  reshape[Shape : @shape.Shape](Self[Float], Shape) -> Self[Float]
+  shape(Self[Float]) -> FixedArray[Int]
+  sigmoid(Self[Float]) -> Self[Float]
+  sqrt(Self[Float]) -> Self[Float]
+  squeeze(Self[Float], dim? : @shape.Shape) -> Self[Float]
+  stack[Dtype](FixedArray[Self[Dtype]]) -> Self[Dtype]
+  sum(Self[Float], dim? : @shape.Shape, keep_dim~ : Bool = ..) -> Self[Float]
+  tanh(Self[Float]) -> Self[Float]
+  to_float[Dtype : ToFloat](Self[Dtype]) -> Self[Float]
+  to_json[Dtype : ToJson](Self[Dtype]) -> Json
+  to_string[Float : Show](Self[Float]) -> String
+  transpose(Self[Float], Int, Int) -> Self[Float]
+  value(Self[Float]) -> FixedArray[Float]
+  zeros[Shape : @shape.Shape](Shape, requires_grad~ : Bool = ..) -> Self[Float]
 }
-impl Default for Tensor
-impl ToTensor for Tensor
+impl[T : TensorToValue] ToValue for Tensor[T]
 
 type TensorIndex
 impl Show for TensorIndex
 
-type TensorView
-impl TensorView {
-  log(Self) -> Tensor
-  op_add(Self, Self) -> Tensor
-  op_as_view(Self, start~ : Int, end? : Int) -> Self
-  op_get(Self, Int) -> Self
-  op_mul(Self, Self) -> Tensor
-  op_set(Self, Int, ToTensor) -> Unit
-  op_sub(Self, Self) -> Tensor
-  output(Self, Logger) -> Unit
-  to_double(Self) -> Double
-  to_json(Self) -> Json
-  to_string(Self) -> String
-  to_tensor(Self) -> Tensor
+pub(readonly) struct TensorView {
+  tensor : Tensor[Float]
+  shape : FixedArray[Int]
+  index : FixedArray[TensorIndex]
 }
+impl TensorView {
+  iter[Dtype](Self[Dtype]) -> Iter[Self[Dtype]]
+  log(Self[Float]) -> Tensor[Float]
+  op_add(Self[Float], Self[Float]) -> Tensor[Float]
+  op_as_view(Self[Float], start~ : Int, end? : Int) -> Self[Float]
+  op_get[Dtype](Self[Dtype], Int) -> Self[Dtype]
+  op_mul(Self[Float], Self[Float]) -> Tensor[Float]
+  op_set[Dtype : ValueToTensor, Other : ToValue](Self[Dtype], Int, Other) -> Unit
+  op_sub(Self[Float], Self[Float]) -> Tensor[Float]
+  output[Dtype : Show](Self[Dtype], Logger) -> Unit
+  to_json[Dtype : ToJson](Self[Dtype]) -> Json
+  to_string[Dtype : Show](Self[Dtype]) -> String
+  to_tensor(Self[Float]) -> Tensor[Float]
+}
+
+type Value
 
 // Type aliases
 
 // Traits
+trait Backward
+
 pub(readonly) trait Default {
   default() -> Self
 }
@@ -115,13 +131,23 @@ impl Default for Double
 impl[X] Default for FixedArray[X]
 impl[X] Default for Array[X]
 
-pub(readonly) trait ToTensor : Show {
-  to_tensor(Self) -> Tensor
-}
-impl ToTensor for Bool
-impl ToTensor for Int
-impl ToTensor for Float
-impl ToTensor for Double
-impl[X : ToTensor + Default] ToTensor for FixedArray[X]
-impl[X : ToTensor + Default] ToTensor for Array[X]
+trait TensorAdd
+impl TensorAdd for Int
+impl TensorAdd for Float
+
+trait TensorToValue
+impl TensorToValue for Float
+
+trait ToFloat
+
+trait ToValue
+impl ToValue for Bool
+impl ToValue for Int
+impl ToValue for Float
+impl ToValue for Double
+impl[T : ToValue] ToValue for FixedArray[T]
+impl[T : ToValue] ToValue for Array[T]
+
+trait ValueToTensor
+impl ValueToTensor for Float
 

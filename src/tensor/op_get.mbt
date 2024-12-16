@@ -1,5 +1,8 @@
 ///|
-pub fn Tensor::op_get(self : Tensor, index : Int) -> TensorView {
+pub fn Tensor::op_get[Dtype](
+  self : Tensor[Dtype],
+  index : Int
+) -> TensorView[Dtype] {
   if @debug.DEBUG {
     if self.shape.length() == 0 {
       abort("Tensor is a scalar")

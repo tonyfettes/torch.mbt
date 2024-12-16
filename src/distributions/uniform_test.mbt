@@ -7,8 +7,8 @@ test "Uniform/sample" {
 
 test "Uniform/rsample" {
   @distributions.seed(b"12345678223456783234567842345678")
-  let lower = @tensor.tensor(0.0, requires_grad=true)
-  let upper = @tensor.tensor(1.0, requires_grad=true)
+  let lower : @tensor.Tensor[Float] = @tensor.tensor(0.0, requires_grad=true)
+  let upper : @tensor.Tensor[Float] = @tensor.tensor(1.0, requires_grad=true)
   let uniform = @distributions.Uniform::new(lower, upper)
   let sample = uniform.rsample(())
   @json.inspect!(sample, content=0.35221487283706665)
@@ -19,8 +19,8 @@ test "Uniform/rsample" {
 
 test "Uniform/entropy" {
   @distributions.seed(b"12345678223456783234567842345678")
-  let lower = @tensor.tensor(-3.0, requires_grad=true)
-  let upper = @tensor.tensor(5.0, requires_grad=true)
+  let lower : @tensor.Tensor[Float] = @tensor.tensor(-3.0, requires_grad=true)
+  let upper : @tensor.Tensor[Float] = @tensor.tensor(5.0, requires_grad=true)
   let uniform = @distributions.Uniform::new(lower, upper)
   let entropy = uniform.entropy()
   @json.inspect!(entropy, content=2.079441547393799)
@@ -30,8 +30,8 @@ test "Uniform/entropy" {
 }
 
 test "Uniform/entropy/pytorch" (it : @test.T) {
-  let lower = @tensor.tensor(-3.0, requires_grad=true)
-  let upper = @tensor.tensor(5.0, requires_grad=true)
+  let lower : @tensor.Tensor[Float] = @tensor.tensor(-3.0, requires_grad=true)
+  let upper : @tensor.Tensor[Float] = @tensor.tensor(5.0, requires_grad=true)
   let uniform = @distributions.Uniform::new(lower, upper)
   let entropy = uniform.entropy()
   entropy.backward()

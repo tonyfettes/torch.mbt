@@ -1,7 +1,9 @@
 test "silu" {
-  let a = @tensor.tensor(1.0)
+  let a : @tensor.Tensor[Float] = @tensor.tensor(1.0)
   @json.inspect!(@functional.silu(a), content=0.7310585975646973)
-  let b = @tensor.tensor([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+  let b : @tensor.Tensor[Float] = @tensor.tensor(
+    [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]],
+  )
   @json.inspect!(
     @functional.silu(b),
     content=[

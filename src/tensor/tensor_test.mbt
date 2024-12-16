@@ -1,23 +1,23 @@
-test "Tensor::new - Scalar" {
+test "Tensor::new/scalar" {
   let value = 1.0
-  let tensor = @tensor.Tensor::new(value)
-  inspect!(tensor, content="1")
+  let tensor : @tensor.Tensor[Float] = @tensor.tensor(value)
+  @json.inspect!(tensor, content=1)
 }
 
-test "Tensor::new - Vector" {
+test "Tensor::new/vector" {
   let value = [0.0, 1.0, 2.0, 3.0]
-  let tensor = @tensor.Tensor::new(value)
-  inspect!(tensor, content="[0, 1, 2, 3]")
+  let tensor : @tensor.Tensor[Float] = @tensor.tensor(value)
+  @json.inspect!(tensor, content=[0, 1, 2, 3])
 }
 
-test "Tensor::new - Matrix" {
+test "Tensor::new/matrix" {
   let value = [[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]]
-  let tensor = @tensor.Tensor::new(value)
-  inspect!(tensor, content="[[0, 1, 2], [3, 4, 5]]")
+  let tensor : @tensor.Tensor[Float] = @tensor.tensor(value)
+  @json.inspect!(tensor, content=[[0, 1, 2], [3, 4, 5]])
 }
 
-test "Tensor::new - Tensor" {
-  let tensor = @tensor.Tensor::new(
+test "Tensor::new/tensor" {
+  let tensor : @tensor.Tensor[Float] = @tensor.tensor(
     [
       [[0.0, 1.0, 2.0, 3.0], [4.0, 5.0, 6.0, 7.0], [8.0, 9.0, 10.0, 11.0]],
       [
@@ -27,54 +27,61 @@ test "Tensor::new - Tensor" {
       ],
     ],
   )
-  inspect!(
+  @json.inspect!(
     tensor,
-    content="[[[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11]], [[12, 13, 14, 15], [16, 17, 18, 19], [20, 21, 22, 23]]]",
+    content=[
+      [[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11]],
+      [[12, 13, 14, 15], [16, 17, 18, 19], [20, 21, 22, 23]],
+    ],
   )
 }
 
-test "panic Tensor::op_get - Scalar" {
-  let tensor = @tensor.Tensor::new(1.0)
+test "panic Tensor::op_get/scalar" {
+  let tensor : @tensor.Tensor[Float] = @tensor.tensor(1.0)
   tensor[0] |> ignore
 }
 
-test "Tensor::op_get - Vector" {
-  let tensor = @tensor.Tensor::new([0.0, 1.0, 2.0, 3.0])
+test "Tensor::op_get/vector" {
+  let tensor : @tensor.Tensor[Float] = @tensor.tensor([0.0, 1.0, 2.0, 3.0])
   let slice = tensor[1]
-  inspect!(slice, content="1")
+  @json.inspect!(slice, content=1)
 }
 
-test "Tensor::op_get - Matrix" {
-  let tensor = @tensor.Tensor::new([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]])
+test "Tensor::op_get/matrix" {
+  let tensor : @tensor.Tensor[Float] = @tensor.tensor(
+    [[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]],
+  )
   let view = tensor[1]
-  inspect!(view, content="[3, 4, 5]")
+  @json.inspect!(view, content=[3, 4, 5])
 }
 
 test "TensorView::to_tensor" {
-  let tensor = @tensor.tensor(
+  let tensor : @tensor.Tensor[Float] = @tensor.tensor(
     [
       [[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]],
       [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]],
       [[2.0, 3.0, 4.0], [5.0, 6.0, 7.0]],
     ],
   )
-  inspect!(
+  @json.inspect!(
     tensor[:][0].to_tensor(),
-    content="[[0, 1, 2], [1, 2, 3], [2, 3, 4]]",
+    content=[[0, 1, 2], [1, 2, 3], [2, 3, 4]],
   )
-  inspect!(tensor[0][:].to_tensor(), content="[[0, 1, 2], [3, 4, 5]]")
-  inspect!(tensor[0][:][1].to_tensor(), content="[1, 4]")
-  inspect!(tensor[:][1][1].to_tensor(), content="[4, 5, 6]")
-  inspect!(tensor[:1][1][:].to_tensor(), content="[[3, 4, 5]]")
+  @json.inspect!(tensor[0][:].to_tensor(), content=[[0, 1, 2], [3, 4, 5]])
+  @json.inspect!(tensor[0][:][1].to_tensor(), content=[1, 4])
+  @json.inspect!(tensor[:][1][1].to_tensor(), content=[4, 5, 6])
+  @json.inspect!(tensor[:1][1][:].to_tensor(), content=[[3, 4, 5]])
 }
 
 test "Tensor::permute" {
-  let tensor = @tensor.tensor([[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]])
-  inspect!(tensor.permute([1, 0]), content="[[0, 3], [1, 4], [2, 5]]")
+  let tensor : @tensor.Tensor[Float] = @tensor.tensor(
+    [[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]],
+  )
+  @json.inspect!(tensor.permute([1, 0]), content=[[0, 3], [1, 4], [2, 5]])
 }
 
 test "TensorView::to_json" {
-  let tensor = @tensor.Tensor::new(
+  let tensor : @tensor.Tensor[Float] = @tensor.tensor(
     [[[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]], [[6.0, 7.0, 8.0], [9.0, 10.0, 11.0]]],
   )
   let view = tensor[1][:][2]

@@ -1,9 +1,9 @@
 ///|
 pub fn Tensor::max_pool2d(
-  self : Tensor,
+  self : Tensor[Float],
   kernel_size~ : (Int, Int),
   stride~ : (Int, Int)
-) -> Tensor {
+) -> Tensor[Float] {
   if self.shape.length() != 4 {
     abort("Input should be of the shape (N, C, H, W)")
   }

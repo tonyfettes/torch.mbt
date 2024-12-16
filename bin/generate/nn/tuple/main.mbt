@@ -34,8 +34,8 @@ fn build_forward(length : Int) -> String {
   let body = String::concat(build_body(length), separator="\n  ")
   $|pub impl[\{type_parameters}] Module for \{tuple_type} with forward(
   $|  self : \{tuple_type},
-  $|  input : @tensor.Tensor
-  $|) -> @tensor.Tensor {
+  $|  input : @tensor.Tensor[Float]
+  $|) -> @tensor.Tensor[Float] {
   $|  \{body}
   $|}
 }
@@ -54,7 +54,7 @@ fn build_parameters(length : Int) -> String {
   let body = String::concat(build_body(length), separator="\n  ")
   $|pub impl[\{type_parameters}] Module for \{tuple_type} with parameters(
   $|  self : \{tuple_type}
-  $|) -> Iter[@tensor.Tensor] {
+  $|) -> Iter[@tensor.Tensor[Float]] {
   $|  \{body}
   $|}
 }

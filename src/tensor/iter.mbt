@@ -1,5 +1,5 @@
 ///|
-pub fn Tensor::iter(self : Tensor) -> Iter[TensorView] {
+pub fn Tensor::iter(self : Tensor[Float]) -> Iter[TensorView[Float]] {
   let self_shape = self.shape
   if self_shape.length() == 0 {
     abort("Iterating over a scalar tensor is not allowed.")

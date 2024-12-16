@@ -12,28 +12,24 @@ pub(readonly) struct AvgPool2d {
   stride : (Int, Int)
 }
 impl AvgPool2d {
-  forward(Self, @tensor.Tensor) -> @tensor.Tensor
-  from_json(Json, @json.JsonPath) -> Self!@json.JsonDecodeError
+  forward(Self, @tensor.Tensor[Float]) -> @tensor.Tensor[Float]
   new[KernelSize : @shape.Shape2d](KernelSize, stride? : @shape.Shape2d) -> Self
-  parameters(Self) -> Iter[@tensor.Tensor]
-  to_json(Self) -> Json
+  parameters(Self) -> Iter[@tensor.Tensor[Float]]
 }
 impl Show for AvgPool2d
 impl ToJson for AvgPool2d
 impl @json.FromJson for AvgPool2d
 
 pub(readonly) struct Conv2d {
-  weight : Array[Array[@tensor.Tensor]]
-  bias : @tensor.Tensor
+  weight : Array[Array[@tensor.Tensor[Float]]]
+  bias : @tensor.Tensor[Float]
   padding : (Int, Int)
 }
 impl Conv2d {
-  forward(Self, @tensor.Tensor) -> @tensor.Tensor
-  from_json(Json, @json.JsonPath) -> Self!@json.JsonDecodeError
+  forward(Self, @tensor.Tensor[Float]) -> @tensor.Tensor[Float]
   new[KernelSize : @shape.Shape2d](Int, Int, kernel_size~ : KernelSize, padding~ : @shape.Shape2d = ..) -> Self
   output(Self, Logger) -> Unit
-  parameters(Self) -> Iter[@tensor.Tensor]
-  to_json(Self) -> Json
+  parameters(Self) -> Iter[@tensor.Tensor[Float]]
 }
 impl Show for Conv2d
 impl ToJson for Conv2d
@@ -41,35 +37,31 @@ impl @json.FromJson for Conv2d
 
 type CrossEntropyLoss
 impl CrossEntropyLoss {
-  forward(Self, @tensor.Tensor, @tensor.Tensor) -> @tensor.Tensor
+  forward(Self, @tensor.Tensor[Float], @tensor.Tensor[Float]) -> @tensor.Tensor[Float]
   new(reduction~ : Reduction = ..) -> Self
   output(Self, Logger) -> Unit
 }
 
 type Flatten
 impl Flatten {
-  forward(Self, @tensor.Tensor) -> @tensor.Tensor
-  from_json(Json, @json.JsonPath) -> Self!@json.JsonDecodeError
+  forward(Self, @tensor.Tensor[Float]) -> @tensor.Tensor[Float]
   new(start~ : Int = .., end? : Int) -> Self
-  parameters(Self) -> Iter[@tensor.Tensor]
-  to_json(Self) -> Json
+  parameters(Self) -> Iter[@tensor.Tensor[Float]]
 }
 impl Show for Flatten
 impl ToJson for Flatten
 impl @json.FromJson for Flatten
 
 pub(readonly) struct Linear {
-  weight : @tensor.Tensor
-  bias : @tensor.Tensor
+  weight : @tensor.Tensor[Float]
+  bias : @tensor.Tensor[Float]
 }
 impl Linear {
-  forward(Self, @tensor.Tensor) -> @tensor.Tensor
-  from_json(Json, @json.JsonPath) -> Self!@json.JsonDecodeError
+  forward(Self, @tensor.Tensor[Float]) -> @tensor.Tensor[Float]
   new(Int, Int) -> Self
-  of(@tensor.Tensor, @tensor.Tensor) -> Self
+  of(@tensor.Tensor[Float], @tensor.Tensor[Float]) -> Self
   output(Self, Logger) -> Unit
-  parameters(Self) -> Iter[@tensor.Tensor]
-  to_json(Self) -> Json
+  parameters(Self) -> Iter[@tensor.Tensor[Float]]
 }
 impl Show for Linear
 impl ToJson for Linear
@@ -77,18 +69,16 @@ impl @json.FromJson for Linear
 
 type MSELoss
 impl MSELoss {
-  forward(Self, @tensor.Tensor, @tensor.Tensor) -> @tensor.Tensor
+  forward(Self, @tensor.Tensor[Float], @tensor.Tensor[Float]) -> @tensor.Tensor[Float]
   new() -> Self
   output(Self, Logger) -> Unit
 }
 
 type RMSNorm
 impl RMSNorm {
-  forward(Self, @tensor.Tensor) -> @tensor.Tensor
-  from_json(Json, @json.JsonPath) -> Self!@json.JsonDecodeError
+  forward(Self, @tensor.Tensor[Float]) -> @tensor.Tensor[Float]
   new[Shape : @shape.Shape](Shape, eps? : Float) -> Self
-  parameters(Self) -> Iter[@tensor.Tensor]
-  to_json(Self) -> Json
+  parameters(Self) -> Iter[@tensor.Tensor[Float]]
 }
 impl Show for RMSNorm
 impl ToJson for RMSNorm
@@ -96,12 +86,10 @@ impl @json.FromJson for RMSNorm
 
 type ReLU
 impl ReLU {
-  forward(Self, @tensor.Tensor) -> @tensor.Tensor
-  from_json(Json, @json.JsonPath) -> Self!@json.JsonDecodeError
+  forward(Self, @tensor.Tensor[Float]) -> @tensor.Tensor[Float]
   new() -> Self
   output(Self, Logger) -> Unit
-  parameters(Self) -> Iter[@tensor.Tensor]
-  to_json(Self) -> Json
+  parameters(Self) -> Iter[@tensor.Tensor[Float]]
 }
 impl Show for ReLU
 impl ToJson for ReLU
@@ -117,21 +105,19 @@ pub(all) struct Sequential {
   modules : Array[Module]
 }
 impl Sequential {
-  forward(Self[Module], @tensor.Tensor) -> @tensor.Tensor
+  forward(Self[Module], @tensor.Tensor[Float]) -> @tensor.Tensor[Float]
   new[Module : Module](Array[Module]) -> Self[Module]
   output(Self[Module], Logger) -> Unit
-  parameters(Self[Module]) -> Iter[@tensor.Tensor]
+  parameters(Self[Module]) -> Iter[@tensor.Tensor[Float]]
   to_string(Self[Module]) -> String
 }
 
 type SiLU
 impl SiLU {
-  forward(Self, @tensor.Tensor) -> @tensor.Tensor
-  from_json(Json, @json.JsonPath) -> Self!@json.JsonDecodeError
+  forward(Self, @tensor.Tensor[Float]) -> @tensor.Tensor[Float]
   new() -> Self
   output(Self, Logger) -> Unit
-  parameters(Self) -> Iter[@tensor.Tensor]
-  to_json(Self) -> Json
+  parameters(Self) -> Iter[@tensor.Tensor[Float]]
 }
 impl Show for SiLU
 impl ToJson for SiLU
@@ -139,11 +125,9 @@ impl @json.FromJson for SiLU
 
 type Sigmoid
 impl Sigmoid {
-  forward(Self, @tensor.Tensor) -> @tensor.Tensor
-  from_json(Json, @json.JsonPath) -> Self!@json.JsonDecodeError
+  forward(Self, @tensor.Tensor[Float]) -> @tensor.Tensor[Float]
   new() -> Self
-  parameters(Self) -> Iter[@tensor.Tensor]
-  to_json(Self) -> Json
+  parameters(Self) -> Iter[@tensor.Tensor[Float]]
 }
 impl Show for Sigmoid
 impl ToJson for Sigmoid
@@ -151,12 +135,10 @@ impl @json.FromJson for Sigmoid
 
 type Softmax
 impl Softmax {
-  forward(Self, @tensor.Tensor) -> @tensor.Tensor
-  from_json(Json, @json.JsonPath) -> Self!@json.JsonDecodeError
+  forward(Self, @tensor.Tensor[Float]) -> @tensor.Tensor[Float]
   new() -> Self
   output(Self, Logger) -> Unit
-  parameters(Self) -> Iter[@tensor.Tensor]
-  to_json(Self) -> Json
+  parameters(Self) -> Iter[@tensor.Tensor[Float]]
 }
 impl Show for Softmax
 impl ToJson for Softmax
@@ -164,11 +146,10 @@ impl @json.FromJson for Softmax
 
 type Tanh
 impl Tanh {
-  forward(Self, @tensor.Tensor) -> @tensor.Tensor
+  forward(Self, @tensor.Tensor[Float]) -> @tensor.Tensor[Float]
   new() -> Self
   output(Self, Logger) -> Unit
-  parameters(Self) -> Iter[@tensor.Tensor]
-  to_json(Self) -> Json
+  parameters(Self) -> Iter[@tensor.Tensor[Float]]
 }
 impl Show for Tanh
 impl ToJson for Tanh
@@ -177,8 +158,8 @@ impl ToJson for Tanh
 
 // Traits
 pub(open) trait Module : Show {
-  forward(Self, @tensor.Tensor) -> @tensor.Tensor
-  parameters(Self) -> Iter[@tensor.Tensor]
+  forward(Self, @tensor.Tensor[Float]) -> @tensor.Tensor[Float]
+  parameters(Self) -> Iter[@tensor.Tensor[Float]]
 }
 impl[A : Module, B : Module] Module for (A, B)
 impl[A : Module, B : Module, C : Module] Module for (A, B, C)

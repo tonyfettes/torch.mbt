@@ -1,13 +1,13 @@
 test "CrossEntropyLoss" {
-  let input = @tensor.tensor([0.0, 1.0e3, 0.0])
-  let target = @tensor.tensor([0.3, 0.3, 0.4])
+  let input : @tensor.Tensor[Float] = @tensor.tensor([0.0, 1.0e3, 0.0])
+  let target : @tensor.Tensor[Float] = @tensor.tensor([0.3, 0.3, 0.4])
   let loss = @nn.CrossEntropyLoss::new()
   let output = loss.forward(input, target)
   inspect!(output, content="700")
 }
 
 test "CrossEntropyLoss/Random" {
-  let input = @tensor.tensor(
+  let input : @tensor.Tensor[Float] = @tensor.tensor(
     [
       -0.14630347333285626, -0.11041421512364283, -0.12559252186003866, -0.13513121430614242,
       -0.1788202792999719, -0.1412897765465771, -0.12746655654191671, -0.12665480060556913,
@@ -25,7 +25,7 @@ test "CrossEntropyLoss/Random" {
 }
 
 test "CrossEntropyLoss/Backward" {
-  let input = @tensor.tensor(
+  let input : @tensor.Tensor[Float] = @tensor.tensor(
     [
       -0.14630347333285626, -0.11041421512364283, -0.12559252186003866, -0.13513121430614242,
       -0.1788202792999719, -0.1412897765465771, -0.12746655654191671, -0.12665480060556913,
@@ -54,7 +54,7 @@ test "CrossEntropyLoss/Backward" {
 }
 
 test "CrossEntropyLoss/Batch" {
-  let input = @tensor.tensor(
+  let input : @tensor.Tensor[Float] = @tensor.tensor(
     FixedArray::makei(2 * 4 * 2 * 2, fn(i) { i.to_double() }),
   ).reshape([2, 4, 2, 2])
   let target = @tensor.zeros([2, 4, 2, 2])

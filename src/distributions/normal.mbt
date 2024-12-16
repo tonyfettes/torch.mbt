@@ -18,21 +18,27 @@ fn normal(mean~ : Float = 0.0, std~ : Float = 1.0) -> Float {
 
 ///|
 struct Normal {
-  loc : @tensor.Tensor
-  scale : @tensor.Tensor
+  loc : @tensor.Tensor[Float]
+  scale : @tensor.Tensor[Float]
 }
 
 ///|
-pub fn Normal::new[Loc : @tensor.ToTensor, Scale : @tensor.ToTensor](
+pub fn Normal::new[Loc : @tensor.ToValue, Scale : @tensor.ToValue](
   loc : Loc,
   scale : Scale
 ) -> Normal {
-  let (loc, scale) = @tensor.broadcast(loc.to_tensor(), scale.to_tensor())
+  let (loc, scale) = @tensor.broadcast(
+    @tensor.tensor(loc),
+    @tensor.tensor(scale),
+  )
   Normal::{ loc, scale }
 }
 
 ///|
-pub fn Normal::sample(self : Normal, shape : @shape.Shape) -> @tensor.Tensor {
+pub fn Normal::sample(
+  self : Normal,
+  shape : @shape.Shape
+) -> @tensor.Tensor[Float] {
   let shape = shape.to_fixed_array()
   let sample = @tensor.zeros([..shape, ..self.loc.shape._])
   self.sample_(sample)
@@ -40,7 +46,7 @@ pub fn Normal::sample(self : Normal, shape : @shape.Shape) -> @tensor.Tensor {
 }
 
 ///|
-pub fn Normal::sample_(self : Normal, sample : @tensor.Tensor) -> Unit {
+pub fn Normal::sample_(self : Normal, sample : @tensor.Tensor[Float]) -> Unit {
   let loc = self.loc.broadcast_to(sample.shape)
   let scale = self.scale.broadcast_to(sample.shape)
   for i = 0; i < sample.value.length(); i = i + 1 {
@@ -49,7 +55,10 @@ pub fn Normal::sample_(self : Normal, sample : @tensor.Tensor) -> Unit {
 }
 
 ///|
-pub fn Normal::rsample(self : Normal, shape : @shape.Shape) -> @tensor.Tensor {
+pub fn Normal::rsample(
+  self : Normal,
+  shape : @shape.Shape
+) -> @tensor.Tensor[Float] {
   let shape = shape.to_fixed_array()
   let sample = @tensor.zeros([..shape, ..self.loc.shape._])
   for i = 0; i < sample.value.length(); i = i + 1 {
@@ -62,6 +71,6 @@ pub fn Normal::rsample(self : Normal, shape : @shape.Shape) -> @tensor.Tensor {
 pub let standard_normal : Normal = Normal::new(0.0, 1.0)
 
 ///|
-pub fn Normal::entropy(self : Normal) -> @tensor.Tensor {
+pub fn Normal::entropy(self : Normal) -> @tensor.Tensor[Float] {
   @tensor.tensor((2.0 * @math.PI).ln() * 0.5 + 0.5) + self.scale.log()
 }

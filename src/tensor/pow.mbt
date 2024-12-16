@@ -34,7 +34,7 @@ test "power" {
 }
 
 ///|
-pub fn Tensor::pow(self : Tensor, exponent : Int) -> Tensor {
+pub fn Tensor::pow(self : Tensor[Float], exponent : Int) -> Tensor[Float] {
   let length = self.value.length()
   let output : FixedArray[Float] = FixedArray::make(length, (0.0 : Float))
   for i = 0; i < self.value.length(); i = i + 1 {
