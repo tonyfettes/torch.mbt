@@ -17,3 +17,16 @@ test "qr" {
     [-4, 24, -41.00000762939453],
   ])
 }
+
+test "panic qr/1d" {
+  let a = @tensor.tensor([12.0, -51, 4])
+  @linalg.qr(a) |> ignore
+}
+
+test "panic qr/3d" {
+  let a = @tensor.tensor([
+    [[12.0, -51, 4], [6, 167, -68], [-4, 24, -41]],
+    [[12.0, -51, 4], [6, 167, -68], [-4, 24, -41]],
+  ])
+  @linalg.qr(a) |> ignore
+}
