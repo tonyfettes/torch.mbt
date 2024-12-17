@@ -1,16 +1,14 @@
 test "avg_pool2d" {
-  let input : @tensor.Tensor[Float] = @tensor.tensor(
+  let input : @tensor.Tensor[Float] = @tensor.tensor([
     [
       [
-        [
-          [1.0, 2.0, 3.0, 4.0],
-          [2.0, 3.0, 4.0, 5.0],
-          [3.0, 4.0, 5.0, 6.0],
-          [4.0, 5.0, 6.0, 7.0],
-        ],
+        [1.0, 2.0, 3.0, 4.0],
+        [2.0, 3.0, 4.0, 5.0],
+        [3.0, 4.0, 5.0, 6.0],
+        [4.0, 5.0, 6.0, 7.0],
       ],
     ],
-  )
+  ])
   inspect!(
     @tensor.avg_pool2d(input, kernel_size=(2, 2), stride=(2, 2)),
     content="[[[[2, 4], [4, 6]]]]",
@@ -22,9 +20,10 @@ test "avg_pool2d" {
 }
 
 test "panic avg_pool2d" {
-  let input : @tensor.Tensor[Float] = @tensor.tensor(
-    [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]],
-  )
+  let input : @tensor.Tensor[Float] = @tensor.tensor([
+    [1.0, 2.0, 3.0],
+    [4.0, 5.0, 6.0],
+  ])
   input.avg_pool2d(kernel_size=(2, 2), stride=(2, 2)) |> ignore()
 }
 

@@ -50,10 +50,9 @@ pub fn CrossEntropyLoss::forward(
   let output = match dimension {
     1 => compute1d(input, target)
     2 =>
-      FixedArray::makei(
-        input_shape[0],
-        fn(i) { compute1d(input[i][:].to_tensor(), target[i][:].to_tensor()) },
-      )
+      FixedArray::makei(input_shape[0], fn(i) {
+        compute1d(input[i][:].to_tensor(), target[i][:].to_tensor())
+      })
       |> @tensor.stack()
     dimension =>
       if dimension <= 0 {
@@ -63,21 +62,12 @@ pub fn CrossEntropyLoss::forward(
       } else {
         let input = input.flatten(start=2)
         let target = target.flatten(start=2)
-        let output = FixedArray::makei(
-            input.shape[0],
-            fn(i) {
-              FixedArray::makei(
-                input.shape[2],
-                fn(j) {
-                  compute1d(
-                    input[i][:][j].to_tensor(),
-                    target[i][:][j].to_tensor(),
-                  )
-                },
-              )
-              |> @tensor.stack()
-            },
-          )
+        let output = FixedArray::makei(input.shape[0], fn(i) {
+            FixedArray::makei(input.shape[2], fn(j) {
+              compute1d(input[i][:][j].to_tensor(), target[i][:][j].to_tensor())
+            })
+            |> @tensor.stack()
+          })
           |> @tensor.stack()
         let output_shape = FixedArray::make(dimension - 1, input_shape[0])
         for i in 1..<(dimension - 1) {

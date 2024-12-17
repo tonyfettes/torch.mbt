@@ -29,13 +29,11 @@ pub impl[Module : @nn.Module + Transpile] Transpile for @nn.Sequential[Module] w
     module_variables.push(variable)
   }
   transpiler.line("\{variable} = torch.nn.Sequential(")
-  transpiler.open(
-    fn() {
-      for module_variable in module_variables {
-        transpiler.line("\{module_variable},")
-      }
-    },
-  )
+  transpiler.open(fn() {
+    for module_variable in module_variables {
+      transpiler.line("\{module_variable},")
+    }
+  })
   transpiler.line(")")
 }
 
@@ -58,16 +56,14 @@ pub impl Transpile for @nn.Linear with transpile(
     "\{variable} = torch.nn.Linear(\{self.weight.shape[0]}, \{self.weight.shape[1]})",
   )
   transpiler.line("with torch.no_grad():")
-  transpiler.open(
-    fn() {
-      transpiler.line(
-        "\{variable}.weight = torch.nn.Parameter(torch.tensor(\{self.weight.to_json().stringify()}).transpose(-2, -1))",
-      )
-      transpiler.line(
-        "\{variable}.bias = torch.nn.Parameter(torch.tensor(\{self.bias.to_json().stringify()}))",
-      )
-    },
-  )
+  transpiler.open(fn() {
+    transpiler.line(
+      "\{variable}.weight = torch.nn.Parameter(torch.tensor(\{self.weight.to_json().stringify()}).transpose(-2, -1))",
+    )
+    transpiler.line(
+      "\{variable}.bias = torch.nn.Parameter(torch.tensor(\{self.bias.to_json().stringify()}))",
+    )
+  })
 }
 
 ///|
@@ -91,16 +87,14 @@ pub impl Transpile for @nn.Conv2d with transpile(
     "\{variable} = torch.nn.Conv2d(\{self.weight[1].length()}, \{self.weight.length()}, kernel_size=\{kernel_size}, padding=\{self.padding})",
   )
   transpiler.line("with torch.no_grad():")
-  transpiler.open(
-    fn() {
-      transpiler.line(
-        "\{variable}.weight = torch.nn.Parameter(torch.tensor(\{self.weight.to_json().stringify()}))",
-      )
-      transpiler.line(
-        "\{variable}.bias = torch.nn.Parameter(torch.tensor(\{self.bias.to_json().stringify()}))",
-      )
-    },
-  )
+  transpiler.open(fn() {
+    transpiler.line(
+      "\{variable}.weight = torch.nn.Parameter(torch.tensor(\{self.weight.to_json().stringify()}))",
+    )
+    transpiler.line(
+      "\{variable}.bias = torch.nn.Parameter(torch.tensor(\{self.bias.to_json().stringify()}))",
+    )
+  })
 }
 
 ///|

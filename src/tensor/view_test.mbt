@@ -1,7 +1,8 @@
 test "TensorView::op_get" {
-  let tensor : @tensor.Tensor[Float] = @tensor.tensor(
-    [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]],
-  )
+  let tensor : @tensor.Tensor[Float] = @tensor.tensor([
+    [1.0, 2.0, 3.0],
+    [4.0, 5.0, 6.0],
+  ])
   let view = tensor[1]
   @json.inspect!(view, content=[4, 5, 6])
   let view = tensor[0]
@@ -9,9 +10,10 @@ test "TensorView::op_get" {
 }
 
 test "panic TensorView::op_get/out-of-bound" {
-  let tensor : @tensor.Tensor[Float] = @tensor.tensor(
-    [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]],
-  )
+  let tensor : @tensor.Tensor[Float] = @tensor.tensor([
+    [1.0, 2.0, 3.0],
+    [4.0, 5.0, 6.0],
+  ])
   tensor[2] |> ignore()
 }
 
@@ -21,16 +23,18 @@ test "panic TensorView::op_get/scalar" {
 }
 
 test "panic TensorView::op_get/too-deep" {
-  let tensor : @tensor.Tensor[Float] = @tensor.tensor(
-    [[[1.0, 2.0], [3.0, 4.0]], [[5.0, 6.0], [7.0, 8.0]]],
-  )
+  let tensor : @tensor.Tensor[Float] = @tensor.tensor([
+    [[1.0, 2.0], [3.0, 4.0]],
+    [[5.0, 6.0], [7.0, 8.0]],
+  ])
   tensor[1][1][1][1] |> ignore()
 }
 
 test "TensorView::op_set" {
-  let tensor : @tensor.Tensor[Float] = @tensor.tensor(
-    [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]],
-  )
+  let tensor : @tensor.Tensor[Float] = @tensor.tensor([
+    [1.0, 2.0, 3.0],
+    [4.0, 5.0, 6.0],
+  ])
   tensor[:][1] = [7.0, 8.0]
   inspect!(tensor, content="[[1, 7, 3], [4, 8, 6]]")
   tensor[:][0] = [0.0, 1.0]
@@ -42,9 +46,10 @@ test "TensorView::op_set" {
 }
 
 test "TensorView::to_tensor" {
-  let tensor : @tensor.Tensor[Float] = @tensor.tensor(
-    [[0.0, 1.0, 2.0], [3.0, 4.0, 5.0]],
-  )
+  let tensor : @tensor.Tensor[Float] = @tensor.tensor([
+    [0.0, 1.0, 2.0],
+    [3.0, 4.0, 5.0],
+  ])
   let view = tensor[1]
   let tensor = view.to_tensor()
   inspect!(tensor.value, content="[3, 4, 5]")
@@ -62,9 +67,10 @@ test "TensorView::iter" {
 }
 
 test "TensorView::iter/shape" {
-  let a : @tensor.Tensor[Float] = @tensor.tensor(
-    [[[1.0, 2.0], [3.0, 4.0]], [[5.0, 6.0], [7.0, 8.0]]],
-  )
+  let a : @tensor.Tensor[Float] = @tensor.tensor([
+    [[1.0, 2.0], [3.0, 4.0]],
+    [[5.0, 6.0], [7.0, 8.0]],
+  ])
   @json.inspect!(a.shape, content=[2, 2, 2])
   let bs = FixedArray::from_iter(a[1].iter())
   @json.inspect!(bs[0], content=[5, 6])

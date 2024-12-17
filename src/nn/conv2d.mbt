@@ -27,15 +27,9 @@ pub fn Conv2d::new[KernelSize : @shape.Shape2d](
     let stdv = (1.0 : Float) / n.to_float().sqrt()
     @distributions.Uniform::new(-stdv, stdv)
   }
-  let weight = Array::makei(
-    out_channels,
-    fn(__) {
-      Array::makei(
-        in_channels,
-        fn(__) { weight_distribution.sample(kernel_size) },
-      )
-    },
-  )
+  let weight = Array::makei(out_channels, fn(__) {
+    Array::makei(in_channels, fn(__) { weight_distribution.sample(kernel_size) })
+  })
   let bias = weight_distribution.sample([out_channels])
   Conv2d::{ weight, bias, padding: padding.to_tuple() }
 }
@@ -61,27 +55,17 @@ pub fn Conv2d::forward(
     )
   }
   let batch_size = input.shape[0]
-  let batch = FixedArray::makei(
-    batch_size,
-    fn(n) {
-      let channels = FixedArray::makei(
-        out_channels,
-        fn(oc) {
-          let correlations = FixedArray::makei(
-            in_channels,
-            fn(ic) {
-              let input = input[n][ic].to_tensor()
-              let weight = self.weight[oc][ic]
-              @tensor.correlate2d(input, weight, padding=self.padding.0)
-            },
-          )
-          @tensor.Tensor::stack(correlations).sum(dim=0) +
-          self.bias[oc].to_tensor()
-        },
-      )
-      @tensor.Tensor::stack(channels)
-    },
-  )
+  let batch = FixedArray::makei(batch_size, fn(n) {
+    let channels = FixedArray::makei(out_channels, fn(oc) {
+      let correlations = FixedArray::makei(in_channels, fn(ic) {
+        let input = input[n][ic].to_tensor()
+        let weight = self.weight[oc][ic]
+        @tensor.correlate2d(input, weight, padding=self.padding.0)
+      })
+      @tensor.Tensor::stack(correlations).sum(dim=0) + self.bias[oc].to_tensor()
+    })
+    @tensor.Tensor::stack(channels)
+  })
   @tensor.Tensor::stack(batch)
 }
 

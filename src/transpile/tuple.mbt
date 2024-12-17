@@ -12,13 +12,11 @@ pub impl[A : Transpile, B : Transpile] Transpile for (A, B) with transpile(
   Transpile::transpile(self.1, transpiler, module_variable)
   module_variables.push(module_variable)
   transpiler.line("\{variable} = torch.nn.Sequential(")
-  transpiler.open(
-    fn() {
-      for module_variable in module_variables {
-        transpiler.line("\{module_variable},")
-      }
-    },
-  )
+  transpiler.open(fn() {
+    for module_variable in module_variables {
+      transpiler.line("\{module_variable},")
+    }
+  })
   transpiler.line(")")
 }
 
@@ -39,13 +37,11 @@ pub impl[A : Transpile, B : Transpile, C : Transpile] Transpile for (A, B, C) wi
   Transpile::transpile(self.2, transpiler, module_variable)
   module_variables.push(module_variable)
   transpiler.line("\{variable} = torch.nn.Sequential(")
-  transpiler.open(
-    fn() {
-      for module_variable in module_variables {
-        transpiler.line("\{module_variable},")
-      }
-    },
-  )
+  transpiler.open(fn() {
+    for module_variable in module_variables {
+      transpiler.line("\{module_variable},")
+    }
+  })
   transpiler.line(")")
 }
 
@@ -74,13 +70,11 @@ pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile] Transpile f
   Transpile::transpile(self.3, transpiler, module_variable)
   module_variables.push(module_variable)
   transpiler.line("\{variable} = torch.nn.Sequential(")
-  transpiler.open(
-    fn() {
-      for module_variable in module_variables {
-        transpiler.line("\{module_variable},")
-      }
-    },
-  )
+  transpiler.open(fn() {
+    for module_variable in module_variables {
+      transpiler.line("\{module_variable},")
+    }
+  })
   transpiler.line(")")
 }
 
@@ -113,13 +107,11 @@ pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpi
   Transpile::transpile(self.4, transpiler, module_variable)
   module_variables.push(module_variable)
   transpiler.line("\{variable} = torch.nn.Sequential(")
-  transpiler.open(
-    fn() {
-      for module_variable in module_variables {
-        transpiler.line("\{module_variable},")
-      }
-    },
-  )
+  transpiler.open(fn() {
+    for module_variable in module_variables {
+      transpiler.line("\{module_variable},")
+    }
+  })
   transpiler.line(")")
 }
 
@@ -156,13 +148,11 @@ pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpi
   Transpile::transpile(self.5, transpiler, module_variable)
   module_variables.push(module_variable)
   transpiler.line("\{variable} = torch.nn.Sequential(")
-  transpiler.open(
-    fn() {
-      for module_variable in module_variables {
-        transpiler.line("\{module_variable},")
-      }
-    },
-  )
+  transpiler.open(fn() {
+    for module_variable in module_variables {
+      transpiler.line("\{module_variable},")
+    }
+  })
   transpiler.line(")")
 }
 
@@ -203,13 +193,11 @@ pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpi
   Transpile::transpile(self.6, transpiler, module_variable)
   module_variables.push(module_variable)
   transpiler.line("\{variable} = torch.nn.Sequential(")
-  transpiler.open(
-    fn() {
-      for module_variable in module_variables {
-        transpiler.line("\{module_variable},")
-      }
-    },
-  )
+  transpiler.open(fn() {
+    for module_variable in module_variables {
+      transpiler.line("\{module_variable},")
+    }
+  })
   transpiler.line(")")
 }
 
@@ -254,13 +242,11 @@ pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpi
   Transpile::transpile(self.7, transpiler, module_variable)
   module_variables.push(module_variable)
   transpiler.line("\{variable} = torch.nn.Sequential(")
-  transpiler.open(
-    fn() {
-      for module_variable in module_variables {
-        transpiler.line("\{module_variable},")
-      }
-    },
-  )
+  transpiler.open(fn() {
+    for module_variable in module_variables {
+      transpiler.line("\{module_variable},")
+    }
+  })
   transpiler.line(")")
 }
 
@@ -309,13 +295,11 @@ pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpi
   Transpile::transpile(self.8, transpiler, module_variable)
   module_variables.push(module_variable)
   transpiler.line("\{variable} = torch.nn.Sequential(")
-  transpiler.open(
-    fn() {
-      for module_variable in module_variables {
-        transpiler.line("\{module_variable},")
-      }
-    },
-  )
+  transpiler.open(fn() {
+    for module_variable in module_variables {
+      transpiler.line("\{module_variable},")
+    }
+  })
   transpiler.line(")")
 }
 
@@ -368,13 +352,11 @@ pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpi
   Transpile::transpile(self.9, transpiler, module_variable)
   module_variables.push(module_variable)
   transpiler.line("\{variable} = torch.nn.Sequential(")
-  transpiler.open(
-    fn() {
-      for module_variable in module_variables {
-        transpiler.line("\{module_variable},")
-      }
-    },
-  )
+  transpiler.open(fn() {
+    for module_variable in module_variables {
+      transpiler.line("\{module_variable},")
+    }
+  })
   transpiler.line(")")
 }
 
@@ -431,13 +413,11 @@ pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpi
   Transpile::transpile(self.10, transpiler, module_variable)
   module_variables.push(module_variable)
   transpiler.line("\{variable} = torch.nn.Sequential(")
-  transpiler.open(
-    fn() {
-      for module_variable in module_variables {
-        transpiler.line("\{module_variable},")
-      }
-    },
-  )
+  transpiler.open(fn() {
+    for module_variable in module_variables {
+      transpiler.line("\{module_variable},")
+    }
+  })
   transpiler.line(")")
 }
 
@@ -498,13 +478,11 @@ pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpi
   Transpile::transpile(self.11, transpiler, module_variable)
   module_variables.push(module_variable)
   transpiler.line("\{variable} = torch.nn.Sequential(")
-  transpiler.open(
-    fn() {
-      for module_variable in module_variables {
-        transpiler.line("\{module_variable},")
-      }
-    },
-  )
+  transpiler.open(fn() {
+    for module_variable in module_variables {
+      transpiler.line("\{module_variable},")
+    }
+  })
   transpiler.line(")")
 }
 
@@ -569,13 +547,11 @@ pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpi
   Transpile::transpile(self.12, transpiler, module_variable)
   module_variables.push(module_variable)
   transpiler.line("\{variable} = torch.nn.Sequential(")
-  transpiler.open(
-    fn() {
-      for module_variable in module_variables {
-        transpiler.line("\{module_variable},")
-      }
-    },
-  )
+  transpiler.open(fn() {
+    for module_variable in module_variables {
+      transpiler.line("\{module_variable},")
+    }
+  })
   transpiler.line(")")
 }
 
@@ -644,13 +620,11 @@ pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpi
   Transpile::transpile(self.13, transpiler, module_variable)
   module_variables.push(module_variable)
   transpiler.line("\{variable} = torch.nn.Sequential(")
-  transpiler.open(
-    fn() {
-      for module_variable in module_variables {
-        transpiler.line("\{module_variable},")
-      }
-    },
-  )
+  transpiler.open(fn() {
+    for module_variable in module_variables {
+      transpiler.line("\{module_variable},")
+    }
+  })
   transpiler.line(")")
 }
 
@@ -723,13 +697,11 @@ pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpi
   Transpile::transpile(self.14, transpiler, module_variable)
   module_variables.push(module_variable)
   transpiler.line("\{variable} = torch.nn.Sequential(")
-  transpiler.open(
-    fn() {
-      for module_variable in module_variables {
-        transpiler.line("\{module_variable},")
-      }
-    },
-  )
+  transpiler.open(fn() {
+    for module_variable in module_variables {
+      transpiler.line("\{module_variable},")
+    }
+  })
   transpiler.line(")")
 }
 
@@ -806,12 +778,10 @@ pub impl[A : Transpile, B : Transpile, C : Transpile, D : Transpile, E : Transpi
   Transpile::transpile(self.15, transpiler, module_variable)
   module_variables.push(module_variable)
   transpiler.line("\{variable} = torch.nn.Sequential(")
-  transpiler.open(
-    fn() {
-      for module_variable in module_variables {
-        transpiler.line("\{module_variable},")
-      }
-    },
-  )
+  transpiler.open(fn() {
+    for module_variable in module_variables {
+      transpiler.line("\{module_variable},")
+    }
+  })
   transpiler.line(")")
 }

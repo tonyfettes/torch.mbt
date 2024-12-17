@@ -298,29 +298,27 @@ pub fn TensorView::iter[Dtype](
   if dimension == 0 {
     abort("Iterating over a scalar tensor is not allowed.")
   }
-  Iter::new(
-    fn(yield_) {
-      for i in 0..<shape[0] {
-        let shape = FixedArray::make(dimension - 1, 0)
-        for j in 1..<dimension {
-          shape[j - 1] = self.shape[j]
-        }
-        let index : FixedArray[TensorIndex] = FixedArray::make(
-          self.index.length() + 1,
-          self.index[0],
-        )
-        for j in 0..<self.index.length() {
-          index[j] = self.index[j]
-        }
-        index[self.index.length()] = Index(i)
-        let view = TensorView::{ tensor: self.tensor, shape, index }
-        match yield_(view) {
-          IterContinue => ()
-          IterEnd => break IterEnd
-        }
-      } else {
-        IterEnd
+  Iter::new(fn(yield_) {
+    for i in 0..<shape[0] {
+      let shape = FixedArray::make(dimension - 1, 0)
+      for j in 1..<dimension {
+        shape[j - 1] = self.shape[j]
       }
-    },
-  )
+      let index : FixedArray[TensorIndex] = FixedArray::make(
+        self.index.length() + 1,
+        self.index[0],
+      )
+      for j in 0..<self.index.length() {
+        index[j] = self.index[j]
+      }
+      index[self.index.length()] = Index(i)
+      let view = TensorView::{ tensor: self.tensor, shape, index }
+      match yield_(view) {
+        IterContinue => ()
+        IterEnd => break IterEnd
+      }
+    } else {
+      IterEnd
+    }
+  })
 }

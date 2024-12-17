@@ -11,14 +11,11 @@ test "Tensor::broadcast - scalar" {
   let y = @tensor.zeros([3, 1, 7])
   let (bx, _) = @tensor.broadcast(x, y)
   @json.inspect!(bx.shape, content=[3, 1, 7])
-  @json.inspect!(
-    bx,
-    content=[
-      [[1, 1, 1, 1, 1, 1, 1]],
-      [[1, 1, 1, 1, 1, 1, 1]],
-      [[1, 1, 1, 1, 1, 1, 1]],
-    ],
-  )
+  @json.inspect!(bx, content=[
+    [[1, 1, 1, 1, 1, 1, 1]],
+    [[1, 1, 1, 1, 1, 1, 1]],
+    [[1, 1, 1, 1, 1, 1, 1]],
+  ])
 }
 
 test "Tensor::broadcast - vector" {
@@ -26,39 +23,34 @@ test "Tensor::broadcast - vector" {
   let y = @tensor.zeros([7, 1, 3])
   let (bx, _) = @tensor.broadcast(x, y)
   @json.inspect!(bx.shape, content=[7, 1, 3])
-  @json.inspect!(
-    bx,
-    content=[
-      [[1, 2, 3]],
-      [[1, 2, 3]],
-      [[1, 2, 3]],
-      [[1, 2, 3]],
-      [[1, 2, 3]],
-      [[1, 2, 3]],
-      [[1, 2, 3]],
-    ],
-  )
+  @json.inspect!(bx, content=[
+    [[1, 2, 3]],
+    [[1, 2, 3]],
+    [[1, 2, 3]],
+    [[1, 2, 3]],
+    [[1, 2, 3]],
+    [[1, 2, 3]],
+    [[1, 2, 3]],
+  ])
 }
 
 test "Tensor::broadcast - matrix" {
-  let x : @tensor.Tensor[Float] = @tensor.tensor(
-    [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]],
-  )
+  let x : @tensor.Tensor[Float] = @tensor.tensor([
+    [1.0, 2.0, 3.0],
+    [4.0, 5.0, 6.0],
+  ])
   let y = @tensor.zeros([7, 2, 3])
   let (bx, _) = @tensor.broadcast(x, y)
   @json.inspect!(bx.shape, content=[7, 2, 3])
-  @json.inspect!(
-    bx,
-    content=[
-      [[1, 2, 3], [4, 5, 6]],
-      [[1, 2, 3], [4, 5, 6]],
-      [[1, 2, 3], [4, 5, 6]],
-      [[1, 2, 3], [4, 5, 6]],
-      [[1, 2, 3], [4, 5, 6]],
-      [[1, 2, 3], [4, 5, 6]],
-      [[1, 2, 3], [4, 5, 6]],
-    ],
-  )
+  @json.inspect!(bx, content=[
+    [[1, 2, 3], [4, 5, 6]],
+    [[1, 2, 3], [4, 5, 6]],
+    [[1, 2, 3], [4, 5, 6]],
+    [[1, 2, 3], [4, 5, 6]],
+    [[1, 2, 3], [4, 5, 6]],
+    [[1, 2, 3], [4, 5, 6]],
+    [[1, 2, 3], [4, 5, 6]],
+  ])
 }
 
 test "Tensor::broadcast" {

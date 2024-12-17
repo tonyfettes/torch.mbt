@@ -38,10 +38,13 @@ pub fn Tensor::max(
       abort("Invalid dimension \{dim} for max operation.")
     }
   }
-  let shape = FixedArray::makei(
-    self.shape.length(),
-    fn(i) { if i == dim { 1 } else { self.shape[i] } },
-  )
+  let shape = FixedArray::makei(self.shape.length(), fn(i) {
+    if i == dim {
+      1
+    } else {
+      self.shape[i]
+    }
+  })
   let block = compute_block_size(shape)
   let total = shape[0] * block[0]
   let value = FixedArray::make(total, @float.min_value)
@@ -71,10 +74,13 @@ pub fn Tensor::max(
   let shape = if keep_dim {
     shape
   } else {
-    FixedArray::makei(
-      self.shape.length() - 1,
-      fn(i) { if i < dim { self.shape[i] } else { self.shape[i + 1] } },
-    )
+    FixedArray::makei(self.shape.length() - 1, fn(i) {
+      if i < dim {
+        self.shape[i]
+      } else {
+        self.shape[i + 1]
+      }
+    })
   }
   let block = compute_block_size(block)
   let value = Tensor::{
