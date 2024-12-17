@@ -54,3 +54,24 @@ test "triu" {
     ],
   ])
 }
+
+test "panic triu/0d" {
+  let a : @tensor.Tensor[Float] = @tensor.tensor(1.0)
+  a.triu() |> ignore
+}
+
+test "panic triu/1d" {
+  let a : @tensor.Tensor[Float] = @tensor.tensor([1.0, 2.0, 3.0])
+  a.triu() |> ignore
+}
+
+test "panic triu/3d" {
+  let a : @tensor.Tensor[Float] = @tensor.tensor([
+    [
+      [0.2309, 0.5207, 2.0049],
+      [0.2072, -1.0680, 0.6602],
+      [0.3480, -0.5211, -0.4573],
+    ],
+  ])
+  a.triu() |> ignore
+}
