@@ -1,8 +1,8 @@
 ///|
-pub fn Tensor::cat(
-  tensors : FixedArray[Tensor[Float]],
+pub fn Tensor::cat[Dtype](
+  tensors : FixedArray[Tensor[Dtype]],
   dim~ : Int = 0
-) -> Tensor[Float] {
+) -> Tensor[Dtype] {
   if tensors.length() == 0 {
     abort("No tensors to concatenate")
   }
