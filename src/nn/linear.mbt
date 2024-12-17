@@ -66,7 +66,7 @@ pub fn Linear::parameters(self : Linear) -> Iter[@tensor.Tensor[Float]] {
 }
 
 ///|
-pub fn Linear::output(self : Linear, logger : Logger) -> Unit {
+pub fn Linear::output(self : Linear, logger : &Logger) -> Unit {
   logger.write_string("Linear(\n")
   for row = 0; row < self.weight.length(); row = row + 1 {
     logger.write_string("  ")

@@ -8,10 +8,7 @@ test "Tensor::stack" {
     @tensor.tensor([5.0, 6.0]),
   ]
   let input = @tensor.stack(input)
-  @json.inspect!(
-    input,
-    content=[[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6]],
-  )
+  @json.inspect!(input, content=[[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6]])
 }
 
 test "panic Tensor::stack/empty" {

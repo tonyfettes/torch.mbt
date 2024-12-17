@@ -7,7 +7,7 @@ pub fn Tanh::new() -> Tanh {
 }
 
 ///|
-pub fn Tanh::output(_self : Tanh, logger : Logger) -> Unit {
+pub fn Tanh::output(_self : Tanh, logger : &Logger) -> Unit {
   logger.write_string("Tanh()")
 }
 

@@ -1,6 +1,7 @@
 ///|
 typealias Tensor[Dtype] = @tensor.Tensor[Dtype]
 
+///|
 pub let float : Float = 0.0
 
 ///|

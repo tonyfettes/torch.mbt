@@ -7,7 +7,7 @@ pub fn SiLU::new() -> SiLU {
 }
 
 ///|
-pub fn SiLU::output(_self : SiLU, logger : Logger) -> Unit {
+pub fn SiLU::output(_self : SiLU, logger : &Logger) -> Unit {
   logger.write_string("SiLU()")
 }
 

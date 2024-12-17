@@ -1,0 +1,6 @@
+{
+  "is-main": true,
+  "import": [
+    "tonyfettes/torch/bin/generate"
+  ]
+}

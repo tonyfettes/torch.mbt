@@ -7,7 +7,7 @@ pub fn Softmax::new() -> Softmax {
 }
 
 ///|
-pub fn Softmax::output(_self : Softmax, logger : Logger) -> Unit {
+pub fn Softmax::output(_self : Softmax, logger : &Logger) -> Unit {
   logger.write_string("Softmax()")
 }
 

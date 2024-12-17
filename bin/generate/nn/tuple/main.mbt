@@ -1,8 +1,10 @@
+///|
 let type_names = [
   "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P",
   "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
 ]
 
+///|
 pub fn build_type_parameters(
   length : Int,
   constraint~ : String = "Module"
@@ -14,12 +16,14 @@ pub fn build_type_parameters(
   String::concat(type_parameters, separator=", ")
 }
 
+///|
 pub fn build_tuple_type(length : Int) -> String {
   "(" +
   String::concat(type_names[:length].iter().collect(), separator=", ") +
   ")"
 }
 
+///|
 fn build_forward(length : Int) -> String {
   fn build_body(length : Int) {
     let lines = ["input"]
@@ -40,6 +44,7 @@ fn build_forward(length : Int) -> String {
   $|}
 }
 
+///|
 fn build_parameters(length : Int) -> String {
   fn build_body(length : Int) {
     let lines = ["self.0.parameters()"]
@@ -59,6 +64,7 @@ fn build_parameters(length : Int) -> String {
   $|}
 }
 
+///|
 fn main {
   let functions = []
   for i in 2..=16 {

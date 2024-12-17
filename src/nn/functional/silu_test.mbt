@@ -1,16 +1,14 @@
 test "silu" {
   let a : @tensor.Tensor[Float] = @tensor.tensor(1.0)
   @json.inspect!(@functional.silu(a), content=0.7310585975646973)
-  let b : @tensor.Tensor[Float] = @tensor.tensor(
-    [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]],
-  )
-  @json.inspect!(
-    @functional.silu(b),
-    content=[
-      [0.7310585975646973, 1.7615940570831299, 2.857722282409668],
-      [3.9280550479888916, 4.966536045074463, 5.985164642333984],
-    ],
-  )
+  let b : @tensor.Tensor[Float] = @tensor.tensor([
+    [1.0, 2.0, 3.0],
+    [4.0, 5.0, 6.0],
+  ])
+  @json.inspect!(@functional.silu(b), content=[
+    [0.7310585975646973, 1.7615940570831299, 2.857722282409668],
+    [3.9280550479888916, 4.966536045074463, 5.985164642333984],
+  ])
 }
 
 test "silu/consistent" (it : @test.T) {

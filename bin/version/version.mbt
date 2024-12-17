@@ -1,5 +1,7 @@
+///|
 let ignore_list = ["target", "node_modules"]
 
+///|
 fn should_ignore(item : String) -> Bool {
   if item.starts_with(".") || item.starts_with("_") {
     return true
@@ -7,6 +9,7 @@ fn should_ignore(item : String) -> Bool {
   ignore_list.contains(item)
 }
 
+///|
 pub fn update(path~ : String, version~ : String) -> Unit! {
   for item in @fs.read_dir!(path~) {
     if should_ignore(item) {
@@ -20,9 +23,7 @@ pub fn update(path~ : String, version~ : String) -> Unit! {
       let content = @fs.read_file_to_string!(path=item_path)
       match @json.parse!(content) {
         Object(
-          { "name": String(module_name), "version": String(module_version) }
-          as
-          module_
+          { "name": String(module_name), "version": String(module_version) } as module_
         ) => {
           if module_version == version {
             continue
@@ -65,6 +66,7 @@ pub fn update(path~ : String, version~ : String) -> Unit! {
   }
 }
 
+///|
 fn main {
   try {
     let module_ = @fs.read_file_to_string!(path="../moon.mod.json")

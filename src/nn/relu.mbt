@@ -7,7 +7,7 @@ pub fn ReLU::new() -> ReLU {
 }
 
 ///|
-pub fn ReLU::output(_self : ReLU, logger : Logger) -> Unit {
+pub fn ReLU::output(_self : ReLU, logger : &Logger) -> Unit {
   logger.write_string("ReLU()")
 }
 

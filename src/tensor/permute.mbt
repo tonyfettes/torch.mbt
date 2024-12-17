@@ -6,10 +6,9 @@ pub fn Tensor::permute(
   if permutation.length() != self.shape.length() {
     abort("Permutation length does not match tensor rank")
   }
-  let shape = FixedArray::makei(
-    self.shape.length(),
-    fn(i) { self.shape[permutation[i]] },
-  )
+  let shape = FixedArray::makei(self.shape.length(), fn(i) {
+    self.shape[permutation[i]]
+  })
   let value = Array::new(capacity=self.value.length())
   let index = Array::new(capacity=self.value.length())
   fn build(dimension : Int, offset : Int) -> Unit {

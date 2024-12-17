@@ -1,3 +1,4 @@
+///|
 fn build_pytorch_transpile(length : Int) -> String {
   let type_parameters = @generate/nn/tuple.build_type_parameters(
     length,
@@ -32,6 +33,7 @@ fn build_pytorch_transpile(length : Int) -> String {
   #|}
 }
 
+///|
 fn main {
   let functions = []
   for i in 2..=16 {

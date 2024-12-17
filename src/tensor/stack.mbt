@@ -18,6 +18,11 @@ pub fn Tensor::stack[Dtype](
   let value = @unsafe.UnsafeArray::new(total)
   let index = FixedArray::make(total, (-1, -1))
   for i in 0..<tensors.length() {
+    if @debug.DEBUG {
+      if tensors[i].shape != element.shape {
+        abort("Cannot stack tensors with different shapes")
+      }
+    }
     let tensor_i_value = tensors[i].value
     for j in 0..<tensor_i_value.length() {
       let k = i * block[0] + j

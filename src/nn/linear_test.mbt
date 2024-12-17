@@ -1,15 +1,13 @@
 test "Linear" {
   let linear = @nn.Linear::new(2, 2)
-  @tensor.with_no_grad(
-    fn() {
-      linear.weight[0][0] = 1.0
-      linear.weight[0][1] = 3.0
-      linear.weight[1][0] = 2.0
-      linear.weight[1][1] = 4.0
-      linear.bias[0] = 5.0
-      linear.bias[1] = 6.0
-    },
-  )
+  @tensor.with_no_grad(fn() {
+    linear.weight[0][0] = 1.0
+    linear.weight[0][1] = 3.0
+    linear.weight[1][0] = 2.0
+    linear.weight[1][1] = 4.0
+    linear.bias[0] = 5.0
+    linear.bias[1] = 6.0
+  })
   let input : @tensor.Tensor[Float] = @tensor.tensor([1.0, 2.0])
   let optimizer = @optim.SGD::new(linear.parameters(), learning_rate=0.1)
   let output = linear.forward(input)
@@ -34,19 +32,18 @@ test "Linear" {
 
 test "Linear with ReLU" {
   let linear = @nn.Linear::new(2, 2)
-  @tensor.with_no_grad(
-    fn() {
-      linear.weight[0][0] = 1.0
-      linear.weight[0][1] = 3.0
-      linear.weight[1][0] = 2.0
-      linear.weight[1][1] = 4.0
-      linear.bias[0] = 5.0
-      linear.bias[1] = 6.0
-    },
-  )
-  let layers : @nn.Sequential[@nn.Module] = @nn.Sequential::new(
-    [linear, @nn.ReLU::new()],
-  )
+  @tensor.with_no_grad(fn() {
+    linear.weight[0][0] = 1.0
+    linear.weight[0][1] = 3.0
+    linear.weight[1][0] = 2.0
+    linear.weight[1][1] = 4.0
+    linear.bias[0] = 5.0
+    linear.bias[1] = 6.0
+  })
+  let layers : @nn.Sequential[&@nn.Module] = @nn.Sequential::new([
+    linear,
+    @nn.ReLU::new(),
+  ])
   let optimizer = @optim.SGD::new(linear.parameters(), learning_rate=1)
   let input : @tensor.Tensor[Float] = @tensor.tensor([2.0, 2.0])
   let output = layers.forward(input)
@@ -70,19 +67,18 @@ test "Linear with ReLU" {
 
 test "Linear with Softmax" {
   let linear = @nn.Linear::new(2, 2)
-  @tensor.with_no_grad(
-    fn() {
-      linear.weight[0][0] = 2.0
-      linear.weight[0][1] = 2.0
-      linear.weight[1][0] = 2.0
-      linear.weight[1][1] = 2.0
-      linear.bias[0] = 1.0
-      linear.bias[1] = 2.0
-    },
-  )
-  let layers : @nn.Sequential[@nn.Module] = @nn.Sequential::new(
-    [linear, @nn.Softmax::new()],
-  )
+  @tensor.with_no_grad(fn() {
+    linear.weight[0][0] = 2.0
+    linear.weight[0][1] = 2.0
+    linear.weight[1][0] = 2.0
+    linear.weight[1][1] = 2.0
+    linear.bias[0] = 1.0
+    linear.bias[1] = 2.0
+  })
+  let layers : @nn.Sequential[&@nn.Module] = @nn.Sequential::new([
+    linear,
+    @nn.Softmax::new(),
+  ])
   let optimizer = @optim.SGD::new(linear.parameters(), learning_rate=1)
   let input : @tensor.Tensor[Float] = @tensor.tensor([2.0, 2.0])
   let output = layers.forward(input)
@@ -102,12 +98,10 @@ test "Linear with Softmax" {
 
 test "Linear Regression" {
   let model = @nn.Linear::new(1, 1)
-  @tensor.with_no_grad(
-    fn() {
-      model.weight[0][0] = 0.0
-      model.bias[0] = 0.0
-    },
-  )
+  @tensor.with_no_grad(fn() {
+    model.weight[0][0] = 0.0
+    model.bias[0] = 0.0
+  })
   let optimizer = @optim.SGD::new(model.parameters(), learning_rate=0.1)
   let target = fn(x : Array[Double]) { [2.0 * x[0] + 3] }
   let inputs = [
@@ -145,31 +139,25 @@ test "linear/consistent" (it : @test.T) {
   let distribution = @distributions.Uniform::new(-1.0, 1.0)
   let model = @nn.Linear::new(8, 16)
   let input = distribution.sample([1, 8])
-  @json.inspect!(
-    input,
-    content=[
-      [
-        -0.4301600456237793, 0.7356255054473877, 0.7850341796875, 0.32139527797698975,
-        0.6747739315032959, 0.8503944873809814, 0.2769254446029663, -0.5336059331893921,
-      ],
+  @json.inspect!(input, content=[
+    [
+      -0.4301600456237793, 0.7356255054473877, 0.7850341796875, 0.32139527797698975,
+      0.6747739315032959, 0.8503944873809814, 0.2769254446029663, -0.5336059331893921,
     ],
-  )
+  ])
   let output = model.forward(input)
   inspect!(input.shape, content="[1, 8]")
   inspect!(model.weight.shape, content="[8, 16]")
   let input_weight = input.matmul(model.weight)
   inspect!(input_weight.shape, content="[1, 16]")
-  @json.inspect!(
-    input_weight,
-    content=[
-      [
-        -0.14556150138378143, 0.34053102135658264, -0.2727360129356384, 0.09315243363380432,
-        0.2314411848783493, 0.009322114288806915, -0.22513717412948608, 0.004441825672984123,
-        -0.35770153999328613, 0.35220563411712646, 0.015071094036102295, -0.3460395932197571,
-        0.28992030024528503, 0.3369879126548767, -0.3778506815433502, 0.22615066170692444,
-      ],
+  @json.inspect!(input_weight, content=[
+    [
+      -0.14556150138378143, 0.34053102135658264, -0.2727360129356384, 0.09315243363380432,
+      0.2314411848783493, 0.009322114288806915, -0.22513717412948608, 0.004441825672984123,
+      -0.35770153999328613, 0.35220563411712646, 0.015071094036102295, -0.3460395932197571,
+      0.28992030024528503, 0.3369879126548767, -0.3778506815433502, 0.22615066170692444,
     ],
-  )
+  ])
   it.writeln(
     #|import torch
     #|

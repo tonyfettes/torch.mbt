@@ -1,14 +1,11 @@
 /// See: https://pytorch.org/docs/stable/generated/torch.tanh.html
 test "tanh" {
-  let a : @tensor.Tensor[Float] = @tensor.tensor(
-    [0.8986, -0.7279, 1.1745, 0.2611],
-  )
-  @json.inspect!(
-    a.tanh(),
-    content=[
-      0.715615451335907, -0.6217789053916931, 0.825709342956543, 0.255324125289917,
-    ],
-  )
+  let a : @tensor.Tensor[Float] = @tensor.tensor([
+    0.8986, -0.7279, 1.1745, 0.2611,
+  ])
+  @json.inspect!(a.tanh(), content=[
+    0.715615451335907, -0.6217789053916931, 0.825709342956543, 0.255324125289917,
+  ])
 }
 
 test "tanh/consistent" (it : @test.T) {

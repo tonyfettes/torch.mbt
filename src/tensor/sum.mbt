@@ -1,7 +1,7 @@
 ///|
 pub fn Tensor::sum(
   self : Tensor[Float],
-  dim? : @shape.Shape,
+  dim? : &@shape.Shape,
   keep_dim~ : Bool = false
 ) -> Tensor[Float] {
   let dim = match dim {

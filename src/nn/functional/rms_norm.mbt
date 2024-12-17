@@ -1,7 +1,7 @@
 ///|
 pub fn rms_norm(
   input : @tensor.Tensor[Float],
-  normalized_shape : @shape.Shape,
+  normalized_shape : &@shape.Shape,
   weight : @tensor.Tensor[Float],
   eps~ : Float = 1.0e-5
 ) -> @tensor.Tensor[Float] {
