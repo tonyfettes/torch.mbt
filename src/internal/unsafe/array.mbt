@@ -2,7 +2,24 @@
 pub(all) type UnsafeArray[T] FixedArray[T]
 
 ///|
-pub fn UnsafeArray::new[T](length : Int) -> UnsafeArray[T] = "%fixedarray.make_uninit"
+trait Primitive {
+  primitive() -> Unit
+}
+
+///|
+pub impl Primitive for Int with primitive() {  }
+
+///|
+pub impl Primitive for Int64 with primitive() {  }
+
+///|
+pub impl Primitive for Float with primitive() {  }
+
+///|
+pub impl Primitive for Double with primitive() {  }
+
+///|
+pub fn UnsafeArray::new[T : Primitive](length : Int) -> UnsafeArray[T] = "%fixedarray.make_uninit"
 
 ///|
 pub fn UnsafeArray::make[T](length : Int, init : T) -> UnsafeArray[T] = "%fixedarray.make"
