@@ -83,6 +83,7 @@ impl Tensor {
   sum(Self[Float], dim? : @shape.Shape, keep_dim~ : Bool = ..) -> Self[Float]
   tanh(Self[Float]) -> Self[Float]
   to_float[Dtype : ToFloat](Self[Dtype]) -> Self[Float]
+  to_int[Dtype : ToInt](Self[Dtype]) -> Self[Int]
   to_json[Dtype : ToJson](Self[Dtype]) -> Json
   to_string[Float : Show](Self[Float]) -> String
   transpose(Self[Float], Int, Int) -> Self[Float]
@@ -140,6 +141,8 @@ impl TensorToValue for Float
 
 trait ToFloat
 
+trait ToInt
+
 trait ToValue
 impl ToValue for Bool
 impl ToValue for Int
@@ -149,5 +152,6 @@ impl[T : ToValue] ToValue for FixedArray[T]
 impl[T : ToValue] ToValue for Array[T]
 
 trait ValueToTensor
+impl ValueToTensor for Int
 impl ValueToTensor for Float
 

@@ -35,9 +35,9 @@ pub fn Normal::new[Loc : @tensor.ToValue, Scale : @tensor.ToValue](
 }
 
 ///|
-pub fn Normal::sample(
+pub fn Normal::sample[Shape : @shape.Shape](
   self : Normal,
-  shape : @shape.Shape
+  shape : Shape
 ) -> @tensor.Tensor[Float] {
   let shape = shape.to_fixed_array()
   let sample = @tensor.zeros([..shape, ..self.loc.shape._])

@@ -1,12 +1,16 @@
 ///|
-pub(all) typealias Tensor = @tensor.Tensor[Float]
+typealias Tensor[Dtype] = @tensor.Tensor[Dtype]
+
+pub let float : Float = 0.0
 
 ///|
-pub fn tensor[X : @tensor.ToValue](
-  x : X,
+pub fn tensor[Value : @tensor.ToValue, Dtype : @tensor.ValueToTensor + Default](
+  value : Value,
+  dtype~ : Dtype = Dtype::default(),
   requires_grad~ : Bool = false
-) -> @tensor.Tensor[Float] {
-  @tensor.tensor(x, requires_grad~)
+) -> Tensor[Dtype] {
+  dtype |> ignore
+  @tensor.tensor(value, requires_grad~)
 }
 
 ///| TODO: This should be moved into
