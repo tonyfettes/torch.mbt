@@ -475,7 +475,7 @@ test "MNIST" {
     @nn.Sigmoid::new(),
     @nn.Linear::new(84, 10),
   )
-  let model = tuple as @nn.Module
+  let model = tuple as &@nn.Module
   let optimizer = @optim.SGD::new(model.parameters(), learning_rate=0.1)
   let criterion = @nn.CrossEntropyLoss::new()
   let output = model.forward(image)

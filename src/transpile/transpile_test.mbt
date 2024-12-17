@@ -3,7 +3,7 @@ trait Module: @nn.Module + @transpile.Transpile {}
 
 test (it : @test.T) {
   @distributions.seed(b"12345678223456783234567842345678")
-  let model : @nn.Sequential[Module] = @nn.Sequential::new([
+  let model : @nn.Sequential[&Module] = @nn.Sequential::new([
     @nn.Linear::new(1, 2),
     @nn.ReLU::new(),
     @nn.Linear::new(2, 2),
@@ -17,7 +17,7 @@ test (it : @test.T) {
 
 test (it : @test.T) {
   @distributions.seed(b"12345678223456783234567842345678")
-  let model : @nn.Sequential[Module] = @nn.Sequential::new([
+  let model : @nn.Sequential[&Module] = @nn.Sequential::new([
     @nn.Conv2d::new(1, 6, kernel_size=5, padding=2),
     @nn.Sigmoid::new(),
     @nn.AvgPool2d::new(2, stride=2),

@@ -14,7 +14,7 @@ pub(readonly) struct TensorView[Float] {
 ///|
 pub fn TensorView::output[Dtype : Show](
   self : TensorView[Dtype],
-  logger : Logger
+  logger : &Logger
 ) -> Unit {
   let shape = self.tensor.shape
   let block = self.tensor.block
@@ -178,7 +178,7 @@ test "TensorView::op_set" {
 ///|
 pub fn TensorView::op_as_view(
   self : TensorView[Float],
-  start~ : Int,
+  start~ : Int = 0,
   end? : Int
 ) -> TensorView[Float] {
   let end = match end {

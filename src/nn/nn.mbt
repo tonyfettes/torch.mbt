@@ -6,7 +6,7 @@ pub(open) trait Module: Show {
 
 test "MLP" {
   @distributions.seed(b"12345678223456783234567842345678")
-  let layers : Sequential[Module] = Sequential::new([
+  let layers : Sequential[&Module] = Sequential::new([
     Linear::new(4, 8),
     ReLU::new(),
     Linear::new(8, 8),

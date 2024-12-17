@@ -7,7 +7,7 @@ pub fn MSELoss::new() -> MSELoss {
 }
 
 ///|
-pub fn MSELoss::output(_self : MSELoss, logger : Logger) -> Unit {
+pub fn MSELoss::output(_self : MSELoss, logger : &Logger) -> Unit {
   logger.write_string("MSELoss()")
 }
 

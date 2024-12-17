@@ -2,8 +2,8 @@
 pub fn correlate2d(
   image : Tensor[Float],
   kernel : Tensor[Float],
-  stride~ : @shape.Shape2d = 1,
-  padding~ : @shape.Shape2d = 0
+  stride~ : &@shape.Shape2d = 1,
+  padding~ : &@shape.Shape2d = 0
 ) -> Tensor[Float] {
   let image_height = image.shape[0]
   let image_width = image.shape[1]

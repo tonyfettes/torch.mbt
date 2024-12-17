@@ -62,13 +62,13 @@ enum Graph[Dtype] {
     stride~ : (Int, Int),
     padding~ : (Int, Int)
   )
-  Backward(Backward)
+  Backward(&Backward)
 } derive(Show)
 
 ///|
 pub fn Tensor::output[Float : Show](
   self : Tensor[Float],
-  logger : Logger
+  logger : &Logger
 ) -> Unit {
   let shape = self.shape
   let dimension = shape.length()

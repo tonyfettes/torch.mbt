@@ -18,7 +18,7 @@ pub fn CrossEntropyLoss::new(reduction~ : Reduction = Mean) -> CrossEntropyLoss 
 ///|
 pub fn CrossEntropyLoss::output(
   _self : CrossEntropyLoss,
-  logger : Logger
+  logger : &Logger
 ) -> Unit {
   logger.write_string("CrossEntropyLoss()")
 }

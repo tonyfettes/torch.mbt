@@ -64,3 +64,9 @@ pub impl Shape2d for (Int, Int) with to_tuple(self : (Int, Int)) -> (Int, Int) {
 pub impl Shape2d for Int with to_tuple(self : Int) -> (Int, Int) {
   (self, self)
 }
+
+pub impl Shape2d for Unit with to_fixed_array(_self : Unit) -> FixedArray[Int] {
+  [0, 0]
+}
+
+pub impl Shape2d for Unit with to_tuple(_self : Unit) -> (Int, Int) { (0, 0) }

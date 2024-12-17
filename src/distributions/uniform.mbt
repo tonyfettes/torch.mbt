@@ -19,7 +19,7 @@ pub fn Uniform::new[Lower : @tensor.ToValue, Upper : @tensor.ToValue](
 ///|
 pub fn Uniform::sample(
   self : Uniform,
-  shape : @shape.Shape
+  shape : &@shape.Shape
 ) -> @tensor.Tensor[Float] {
   let shape = shape.to_fixed_array()
   let sample = @tensor.zeros([..shape, ..self.lower.shape._])
@@ -41,7 +41,7 @@ pub fn Uniform::sample_(self : Uniform, sample : @tensor.Tensor[Float]) -> Unit 
 ///|
 pub fn Uniform::rsample(
   self : Uniform,
-  shape : @shape.Shape
+  shape : &@shape.Shape,
 ) -> @tensor.Tensor[Float] {
   let shape = shape.to_fixed_array()
   let sample = @tensor.zeros([..shape, ..self.lower.shape._])

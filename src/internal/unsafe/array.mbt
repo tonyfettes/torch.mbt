@@ -13,7 +13,7 @@ pub fn UnsafeArray::length[T](self : UnsafeArray[T]) -> Int = "%fixedarray.lengt
 ///|
 pub impl[T : Show] Show for UnsafeArray[T] with output(
   self : UnsafeArray[T],
-  logger : Logger
+  logger : &Logger
 ) {
   Show::output(self._, logger)
 }

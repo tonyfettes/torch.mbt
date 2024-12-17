@@ -40,7 +40,7 @@ test "Linear with ReLU" {
     linear.bias[0] = 5.0
     linear.bias[1] = 6.0
   })
-  let layers : @nn.Sequential[@nn.Module] = @nn.Sequential::new([
+  let layers : @nn.Sequential[&@nn.Module] = @nn.Sequential::new([
     linear,
     @nn.ReLU::new(),
   ])
@@ -75,7 +75,7 @@ test "Linear with Softmax" {
     linear.bias[0] = 1.0
     linear.bias[1] = 2.0
   })
-  let layers : @nn.Sequential[@nn.Module] = @nn.Sequential::new([
+  let layers : @nn.Sequential[&@nn.Module] = @nn.Sequential::new([
     linear,
     @nn.Softmax::new(),
   ])

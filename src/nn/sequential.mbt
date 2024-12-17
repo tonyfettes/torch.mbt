@@ -11,7 +11,7 @@ pub fn Sequential::new[Module : Module](
 }
 
 ///|
-pub fn Sequential::forward(
+pub fn Sequential::forward[Module : Module](
   self : Sequential[Module],
   input : @tensor.Tensor[Float]
 ) -> @tensor.Tensor[Float] {
@@ -22,14 +22,14 @@ pub fn Sequential::forward(
 }
 
 ///|
-pub fn Sequential::parameters(
+pub fn Sequential::parameters[Module : Module](
   self : Sequential[Module]
 ) -> Iter[@tensor.Tensor[Float]] {
   self.modules.iter().flat_map(fn(module_) { module_.parameters() })
 }
 
 ///|
-pub fn Sequential::output(self : Sequential[Module], logger : Logger) -> Unit {
+pub fn Sequential::output[Module : Module](self : Sequential[Module], logger : &Logger) -> Unit {
   for module_ in self.modules {
     Show::output(module_, logger)
     logger.write_string(",\n")
@@ -37,7 +37,7 @@ pub fn Sequential::output(self : Sequential[Module], logger : Logger) -> Unit {
 }
 
 ///|
-pub fn Sequential::to_string(self : Sequential[Module]) -> String {
+pub fn Sequential::to_string[Module : Module](self : Sequential[Module]) -> String {
   let logger = StringBuilder::new()
   self.output(logger)
   logger.to_string()

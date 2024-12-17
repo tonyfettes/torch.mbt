@@ -1,7 +1,7 @@
 ///|
 pub fn Tensor::op_as_view[Dtype](
   self : Tensor[Dtype],
-  start~ : Int,
+  start~ : Int = 0,
   end? : Int
 ) -> TensorView[Dtype] {
   if self.shape.length() == 0 {

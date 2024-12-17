@@ -10,7 +10,7 @@ pub fn Conv2d::new[KernelSize : @shape.Shape2d](
   in_channels : Int,
   out_channels : Int,
   kernel_size~ : KernelSize,
-  padding~ : @shape.Shape2d = 0
+  padding~ : &@shape.Shape2d = 0,
 ) -> Conv2d {
   if @debug.DEBUG && in_channels == 0 {
     abort("Input channels has zero width")
@@ -35,7 +35,7 @@ pub fn Conv2d::new[KernelSize : @shape.Shape2d](
 }
 
 ///|
-pub fn Conv2d::output(self : Conv2d, logger : Logger) -> Unit {
+pub fn Conv2d::output(self : Conv2d, logger : &Logger) -> Unit {
   Show::output(self.weight, logger)
 }
 
