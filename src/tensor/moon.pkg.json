@@ -1,6 +1,7 @@
 {
   "targets": {
-    "op_add.default.mbt": ["wasm-gc", "js", "native"],
+    "op_add.default.mbt": ["wasm-gc", "native"],
+    "op_add.js.mbt": ["js"],
     "op_add.wasm.mbt": ["wasm"],
     "op_mul.mbt": ["wasm-gc", "js", "native"],
     "op_mul.wasm.mbt": ["wasm"]
