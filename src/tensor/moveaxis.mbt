@@ -11,8 +11,8 @@ pub fn Tensor::moveaxis[Shape : @shape.Shape](
       "Source axis (\{source}) and destination axis (\{destination}) must have the same length",
     )
   }
-  let permutation = Array::make(self.shape.length(), -1)
-  let arranged = Array::make(self.shape.length(), false)
+  let permutation = FixedArray::make(self.shape.length(), -1)
+  let arranged = FixedArray::make(self.shape.length(), false)
   for i = 0; i < source.length(); i = i + 1 {
     let source = if source[i] < 0 {
       source[i] + self.shape.length()
@@ -30,6 +30,7 @@ pub fn Tensor::moveaxis[Shape : @shape.Shape](
       )
     }
     permutation[destination] = source
+    arranged[source] = true
   }
   let mut dimension = 0
   for i = 0; i < permutation.length(); i = i + 1 {

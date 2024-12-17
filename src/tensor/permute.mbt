@@ -1,8 +1,9 @@
 ///|
-pub fn Tensor::permute(
+pub fn Tensor::permute[Shape : @shape.Shape](
   self : Tensor[Float],
-  permutation : Array[Int]
+  permutation : Shape
 ) -> Tensor[Float] {
+  let permutation = permutation.to_fixed_array()
   if permutation.length() != self.shape.length() {
     abort("Permutation length does not match tensor rank")
   }

@@ -8,7 +8,8 @@
   "import": [
     "tonyfettes/torch/shape",
     "tonyfettes/torch/internal/debug",
-    "tonyfettes/torch/internal/unsafe"
+    "tonyfettes/torch/internal/unsafe",
+    "tonyfettes/torch/dtype"
   ],
   "test-import": ["tonyfettes/torch/distributions"],
   "alert-list": "-unstable"

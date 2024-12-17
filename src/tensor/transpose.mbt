@@ -4,5 +4,5 @@ pub fn Tensor::transpose(
   dim0 : Int,
   dim1 : Int
 ) -> Tensor[Float] {
-  Tensor::moveaxis(self, [dim0, dim1], [dim1, dim0])
+  Tensor::moveaxis(self, dim0, dim1)
 }

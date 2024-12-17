@@ -1,3 +1,8 @@
+test "UnsafeArray::new" {
+  let _ : @unsafe.UnsafeArray[Int] = @unsafe.UnsafeArray::new(3)
+
+}
+
 test "UnsafeArray::make" {
   let a : @unsafe.UnsafeArray[Int] = @unsafe.UnsafeArray::make(3, 0)
   inspect!(a.length(), content="3")

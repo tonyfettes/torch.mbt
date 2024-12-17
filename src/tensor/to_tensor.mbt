@@ -35,15 +35,9 @@ pub impl ToValue for Bool with to_value(self : Bool) -> Value {
 }
 
 ///|
-pub impl Default for Bool with default() -> Bool { false }
-
-///|
 pub impl ToValue for Int with to_value(self : Int) -> Value {
   Value::Int(scalar(self))
 }
-
-///|
-pub impl Default for Int with default() -> Int { 0 }
 
 ///|
 pub impl ToValue for Float with to_value(self : Float) -> Value {
@@ -59,9 +53,6 @@ pub impl ToValue for Double with to_value(self : Double) -> Value {
 }
 
 ///|
-pub impl Default for Double with default() -> Double { 0.0 }
-
-///|
 pub impl[T : ToValue] ToValue for FixedArray[T] with to_value(
   self : FixedArray[T]
 ) -> Value {
@@ -69,15 +60,9 @@ pub impl[T : ToValue] ToValue for FixedArray[T] with to_value(
 }
 
 ///|
-pub impl[X] Default for FixedArray[X] with default() -> FixedArray[X] { [] }
-
-///|
 pub impl[T : ToValue] ToValue for Array[T] with to_value(self : Array[T]) -> Value {
   Value::Array(FixedArray::from_iter(self.iter().map(fn { x => x.to_value() })))
 }
-
-///|
-pub impl[X] Default for Array[X] with default() -> Array[X] { [] }
 
 ///|
 trait TensorToValue {

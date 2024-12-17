@@ -1,5 +1,5 @@
 ///|
-pub fn Tensor::stack[Dtype](
+pub fn Tensor::stack[Dtype : @dtype.Dtype](
   tensors : FixedArray[Tensor[Dtype]]
 ) -> Tensor[Dtype] {
   if @debug.DEBUG {

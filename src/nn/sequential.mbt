@@ -29,7 +29,10 @@ pub fn Sequential::parameters[Module : Module](
 }
 
 ///|
-pub fn Sequential::output[Module : Module](self : Sequential[Module], logger : &Logger) -> Unit {
+pub fn Sequential::output[Module : Module](
+  self : Sequential[Module],
+  logger : &Logger
+) -> Unit {
   for module_ in self.modules {
     Show::output(module_, logger)
     logger.write_string(",\n")
@@ -37,7 +40,9 @@ pub fn Sequential::output[Module : Module](self : Sequential[Module], logger : &
 }
 
 ///|
-pub fn Sequential::to_string[Module : Module](self : Sequential[Module]) -> String {
+pub fn Sequential::to_string[Module : Module](
+  self : Sequential[Module]
+) -> String {
   let logger = StringBuilder::new()
   self.output(logger)
   logger.to_string()
