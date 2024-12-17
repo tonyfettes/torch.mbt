@@ -30,8 +30,9 @@ pub fn Tensor::cat(
     }
   }
   let block = compute_block_size(shape)
-  let value = Array::new(capacity=shape[0] * block[0])
-  let index = Array::new(capacity=shape[0] * block[0])
+  let total = if shape.length() == 0 { 1 } else { shape[0] * block[0] }
+  let value = Array::new(capacity=total)
+  let index = Array::new(capacity=total)
   fn build(i : Int, d : Int, p : Int) -> Unit {
     if d == tensors[i].shape.length() {
       value.push(tensors[i].value[p])
