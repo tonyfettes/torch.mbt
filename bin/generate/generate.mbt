@@ -1,3 +1,4 @@
+///|
 fn remove_whitespace(content : String) -> String {
   let result = StringBuilder::new()
   for c in content {
@@ -8,6 +9,7 @@ fn remove_whitespace(content : String) -> String {
   result.to_string()
 }
 
+///|
 pub fn write_on_change(path~ : String, content~ : String) -> Unit! {
   if @fs.path_exists(path~) {
     let old_no_space = @fs.read_file_to_string!(path~) |> remove_whitespace
