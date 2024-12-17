@@ -4,6 +4,11 @@
       "input": "../../bin/generate/transpile/tuple/main.mbt",
       "output": "tuple.mbt",
       "command": "(cd bin && moon run generate/transpile/tuple) && moonfmt -w $output"
+    },
+    {
+      "input": "../../bin/generate/transpile/tuple_test/main.mbt",
+      "output": "tuple_test.mbt",
+      "command": "(cd bin && moon run generate/transpile/tuple_test) && moonfmt -w $output"
     }
   ],
   "import": [
