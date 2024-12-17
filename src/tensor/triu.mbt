@@ -1,5 +1,5 @@
 ///|
-pub fn triu[Dtype : Default + @unsafe.Primitive](
+pub fn triu[Dtype : Default + @dtype.Dtype](
   self : Tensor[Dtype],
   diagonal~ : Int = 0
 ) -> Tensor[Dtype] {
