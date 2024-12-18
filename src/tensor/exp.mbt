@@ -8,7 +8,6 @@ pub fn Tensor::exp(self : Tensor[Float]) -> Tensor[Float] {
   Tensor::{
     value: output,
     shape: self.shape,
-    block: self.block,
     graph: Graph::Exp(self),
     refcnt: 0,
     grad: FixedArray::make(length, (0.0 : Float)),

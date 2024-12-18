@@ -54,7 +54,7 @@ test "TensorView::to_tensor" {
   let tensor = view.to_tensor()
   inspect!(tensor.value, content="[3, 4, 5]")
   inspect!(tensor.shape, content="[3]")
-  inspect!(tensor.block, content="[1]")
+  inspect!(tensor.block(), content="[1]")
   inspect!(tensor.grad, content="[0, 0, 0]")
   inspect!(tensor, content="[3, 4, 5]")
 }

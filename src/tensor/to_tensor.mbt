@@ -22,7 +22,6 @@ fn Tensor::scalar[T](value : T) -> Tensor[T] {
   Tensor::{
     value: [value],
     shape: [],
-    block: [],
     graph: Val,
     refcnt: 0,
     grad: [0.0],
@@ -99,7 +98,6 @@ pub fn Tensor::to_float[Dtype : ToFloat](self : Tensor[Dtype]) -> Tensor[Float] 
   }
   Tensor::{
     shape: self.shape,
-    block: self.block,
     value,
     graph: Val,
     refcnt: 0,
@@ -120,7 +118,6 @@ pub fn Tensor::to_int[Dtype : ToInt](self : Tensor[Dtype]) -> Tensor[Int] {
   }
   Tensor::{
     shape: self.shape,
-    block: self.block,
     value,
     graph: Val,
     refcnt: 0,

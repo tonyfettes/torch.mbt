@@ -12,7 +12,6 @@ pub fn Tensor::op_div(
   Tensor::{
     value: output,
     shape: self.shape,
-    block: self.block,
     graph: Graph::Div(self, other),
     refcnt: 0,
     grad: FixedArray::make(length, (0.0 : Float)),

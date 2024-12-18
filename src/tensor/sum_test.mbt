@@ -3,7 +3,7 @@ test "Tensor::sum/scalar" {
   let sum = tensor.sum()
   inspect!(sum.value, content="[1]")
   inspect!(sum.shape, content="[]")
-  inspect!(sum.block, content="[]")
+  inspect!(sum.block(), content="[]")
   inspect!(sum.grad, content="[0]")
   inspect!(sum, content="1")
 }
@@ -13,7 +13,7 @@ test "Tensor::sum/vector" {
   let sum = tensor.sum()
   inspect!(sum.value, content="[6]")
   inspect!(sum.shape, content="[]")
-  inspect!(sum.block, content="[]")
+  inspect!(sum.block(), content="[]")
   inspect!(sum.grad, content="[0]")
   inspect!(sum, content="6")
 }
@@ -26,7 +26,7 @@ test "Tensor::sum/matrix" {
   let sum = tensor.sum(dim=0)
   inspect!(sum.value, content="[3, 5, 7]")
   inspect!(sum.shape, content="[3]")
-  inspect!(sum.block, content="[1]")
+  inspect!(sum.block(), content="[1]")
   inspect!(sum.grad, content="[0, 0, 0]")
   inspect!(sum, content="[3, 5, 7]")
 }
