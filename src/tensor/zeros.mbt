@@ -9,7 +9,6 @@ pub fn Tensor::zeros[Shape : @shape.Shape](
   let value : FixedArray[Float] = FixedArray::make(total, 0.0)
   Tensor::{
     shape,
-    block,
     value,
     refcnt: 0,
     graph: if requires_grad {

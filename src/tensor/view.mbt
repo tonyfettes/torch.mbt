@@ -17,7 +17,7 @@ pub fn TensorView::output[Dtype : Show](
   logger : &Logger
 ) -> Unit {
   let shape = self.tensor.shape
-  let block = self.tensor.block
+  let block = self.tensor.block()
   let value = self.tensor.value
   fn build(d : Int, p : Int) {
     if d == shape.length() {
@@ -57,7 +57,7 @@ pub fn TensorView::to_string[Dtype : Show](self : TensorView[Dtype]) -> String {
 pub fn TensorView::to_json[Dtype : ToJson](self : TensorView[Dtype]) -> Json {
   let shape = self.tensor.shape
   let dimension = shape.length()
-  let block = self.tensor.block
+  let block = self.tensor.block()
   let value = self.tensor.value
   fn build(d : Int, p : Int) {
     if d == dimension {
@@ -115,9 +115,10 @@ pub fn TensorView::op_set[Dtype : ValueToTensor, Other : ToValue](
     }
   }
   let other : Tensor[Dtype] = tensor(other)
+  let other_block = other.block()
   let index = [..self.index, Index(index)]
   let shape = self.tensor.shape
-  let block = self.tensor.block
+  let block = self.tensor.block()
   let value = self.tensor.value
   fn assign(self_dim : Int, self_pos : Int, other_dim : Int, other_pos : Int) {
     if self_dim == shape.length() {
@@ -155,7 +156,7 @@ pub fn TensorView::op_set[Dtype : ValueToTensor, Other : ToValue](
         self_dim + 1,
         self_pos + i * block[self_dim],
         other_dim + 1,
-        other_pos + (i - start) * other.block[other_dim],
+        other_pos + (i - start) * other_block[other_dim],
       )
     }
   }
@@ -212,6 +213,7 @@ pub fn TensorView::to_tensor(self : TensorView[Float]) -> Tensor[Float] {
   let mut value_length = 0
   let index = FixedArray::make(total, 0)
   let mut index_length = 0
+  let self_tensor_block = self.tensor.block()
   fn build(dimension : Int, offset : Int) -> Unit {
     if dimension >= self.tensor.shape.length() {
       value[value_length] = self.tensor.value[offset]
@@ -222,16 +224,16 @@ pub fn TensorView::to_tensor(self : TensorView[Float]) -> Tensor[Float] {
     }
     if dimension >= self.index.length() {
       for i in 0..<self.tensor.shape[dimension] {
-        build(dimension + 1, offset + i * self.tensor.block[dimension])
+        build(dimension + 1, offset + i * self_tensor_block[dimension])
       }
       return
     }
     match self.index[dimension] {
       Index(index) =>
-        build(dimension + 1, offset + index * self.tensor.block[dimension])
+        build(dimension + 1, offset + index * self_tensor_block[dimension])
       Slice(start, end) =>
         for i in start..<end {
-          build(dimension + 1, offset + i * self.tensor.block[dimension])
+          build(dimension + 1, offset + i * self_tensor_block[dimension])
         }
     }
   }
@@ -240,7 +242,6 @@ pub fn TensorView::to_tensor(self : TensorView[Float]) -> Tensor[Float] {
   Tensor::{
     value,
     shape,
-    block,
     graph: Graph::Get(self.tensor, index),
     refcnt: 0,
     grad: FixedArray::make(total, (0.0 : Float)),
@@ -253,7 +254,7 @@ test "TensorView::to_tensor" {
   let tensor = view.to_tensor()
   inspect!(tensor.value, content="[3, 4, 5]")
   inspect!(tensor.shape, content="[3]")
-  inspect!(tensor.block, content="[1]")
+  inspect!(tensor.block(), content="[1]")
   inspect!(tensor.graph, content="Get([[0, 1, 2], [3, 4, 5]], [3, 4, 5])")
   inspect!(tensor.refcnt, content="0")
   inspect!(tensor.grad, content="[0, 0, 0]")

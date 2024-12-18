@@ -5,7 +5,7 @@ struct CrossEntropyLoss {
 
 ///|
 pub(all) enum Reduction {
-  None
+  None_
   Mean
   Sum
 }
@@ -77,8 +77,8 @@ pub fn CrossEntropyLoss::forward(
       }
   }
   match self.reduction {
-    None => output
     Sum => output.sum()
     Mean => output.mean()
+    None_ => output
   }
 }

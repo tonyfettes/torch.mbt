@@ -22,7 +22,6 @@ pub fn correlate2d(
     ) /
     stride_width
   let shape : FixedArray[_] = [output_height, output_width]
-  let block = compute_block_size(shape)
   let total = output_height * output_width
   let value = @unsafe.UnsafeArray::make(total, (0.0 : Float))
   for i in 0..<output_height {
@@ -55,7 +54,6 @@ pub fn correlate2d(
   Tensor::{
     value,
     shape,
-    block,
     graph: Correlate2d(
       image~,
       kernel~,

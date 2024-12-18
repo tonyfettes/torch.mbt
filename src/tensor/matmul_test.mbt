@@ -11,7 +11,7 @@ test "Tensor::matmul - 2x3 * 3x2" {
   let c = a.matmul(b)
   inspect!(c.value, content="[58, 64, 139, 154]")
   inspect!(c.shape, content="[2, 2]")
-  inspect!(c.block, content="[2, 1]")
+  inspect!(c.block(), content="[2, 1]")
   inspect!(c.grad, content="[0, 0, 0, 0]")
   inspect!(c, content="[[58, 64], [139, 154]]")
 }

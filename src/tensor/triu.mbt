@@ -9,7 +9,7 @@ pub fn triu[Dtype : Default + @dtype.Dtype](
     }
   }
   let shape = self.shape
-  let block = self.block
+  let block = self.block()
   let value = @unsafe.UnsafeArray::new(self.value.length())
   let index = @unsafe.UnsafeArray::new(self.value.length())
   for i in 0..<shape[0] {
@@ -26,7 +26,6 @@ pub fn triu[Dtype : Default + @dtype.Dtype](
   Tensor::{
     value,
     shape,
-    block,
     refcnt: 0,
     graph: Get(self, index),
     grad: FixedArray::make(value.length(), (0.0 : Float)),

@@ -10,7 +10,6 @@ pub fn empty[Shape : @shape.Shape](
   Tensor::{
     value,
     shape,
-    block,
     graph: if requires_grad {
       Graph::Var
     } else {
