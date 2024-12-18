@@ -256,7 +256,7 @@ pub fn ptr2str(ptr : Int, len : Int) -> String {
     buf.write_byte(load8_u(ptr + i).to_byte())
   }
   free(ptr)
-  buf.to_string()
+  buf.to_unchecked_string()
 }
 
 pub fn ptr2bytes(ptr : Int, len : Int) -> Bytes {
@@ -285,9 +285,26 @@ pub fn ptr2double_array(ptr : Int, len : Int) -> FixedArray[Double] {
   array
 }
 
+pub fn float_array2ptr(array : FixedArray[Float]) -> Int {
+  let ptr = malloc(array.length() * 4)
+  for i = 0; i < array.length(); i = i + 1 {
+    storef32(ptr + i * 4, array[i])
+  }
+  ptr
+}
+
+pub fn ptr2float_array(ptr : Int, len : Int) -> FixedArray[Float] {
+  let array = FixedArray::make(len, (0.0 : Float))
+  for i = 0; i < len; i = i + 1 {
+    array[i] = loadf32(ptr + i * 4)
+  }
+  free(ptr)
+  array
+}
+
 pub(open) trait Any {}
 
-pub struct Cleanup {
+pub(all) struct Cleanup {
   address : Int
   size : Int
   align : Int
