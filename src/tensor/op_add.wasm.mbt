@@ -55,7 +55,7 @@ pub impl TensorAdd for Float with op_add(
     value,
     shape: self.shape,
     block: self.block,
-    graph: Backward(GraphAdd((self, other))),
+    graph: Graph::Add(self, other),
     refcnt: 0,
     grad: FixedArray::make(length, (0.0 : Float)),
   }
