@@ -2,6 +2,7 @@
 pub(readonly) struct Tensor[Dtype] {
   value : @unsafe.UnsafeArray[Dtype]
   shape : @unsafe.UnsafeArray[Int]
+  block : @unsafe.UnsafeArray[Int]
   priv mut graph : Graph[Dtype]
   priv mut refcnt : Int
   grad : @unsafe.UnsafeArray[Float]
@@ -72,7 +73,6 @@ pub fn Tensor::output[Float : Show](
   let shape = self.shape
   let dimension = shape.length()
   let value = self.value
-  let block = self.block()
   fn build(d : Int, p : Int) {
     if d == dimension {
       Show::output(value[p], logger)
@@ -80,7 +80,7 @@ pub fn Tensor::output[Float : Show](
     }
     logger.write_char('[')
     for i = 0; i < shape[d]; i = i + 1 {
-      build(d + 1, p + i * block[d])
+      build(d + 1, p + i * self.block[d])
       if i < shape[d] - 1 {
         logger.write_string(", ")
       }
@@ -321,8 +321,6 @@ fn Tensor::propagate(self : Tensor[Float]) -> Unit {
         return n * block[0] + c * block[1] + h * block[2] + w
       }
 
-      let x_block = x.block()
-      let self_block = self.block()
       let iN = self.shape[0]
       let iC = self.shape[1]
       let oH = self.shape[2]
@@ -337,13 +335,13 @@ fn Tensor::propagate(self : Tensor[Float]) -> Unit {
               for i = 0; i < kH; i = i + 1 {
                 for j = 0; j < kW; j = j + 1 {
                   let i = index4d(
-                    x_block,
+                    x.block,
                     n,
                     c,
                     h * stride.0 + i,
                     w * stride.1 + j,
                   )
-                  let o = index4d(self_block, n, c, h, w)
+                  let o = index4d(self.block, n, c, h, w)
                   x.grad[i] += self_grad[o] / kA
                 }
               }
@@ -529,16 +527,11 @@ test "Tensor::backward - MatMul" {
 }
 
 ///|
-pub fn Tensor::shape[Dtype](self : Tensor[Dtype]) -> FixedArray[Int] {
+pub fn Tensor::shape(self : Tensor[Float]) -> FixedArray[Int] {
   self.shape._
 }
 
 ///|
 pub fn Tensor::value(self : Tensor[Float]) -> FixedArray[Float] {
   self.value._
-}
-
-///|
-pub fn Tensor::block[Dtype](self : Tensor[Dtype]) -> FixedArray[Int] {
-  compute_block_size(self.shape._)
 }

@@ -40,8 +40,6 @@ pub fn Categorical::sample_(
   sample : @tensor.Tensor[Float]
 ) -> Unit {
   let probs = self.probs
-  let probs_block = probs.block()
-  let sample_block = sample.block()
   let width = probs.shape[probs.shape.length() - 1]
   let batch_dim = sample.shape.length() - probs.shape.length() + 1
   fn sample_(b : Int, d : Int, p : Int) -> Unit {
@@ -58,7 +56,7 @@ pub fn Categorical::sample_(
       return
     }
     for i in 0..<probs.shape[d] {
-      sample_(b, d + 1, p + i * probs_block[d] / width)
+      sample_(b, d + 1, p + i * probs.block[d] / width)
     }
   }
 
@@ -68,7 +66,7 @@ pub fn Categorical::sample_(
       return
     }
     for i in 0..<sample.shape[d] {
-      batch_(d + 1, p + i * sample_block[d])
+      batch_(d + 1, p + i * sample.block[d])
     }
   }
 

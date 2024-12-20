@@ -31,6 +31,7 @@ pub fn Tensor::matmul(
   Tensor::{
     value,
     shape: [row, col],
+    block: [col, 1],
     graph: Graph::MatMul(self, other),
     refcnt: 0,
     grad: FixedArray::make(total, (0.0 : Float)),

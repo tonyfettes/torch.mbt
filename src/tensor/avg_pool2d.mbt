@@ -4,17 +4,15 @@ pub fn Tensor::avg_pool2d(
   kernel_size~ : (Int, Int),
   stride~ : (Int, Int)
 ) -> Tensor[Float] {
-  let self_shape = self.shape
-  let self_block = self.block()
   if @debug.DEBUG {
-    if self_shape.length() != 4 {
+    if self.shape.length() != 4 {
       abort("Input should be of the shape (N, C, H, W)")
     }
   }
-  let iN = self_shape[0]
-  let iC = self_shape[1]
-  let iH = self_shape[2]
-  let iW = self_shape[3]
+  let iN = self.shape[0]
+  let iC = self.shape[1]
+  let iH = self.shape[2]
+  let iW = self.shape[3]
   let kH = kernel_size.0
   let kW = kernel_size.1
   let kA = (kH * kW).to_float()
@@ -42,7 +40,7 @@ pub fn Tensor::avg_pool2d(
           for i = 0; i < kH; i = i + 1 {
             for j = 0; j < kW; j = j + 1 {
               let index = index4d(
-                self_block,
+                self.block,
                 n,
                 c,
                 stride.0 * h + i,
@@ -59,6 +57,7 @@ pub fn Tensor::avg_pool2d(
   Tensor::{
     value,
     shape,
+    block,
     graph: AvgPool2d(self, kernel_size~, stride~),
     refcnt: 0,
     grad: FixedArray::make(total, (0.0 : Float)),

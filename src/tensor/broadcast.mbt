@@ -74,6 +74,7 @@ pub fn Tensor::broadcast[Dtype](
     Tensor::{
       value: FixedArray::from_array(self_value),
       shape: broad_shape,
+      block: broad_block,
       graph: Graph::Get(self, FixedArray::from_array(self_index)),
       refcnt: 0,
       grad: FixedArray::make(total, (0.0 : Float)),
@@ -81,6 +82,7 @@ pub fn Tensor::broadcast[Dtype](
     Tensor::{
       value: FixedArray::from_array(other_value),
       shape: broad_shape,
+      block: broad_block,
       graph: Graph::Get(other, FixedArray::from_array(other_index)),
       refcnt: 0,
       grad: FixedArray::make(total, (0.0 : Float)),
