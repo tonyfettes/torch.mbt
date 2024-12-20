@@ -43,6 +43,7 @@ pub fn Tensor::broadcast_to[Shape : @shape.Shape](
   Tensor::{
     value: FixedArray::from_array(value),
     shape,
+    block,
     graph: Graph::Get(self, FixedArray::from_array(index)),
     refcnt: 0,
     grad: FixedArray::make(total, (0.0 : Float)),

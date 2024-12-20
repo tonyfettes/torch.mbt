@@ -33,6 +33,7 @@ pub fn Tensor::stack[Dtype : @dtype.Dtype](
   Tensor::{
     value,
     shape,
+    block,
     graph: Cat(tensors, index),
     refcnt: 0,
     grad: FixedArray::make(total, (0.0 : Float)),

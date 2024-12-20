@@ -46,6 +46,7 @@ pub impl TensorAdd for Int with op_add(self : Tensor[Int], other : Tensor[Int]) 
   Tensor::{
     value,
     shape: self.shape,
+    block: self.block,
     graph: Val,
     refcnt: 0,
     grad: FixedArray::make(length, (0.0 : Float)),

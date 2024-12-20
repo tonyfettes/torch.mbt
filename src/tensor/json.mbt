@@ -1,15 +1,12 @@
 ///|
 pub fn Tensor::to_json[Dtype : ToJson](self : Tensor[Dtype]) -> Json {
-  let self_shape = self.shape
-  let self_block = self.block()
-  let self_value = self.value
   fn build(dimension : Int, offset : Int) -> Json {
-    if dimension >= self_shape.length() {
-      return self_value[offset].to_json()
+    if dimension >= self.shape.length() {
+      return self.value[offset].to_json()
     }
-    let elements = Array::new(capacity=self_shape[dimension])
-    for i = 0; i < self_shape[dimension]; i = i + 1 {
-      elements.push(build(dimension + 1, offset + i * self_block[dimension]))
+    let elements = Array::new(capacity=self.shape[dimension])
+    for i = 0; i < self.shape[dimension]; i = i + 1 {
+      elements.push(build(dimension + 1, offset + i * self.block[dimension]))
     }
     Json::Array(elements)
   }

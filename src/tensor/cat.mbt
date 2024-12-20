@@ -34,24 +34,21 @@ pub fn Tensor::cat[Dtype](
   let value = Array::new(capacity=total)
   let index = Array::new(capacity=total)
   fn build(i : Int, d : Int, p : Int) -> Unit {
-    let tensor_i = tensors[i]
-    let tensor_i_shape = tensor_i.shape
-    let tensor_i_block = tensor_i.block()
-    if d == tensor_i_shape.length() {
-      value.push(tensor_i.value[p])
+    if d == tensors[i].shape.length() {
+      value.push(tensors[i].value[p])
       index.push((i, p))
       return
     }
     if d == dim {
       for i = 0; i < tensors.length(); i = i + 1 {
-        for j = 0; j < tensor_i_shape[d]; j = j + 1 {
-          build(i, d + 1, p + j * tensor_i_block[d])
+        for j = 0; j < tensors[i].shape[d]; j = j + 1 {
+          build(i, d + 1, p + j * tensors[i].block[d])
         }
       }
       return
     }
-    for j = 0; j < tensor_i_shape[d]; j = j + 1 {
-      build(i, d + 1, p + j * tensor_i_block[d])
+    for j = 0; j < tensors[i].shape[d]; j = j + 1 {
+      build(i, d + 1, p + j * tensors[i].block[d])
     }
   }
 
@@ -59,6 +56,7 @@ pub fn Tensor::cat[Dtype](
   Tensor::{
     value: FixedArray::from_array(value),
     shape,
+    block,
     graph: Cat(tensors, FixedArray::from_array(index)),
     refcnt: 0,
     grad: FixedArray::make(value.length(), (0.0 : Float)),
