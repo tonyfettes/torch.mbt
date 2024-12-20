@@ -14,30 +14,15 @@ pub fn save() -> String {
   model.val.to_json().stringify()
 }
 
-pub fn infer(input : FixedArray[Double]) -> FixedArray[Double] {
-  let array = FixedArray::makei(input.length(), fn(i) { input[i].to_float() })
-  @mnist.infer(model.val, array).map(fn(x) { x.to_double() })
+pub fn infer(input : FixedArray[Float]) -> FixedArray[Float] {
+  @mnist.infer(model.val, input)
 }
 
 pub fn train(
-  batch : FixedArray[(FixedArray[Double], Int)],
-  learning_rate : Double
-) -> Double {
-  let optimizer = @torch/optim.SGD::new(
-    model.val.parameters(),
-    learning_rate=learning_rate.to_float(),
-  )
-  let batch = batch.map(
-    fn {
-      (input, label) =>
-        @mnist.Data::{
-          input: FixedArray::makei(
-            input.length(),
-            fn(i) { input[i].to_float() },
-          ),
-          label,
-        }
-    },
-  )
-  @mnist.train(model.val, optimizer, batch).to_double()
+  batch : FixedArray[(FixedArray[Float], Int)],
+  learning_rate : Float
+) -> Float {
+  let optimizer = @torch/optim.SGD::new(model.val.parameters(), learning_rate~)
+  let batch = batch.map(fn { (input, label) => @mnist.Data::{ input, label } })
+  @mnist.train(model.val, optimizer, batch)
 }

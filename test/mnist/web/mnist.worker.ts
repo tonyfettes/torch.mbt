@@ -3,12 +3,12 @@ import * as MnistModel from "./mnist-model";
 export type MnistWorkerRequest =
   | {
       type: "infer";
-      data: Float64Array;
+      data: Float32Array;
     }
   | {
       type: "train";
       data: {
-        batch: [Float64Array, label: number][];
+        batch: [Float32Array, label: number][];
         learningRate: number;
       };
     };
@@ -16,7 +16,7 @@ export type MnistWorkerRequest =
 export type MnistWorkerResponse =
   | {
       type: "infer";
-      data: Float64Array;
+      data: Float32Array;
     }
   | {
       type: "train";

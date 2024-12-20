@@ -88,10 +88,10 @@ class MnistMain {
         dataIndex < dataset.length;
         dataIndex += batchSize
       ) {
-        const batch: [Float64Array, number][] = [];
+        const batch: [Float32Array, number][] = [];
         for (const data of dataset.slice(dataIndex, dataIndex + batchSize)) {
           batch.push([
-            new Float64Array(data.image.map((value) => value / 255.0)),
+            new Float32Array(data.image.map((value) => value / 255.0)),
             data.label,
           ]);
         }
@@ -106,7 +106,7 @@ class MnistMain {
     const dataset = this.readDataset(filePath);
     let correct = 0;
     for (let index = 0; index < dataset.length; index++) {
-      const image = new Float64Array(
+      const image = new Float32Array(
         dataset[index].image.map((value) => value / 255.0)
       );
       const logits = model.infer(image);
